@@ -25,13 +25,23 @@ const HeroSection = () => {
   };
   
   const downloadAndroidApp = () => {
-    // Open the Google Drive link in a new tab
-    window.open('https://drive.google.com/file/d/1QOcUa0vioVwcyug7Ufo6iiwHyLzYZNCr/view?usp=drive_link', '_blank');
+    // Create a link element
+    const link = document.createElement('a');
+    // Set the href to your APK file location
+    link.href = '/iCopedia.apk'; // Point to the APK file in the public folder
+    // Set download attribute to suggest a filename
+    link.download = 'iCopedia.apk';
+    // Append to the body
+    document.body.appendChild(link);
+    // Trigger the download
+    link.click();
+    // Clean up
+    document.body.removeChild(link);
     
     setIsAndroidDialogOpen(false);
     toast({
       title: "Download Started",
-      description: "You'll be redirected to download the app from Google Drive.",
+      description: "Your download has started. Please check your downloads folder.",
       duration: 5000,
     });
   };
@@ -189,7 +199,7 @@ const HeroSection = () => {
             <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
               <div className="flex justify-between text-sm text-gray-600 mb-2">
                 <span>Application Size</span>
-                <span className="font-medium">24.5 MB</span>
+                <span className="font-medium">31.2 MB</span>
               </div>
               <div className="flex justify-between text-sm text-gray-600 mb-2">
                 <span>Version</span>

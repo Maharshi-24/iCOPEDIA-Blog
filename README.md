@@ -113,7 +113,17 @@ npm run dev
 
 ## Direct App Download
 
-The app download links currently redirect to Google Drive where the APK is hosted. After deploying to Vercel, we'll implement direct download functionality.
+The app download functionality is implemented to serve the APK file directly from the server. The APK file is stored in the `/public` folder and is delivered to users when they click the download button.
+
+To update the APK file:
+
+1. Replace the file at `/public/iCopedia.apk` with your updated APK
+2. Deploy the changes to Vercel
+
+The download functionality is implemented in three places:
+- HeroSection component (Android and iOS buttons)
+- AboutSection component (Download App button)
+- Navigation component (Download App button in the navbar)
 
 ## Built With
 
