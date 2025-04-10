@@ -20,20 +20,20 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-start space-x-3">
                 <MapPin size={18} className="text-blue-400 mt-1 flex-shrink-0" />
-                <p className="text-gray-400">123 Industrial Avenue, Tech Park, Mumbai, India</p>
+                <p className="text-gray-400">A-104, Paragaraj Soc, Harni-Warasiya ring road, Vadodara</p>
               </div>
               <div className="flex items-center space-x-3">
                 <Phone size={18} className="text-blue-400 flex-shrink-0" />
-                <p className="text-gray-400">+91 (022) 1234-5678</p>
+                <p className="text-gray-400">+91 6356824000</p>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail size={18} className="text-blue-400 flex-shrink-0" />
-                <p className="text-gray-400">contact@icopedia.com</p>
+                <p className="text-gray-400">maharshi2406@gmail.com</p>
               </div>
             </div>
           </div>
 
-          <div className="md:col-span-2">
+          <div className="md:col-span-4">
             <h4 className="font-bold text-lg mb-4 text-blue-400">App</h4>
             <ul className="space-y-3">
               <li>
@@ -47,11 +47,6 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="#articles" className="text-gray-400 hover:text-white transition-colors">
-                  Industry News
-                </a>
-              </li>
-              <li>
                 <a href="#contact" className="text-gray-400 hover:text-white transition-colors">
                   Contact
                 </a>
@@ -59,7 +54,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          <div className="md:col-span-2">
+          <div className="md:col-span-4">
             <h4 className="font-bold text-lg mb-4 text-blue-400">Resources</h4>
             <ul className="space-y-3">
               <li>
@@ -83,36 +78,8 @@ const Footer = () => {
                 </a>
               </li>
             </ul>
-          </div>
-
-          <div className="md:col-span-4">
-            <h4 className="font-bold text-lg mb-4 text-blue-400">Newsletter</h4>
-            <p className="text-gray-400 mb-4">
-              Subscribe to our newsletter to receive the latest updates and industry information.
-            </p>
-            <div className="flex">
-              <input 
-                type="email" 
-                placeholder="Your email address" 
-                className="flex-grow px-4 py-2 rounded-l-md focus:outline-none text-gray-900"
-              />
-              <button className="bg-blue-600 px-4 py-2 rounded-r-md hover:bg-blue-700 transition-colors">
-                Subscribe
-              </button>
-            </div>
-            <div className="flex space-x-4 mt-6">
-              <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
-                <Facebook size={20} />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
-                <Twitter size={20} />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
-                <Linkedin size={20} />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
-                <Instagram size={20} />
-              </a>
+            <div className="mt-6 text-gray-400">
+              <p>I don't have any newsletter</p>
             </div>
           </div>
         </div>
