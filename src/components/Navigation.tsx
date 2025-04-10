@@ -37,6 +37,7 @@ const Navigation = () => {
           <nav className="flex items-center space-x-6">
             <a href="#features" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">Features</a>
             <a href="#about" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">About</a>
+            <a href="#articles" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">Articles</a>
             <a href="#contact" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">Contact</a>
           </nav>
           
@@ -61,6 +62,7 @@ const Navigation = () => {
             <nav className="flex flex-col space-y-4">
               <a href="#features" className="text-gray-700 hover:text-blue-600 font-medium p-2 transition-colors">Features</a>
               <a href="#about" className="text-gray-700 hover:text-blue-600 font-medium p-2 transition-colors">About</a>
+              <a href="#articles" className="text-gray-700 hover:text-blue-600 font-medium p-2 transition-colors">Articles</a>
               <a href="#contact" className="text-gray-700 hover:text-blue-600 font-medium p-2 transition-colors">Contact</a>
               <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm w-full transition-colors">
                 <Download size={18} className="mr-1" />
