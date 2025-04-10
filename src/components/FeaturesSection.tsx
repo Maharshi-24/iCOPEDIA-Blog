@@ -1,11 +1,10 @@
-
 import { 
-  Book, 
-  Shield, 
-  BarChart,
-  Heart,
-  Users,
-  Calendar
+  Briefcase, 
+  FileText, 
+  Calculator,
+  FileBarChart,
+  Box,
+  VideoIcon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CSSProperties } from "react";
@@ -19,11 +18,11 @@ interface FeatureCardProps {
 }
 
 const FeatureCard = ({ icon, title, description, className, style }: FeatureCardProps) => (
-  <div className={cn("wellness-card p-6", className)} style={style}>
-    <div className="mb-4 p-3 rounded-full bg-wellness-yellow/10 w-fit">
+  <div className={cn("bg-white p-6 rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition-shadow", className)} style={style}>
+    <div className="mb-4 p-3 rounded-full bg-blue-100 w-fit">
       {icon}
     </div>
-    <h3 className="text-xl font-serif font-semibold mb-3 text-wellness-navy">{title}</h3>
+    <h3 className="text-xl font-semibold mb-3 text-gray-800">{title}</h3>
     <p className="text-gray-600">{description}</p>
   </div>
 );
@@ -31,44 +30,44 @@ const FeatureCard = ({ icon, title, description, className, style }: FeatureCard
 const FeaturesSection = () => {
   const features = [
     {
-      icon: <Book className="h-6 w-6 text-wellness-navy" />,
-      title: "Expert Articles",
-      description: "Access professionally written articles on various aspects of workplace wellness.",
+      icon: <Briefcase className="h-6 w-6 text-blue-600" />,
+      title: "Job & Process Management",
+      description: "Add, edit, and track coating jobs. View job statuses and assign jobs to workers with live updates.",
     },
     {
-      icon: <Shield className="h-6 w-6 text-wellness-navy" />,
-      title: "Secure Resources",
-      description: "All our resources are vetted by wellness professionals to ensure quality information.",
+      icon: <FileText className="h-6 w-6 text-blue-600" />,
+      title: "BOQ Creation",
+      description: "Input material details, surface area, and layers to automatically generate structured BOQs for each job.",
     },
     {
-      icon: <BarChart className="h-6 w-6 text-wellness-navy" />,
-      title: "Progress Tracking",
-      description: "Track your wellness journey with intuitive tools and personalized insights.",
+      icon: <FileBarChart className="h-6 w-6 text-blue-600" />,
+      title: "Report Generation",
+      description: "Generate professional reports containing job data, materials used, DFT/WFT records, and QC feedback.",
     },
     {
-      icon: <Heart className="h-6 w-6 text-wellness-navy" />,
-      title: "Health Programs",
-      description: "Discover comprehensive health programs designed by wellness experts.",
+      icon: <Calculator className="h-6 w-6 text-blue-600" />,
+      title: "Advanced Calculators",
+      description: "Built-in calculators for DFT to WFT, coverage estimation, quantity estimation, unit conversion and more.",
     },
     {
-      icon: <Users className="h-6 w-6 text-wellness-navy" />,
-      title: "Community Support",
-      description: "Connect with like-minded individuals on their wellness journey.",
+      icon: <Box className="h-6 w-6 text-blue-600" />,
+      title: "Product & Equipment",
+      description: "Access coating product information and manage equipment calibration data with detailed records.",
     },
     {
-      icon: <Calendar className="h-6 w-6 text-wellness-navy" />,
-      title: "Event Planning",
-      description: "Tools to organize and manage wellness events for your organization.",
+      icon: <VideoIcon className="h-6 w-6 text-blue-600" />,
+      title: "Video Tutorials",
+      description: "In-app tutorials showing how to navigate the app, use calculators, track jobs, and utilize BOQ tools.",
     },
   ];
 
   return (
-    <section id="features" className="section-padding bg-white">
+    <section id="features" className="section-padding bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-12 animate-fade-in-up">
-          <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4 text-wellness-navy">Features</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-800">Key Features</h2>
           <p className="text-gray-600">
-            Explore the tools and resources designed to enhance wellness in your organization
+            Explore the powerful tools and features designed to digitize and streamline your coating workflow
           </p>
         </div>
 
