@@ -103,8 +103,8 @@ export default {
 				'scale-up': 'scale-up 0.5s ease-out'
 			},
 			fontFamily: {
-				sans: ['Inter', 'sans-serif'],
-				serif: ['Playfair Display', 'serif'],
+				sans: ['Poppins', 'sans-serif'],
+				serif: ['Montserrat', 'sans-serif'],
 			},
 			backgroundImage: {
 				'gradient-primary': 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
