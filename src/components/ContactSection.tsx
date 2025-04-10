@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -71,10 +70,10 @@ const ContactSection = () => {
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-900">Email</p>
                     <a 
-                      href="mailto:contact@appname.com" 
+                      href="mailto:maharshi2406@gmail.com" 
                       className="text-app-blue hover:underline"
                     >
-                      contact@appname.com
+                      maharshi2406@gmail.com
                     </a>
                   </div>
                 </div>
@@ -85,10 +84,10 @@ const ContactSection = () => {
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-900">Phone</p>
                     <a 
-                      href="tel:+11234567890" 
+                      href="tel:+916356824000" 
                       className="text-app-blue hover:underline"
                     >
-                      +1 (123) 456-7890
+                      +91 6356824000
                     </a>
                   </div>
                 </div>
@@ -99,8 +98,7 @@ const ContactSection = () => {
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-900">Address</p>
                     <p className="text-gray-500">
-                      123 App Street, Suite 100<br />
-                      San Francisco, CA 94107
+                      A-104, Paragaraj Soc, Harni-Warasiya ring road, Vadodara
                     </p>
                   </div>
                 </div>

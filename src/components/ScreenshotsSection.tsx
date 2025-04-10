@@ -1,37 +1,26 @@
-
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const blogPosts = [
+const screenshots = [
   {
-    image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-    category: "Workplace Wellness",
-    title: "The Importance Of Employee Well-Being In The Workplace",
-    excerpt: "Discover how prioritizing employee wellness can lead to increased productivity and job satisfaction."
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+    title: "Job Management Dashboard",
+    description: "Track and manage all coating jobs from a centralized dashboard interface."
   },
   {
-    image: "https://images.unsplash.com/photo-1434494878577-86c23bcb06b9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-    category: "Financial Wellness",
-    title: "A Guide To Financial Wellness Programs For Employees",
-    excerpt: "Learn how financial wellness programs help employees manage stress and improve financial literacy."
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+    title: "BOQ Generation Tool",
+    description: "Create detailed Bill of Quantities with our intuitive form interface."
   },
   {
-    image: "https://images.unsplash.com/photo-1542744173-8659b8e77b29?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-    category: "Team Building",
-    title: "15 Company Retreat Ideas To Unite Your Team",
-    excerpt: "Explore team-building activities to strengthen employee relationships and boost morale."
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+    title: "Advanced Calculators",
+    description: "Access specialized coating calculators for precise material estimations."
   },
   {
-    image: "https://images.unsplash.com/photo-1565945887714-d5139f4eb0ce?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-    category: "Wellness Month",
-    title: "Celebrating National Wellness Month in August",
-    excerpt: "Ideas and activities to celebrate National Wellness Month in your organization."
-  },
-  {
-    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-    category: "Workplace Challenges",
-    title: "Summer Wellness Challenges For The Workplace",
-    excerpt: "Fun and engaging wellness challenges to keep employees motivated during summer months."
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+    title: "Reporting Interface",
+    description: "Generate comprehensive reports with detailed job information and metrics."
   },
 ];
 
@@ -39,11 +28,11 @@ const ScreenshotsSection = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const nextSlide = () => {
-    setActiveIndex((current) => (current === blogPosts.length - 1 ? 0 : current + 1));
+    setActiveIndex((current) => (current === screenshots.length - 1 ? 0 : current + 1));
   };
 
   const prevSlide = () => {
-    setActiveIndex((current) => (current === 0 ? blogPosts.length - 1 : current - 1));
+    setActiveIndex((current) => (current === 0 ? screenshots.length - 1 : current - 1));
   };
 
   const goToSlide = (index: number) => {
@@ -51,43 +40,61 @@ const ScreenshotsSection = () => {
   };
 
   return (
-    <section id="blog" className="section-padding relative overflow-hidden">
-      <div className="absolute inset-0 -z-10 bg-wellness-yellow/30"></div>
+    <section id="screenshots" className="section-padding relative overflow-hidden bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-12 animate-fade-in-up">
-          <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4 text-wellness-navy">Latest Articles</h2>
-          <p className="text-gray-700">
-            Browse our collection of wellness articles to find inspiration and guidance
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-800">App Screenshots</h2>
+          <p className="text-gray-600">
+            Preview the powerful features and intuitive interface of the i-Copedia application
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {blogPosts.slice(0, 3).map((post, index) => (
-            <div key={index} className="wellness-card animate-fade-in-up" style={{ animationDelay: `${0.1 * (index + 1)}s` }}>
-              <div className="h-48 overflow-hidden">
-                <img 
-                  src={post.image} 
-                  alt={post.title} 
-                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                />
-              </div>
-              <div className="p-5">
-                <div className="wellness-tag mb-2">{post.category}</div>
-                <h3 className="font-serif text-lg font-bold mb-2 text-wellness-navy">{post.title}</h3>
-                <p className="text-gray-600 text-sm mb-4">{post.excerpt}</p>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500">5 min read</span>
-                  <a href="#" className="text-sm font-medium text-wellness-navy hover:underline">Read more</a>
-                </div>
+        <div className="relative max-w-5xl mx-auto">
+          {/* Main Screenshot Slider */}
+          <div className="overflow-hidden rounded-lg shadow-xl">
+            <div className="relative pb-[56.25%] bg-white">
+              <img 
+                src={screenshots[activeIndex].image}
+                alt={screenshots[activeIndex].title}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
+                <h3 className="text-xl font-bold text-white mb-1">{screenshots[activeIndex].title}</h3>
+                <p className="text-gray-200">{screenshots[activeIndex].description}</p>
               </div>
             </div>
-          ))}
-        </div>
+          </div>
 
-        <div className="mt-12 text-center">
-          <a href="#" className="inline-block border-b-2 border-wellness-navy text-wellness-navy font-medium hover:border-wellness-yellow transition-colors">
-            View All Articles
-          </a>
+          {/* Navigation Arrows */}
+          <button 
+            onClick={prevSlide} 
+            className="absolute top-1/2 left-4 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-md z-10 transition-colors"
+            aria-label="Previous screenshot"
+          >
+            <ChevronLeft size={24} />
+          </button>
+          <button 
+            onClick={nextSlide} 
+            className="absolute top-1/2 right-4 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-md z-10 transition-colors"
+            aria-label="Next screenshot"
+          >
+            <ChevronRight size={24} />
+          </button>
+
+          {/* Thumbnail Navigation */}
+          <div className="flex justify-center mt-6 space-x-2">
+            {screenshots.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => goToSlide(index)}
+                className={`w-3 h-3 rounded-full transition-colors ${
+                  activeIndex === index ? "bg-blue-600" : "bg-gray-300 hover:bg-gray-400"
+                }`}
+                aria-label={`Go to screenshot ${index + 1}`}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>

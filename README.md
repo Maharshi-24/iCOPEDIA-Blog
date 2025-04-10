@@ -73,3 +73,52 @@ npm run preview
 For more information about i-Copedia, please contact:
 - Email: contact@icopedia.com
 - Phone: +91 (022) 1234-5678
+
+# iCOPEDIA Landing Page
+
+This is a landing page for the iCOPEDIA app, designed to showcase the app's features and provide download options.
+
+## Deployment to Vercel
+
+This project is set up for easy deployment to Vercel. Follow these steps:
+
+1. Make sure you have the Vercel CLI installed:
+   ```
+   npm install -g vercel
+   ```
+
+2. Login to Vercel:
+   ```
+   vercel login
+   ```
+
+3. Deploy the project:
+   ```
+   vercel
+   ```
+
+4. For production deployment:
+   ```
+   vercel --prod
+   ```
+
+## Development
+
+To run the project locally:
+
+```
+npm install
+npm run dev
+```
+
+## Direct App Download
+
+The app download links currently redirect to Google Drive where the APK is hosted. After deploying to Vercel, we'll implement direct download functionality.
+
+## Built With
+
+- React
+- Vite
+- Tailwind CSS
+- Shadcn UI
+- Lucide React Icons
