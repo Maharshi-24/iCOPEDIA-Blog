@@ -1,37 +1,27 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import express from 'express';
 import nodemailer from 'nodemailer';
+import cors from 'cors';
+import { Router } from 'express';
 
-type ContactFormData = {
-  name: string;
-  email: string;
-  message: string;
-};
+const router = Router();
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  // Set CORS headers
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-  );
+// Set up CORS
+router.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+}));
 
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
+// Handle preflight requests
+router.options('/contact', (req, res) => {
+  res.status(200).end();
+});
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' });
-  }
-
+// Contact form handler
+router.post('/contact', async (req, res) => {
   try {
-    const { name, email, message } = req.body as ContactFormData;
+    const { name, email, message } = req.body;
 
     // Validate input
     if (!name || !email || !message) {
@@ -50,7 +40,7 @@ export default async function handler(
     // Email content
     const mailOptions = {
       from: import.meta.env.VITE_EMAIL_USER,
-      to: 'maharshi2406@gmail.com', // Your email address
+      to: 'maharshi2406@gmail.com',
       subject: `New Contact Form Submission from ${name}`,
       text: `
         Name: ${name}
@@ -74,4 +64,6 @@ export default async function handler(
     console.error('Error sending email:', error);
     return res.status(500).json({ message: 'Error sending email' });
   }
-} 
+});
+
+export default router; 
