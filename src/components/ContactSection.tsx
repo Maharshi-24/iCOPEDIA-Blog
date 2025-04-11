@@ -23,6 +23,7 @@ const ContactSection = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         body: JSON.stringify(data),
       });
@@ -38,7 +39,11 @@ const ContactSection = () => {
       }
 
       const result = await response.json();
-      toast.success('Message sent successfully!');
+      if (result.message) {
+        toast.success(result.message);
+      } else {
+        toast.success('Message sent successfully!');
+      }
       reset();
     } catch (error) {
       console.error('Form submission error:', error);
