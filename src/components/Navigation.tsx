@@ -20,7 +20,7 @@ const Navigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center">
+          <div className="flex items-center">
             <Image
               src="/logo.png"
               alt="iCOPEDIA Logo"
@@ -29,7 +29,7 @@ const Navigation = () => {
               className="mr-2"
             />
             <span className="text-xl font-bold text-gray-800">iCOPEDIA</span>
-          </Link>
+          </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex space-x-8">
