@@ -10,11 +10,13 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { getFileSize } from "@/lib/file-utils";
 
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDownloadDialogOpen, setIsDownloadDialogOpen] = useState(false);
+  const [appSize, setAppSize] = useState("Loading...");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,11 +30,26 @@ const Navigation = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-  
+
+  // Fetch the app size when the component mounts
+  useEffect(() => {
+    const fetchAppSize = async () => {
+      try {
+        const size = await getFileSize('/iCopedia.apk');
+        setAppSize(size);
+      } catch (error) {
+        console.error('Failed to fetch app size:', error);
+        setAppSize('Unknown size');
+      }
+    };
+
+    fetchAppSize();
+  }, []);
+
   const handleDownloadClick = () => {
     setIsDownloadDialogOpen(true);
   };
-  
+
   const downloadAndroidApp = () => {
     // Create a link element
     const link = document.createElement('a');
@@ -46,7 +63,7 @@ const Navigation = () => {
     link.click();
     // Clean up
     document.body.removeChild(link);
-    
+
     setIsDownloadDialogOpen(false);
     toast.success("Download Started", {
       description: "Your download has started. Please check your downloads folder.",
@@ -103,9 +120,9 @@ const Navigation = () => {
               Contact
             </button>
           </nav>
-          
+
           {/* Download button */}
-          <Button 
+          <Button
             className="bg-blue-600 hover:bg-blue-700 transform hover:scale-105 transition-all duration-300 text-white font-medium shadow-sm"
             onClick={handleDownloadClick}
           >
@@ -150,7 +167,7 @@ const Navigation = () => {
               >
                 Contact
               </button>
-              <Button 
+              <Button
                 className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm w-full transition-colors"
                 onClick={handleDownloadClick}
               >
@@ -161,7 +178,7 @@ const Navigation = () => {
           </div>
         )}
       </div>
-      
+
       {/* Download Confirmation Dialog */}
       <Dialog open={isDownloadDialogOpen} onOpenChange={setIsDownloadDialogOpen}>
         <DialogContent className="sm:max-w-md p-0 overflow-hidden">
@@ -191,11 +208,11 @@ const Navigation = () => {
                 </p>
               </div>
             </div>
-            
+
             <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
               <div className="flex justify-between text-sm text-gray-600 mb-2">
                 <span>Application Size</span>
-                <span className="font-medium">31.2 MB</span>
+                <span className="font-medium">{appSize}</span>
               </div>
               <div className="flex justify-between text-sm text-gray-600 mb-2">
                 <span>Version</span>
@@ -206,17 +223,17 @@ const Navigation = () => {
                 <span className="font-medium">8.0 or higher</span>
               </div>
             </div>
-            
+
             <div className="flex flex-col sm:flex-row gap-3 justify-end">
-              <Button 
-                variant="outline" 
-                className="border-gray-300 sm:flex-1" 
+              <Button
+                variant="outline"
+                className="border-gray-300 sm:flex-1"
                 onClick={() => setIsDownloadDialogOpen(false)}
               >
                 Cancel
               </Button>
-              <Button 
-                className="bg-blue-600 hover:bg-blue-700 gap-2 sm:flex-1" 
+              <Button
+                className="bg-blue-600 hover:bg-blue-700 gap-2 sm:flex-1"
                 onClick={downloadAndroidApp}
               >
                 <CheckCircle2 size={18} />

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Download, Check, ArrowRight, CheckCircle2, Smartphone } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getFileSize } from "@/lib/file-utils";
 import {
   Dialog,
   DialogContent,
@@ -13,12 +14,28 @@ import { useToast } from "@/hooks/use-toast";
 
 const AboutSection = () => {
   const [isDownloadDialogOpen, setIsDownloadDialogOpen] = useState(false);
+  const [appSize, setAppSize] = useState("Loading...");
   const { toast } = useToast();
-  
+
+  // Fetch the app size when the component mounts
+  useEffect(() => {
+    const fetchAppSize = async () => {
+      try {
+        const size = await getFileSize('/iCopedia.apk');
+        setAppSize(size);
+      } catch (error) {
+        console.error('Failed to fetch app size:', error);
+        setAppSize('Unknown size');
+      }
+    };
+
+    fetchAppSize();
+  }, []);
+
   const handleDownloadClick = () => {
     setIsDownloadDialogOpen(true);
   };
-  
+
   const downloadAndroidApp = () => {
     // Create a link element
     const link = document.createElement('a');
@@ -32,7 +49,7 @@ const AboutSection = () => {
     link.click();
     // Clean up
     document.body.removeChild(link);
-    
+
     setIsDownloadDialogOpen(false);
     toast({
       title: "Download Started",
@@ -47,7 +64,7 @@ const AboutSection = () => {
     "Generates detailed BOQs and professional reports",
     "Includes advanced engineering calculators and tools"
   ];
-  
+
   return (
     <section id="about" className="section-padding relative overflow-hidden bg-white">
       <div className="container mx-auto px-4">
@@ -62,7 +79,7 @@ const AboutSection = () => {
                 />
               </div>
               <div className="hidden md:block absolute -z-10 -bottom-10 -right-10 w-72 h-72 bg-blue-200/30 rounded-full blur-3xl"></div>
-              
+
               <div className="absolute -bottom-6 right-6 md:bottom-12 md:right-0 w-36 h-36 bg-white shadow-md rounded-md p-4 flex items-center justify-center">
                 <div className="text-center">
                   <div className="font-bold text-3xl text-gray-800">6+</div>
@@ -71,20 +88,20 @@ const AboutSection = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="order-1 md:order-2">
             <div className="animate-fade-in-up">
               <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-800">About iCOPEDIA</h2>
               <p className="text-gray-700 mb-6">
-                I-Copedia digitizes the coating workflow in industrial environments. It replaces manual logs, 
+                I-Copedia digitizes the coating workflow in industrial environments. It replaces manual logs,
                 estimation sheets, and basic tools with a unified app that streamlines the entire coating process.
               </p>
               <p className="text-gray-700 mb-8">
-                Our mission is to improve efficiency and accuracy in industrial coating operations. The app tracks 
-                job progress, offers advanced calculators, stores product and equipment data, generates reports and BOQs, 
+                Our mission is to improve efficiency and accuracy in industrial coating operations. The app tracks
+                job progress, offers advanced calculators, stores product and equipment data, generates reports and BOQs,
                 and educates users through tutorials.
               </p>
-              
+
               <div className="mb-8">
                 <h3 className="text-xl font-bold mb-4 text-gray-800">Why choose iCOPEDIA?</h3>
                 <ul className="space-y-3">
@@ -98,17 +115,17 @@ const AboutSection = () => {
                   ))}
                 </ul>
               </div>
-              
+
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button 
+                <Button
                   className="bg-blue-600 hover:bg-blue-700 transform hover:scale-105 transition-all duration-300 text-white"
                   onClick={handleDownloadClick}
                 >
                   <Download size={18} />
                   Download App
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 transition-colors group"
                 >
                   Learn More
@@ -119,7 +136,7 @@ const AboutSection = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Download Confirmation Dialog */}
       <Dialog open={isDownloadDialogOpen} onOpenChange={setIsDownloadDialogOpen}>
         <DialogContent className="sm:max-w-md p-0 overflow-hidden">
@@ -149,11 +166,11 @@ const AboutSection = () => {
                 </p>
               </div>
             </div>
-            
+
             <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
               <div className="flex justify-between text-sm text-gray-600 mb-2">
                 <span>Application Size</span>
-                <span className="font-medium">31.2 MB</span>
+                <span className="font-medium">{appSize}</span>
               </div>
               <div className="flex justify-between text-sm text-gray-600 mb-2">
                 <span>Version</span>
@@ -164,17 +181,17 @@ const AboutSection = () => {
                 <span className="font-medium">8.0 or higher</span>
               </div>
             </div>
-            
+
             <div className="flex flex-col sm:flex-row gap-3 justify-end">
-              <Button 
-                variant="outline" 
-                className="border-gray-300 sm:flex-1" 
+              <Button
+                variant="outline"
+                className="border-gray-300 sm:flex-1"
                 onClick={() => setIsDownloadDialogOpen(false)}
               >
                 Cancel
               </Button>
-              <Button 
-                className="bg-blue-600 hover:bg-blue-700 gap-2 sm:flex-1" 
+              <Button
+                className="bg-blue-600 hover:bg-blue-700 gap-2 sm:flex-1"
                 onClick={downloadAndroidApp}
               >
                 <CheckCircle2 size={18} />

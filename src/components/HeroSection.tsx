@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getFileSize } from "@/lib/file-utils";
 import { Button } from "@/components/ui/button";
 import { Download, Smartphone, Wrench, Clock, LineChart, CheckCircle2, AlertTriangle } from "lucide-react";
-import { 
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -14,16 +15,32 @@ import { useToast } from "@/hooks/use-toast";
 const HeroSection = () => {
   const [isIOSDialogOpen, setIsIOSDialogOpen] = useState(false);
   const [isAndroidDialogOpen, setIsAndroidDialogOpen] = useState(false);
+  const [appSize, setAppSize] = useState("Loading...");
   const { toast } = useToast();
+
+  // Fetch the app size when the component mounts
+  useEffect(() => {
+    const fetchAppSize = async () => {
+      try {
+        const size = await getFileSize('/iCopedia.apk');
+        setAppSize(size);
+      } catch (error) {
+        console.error('Failed to fetch app size:', error);
+        setAppSize('Unknown size');
+      }
+    };
+
+    fetchAppSize();
+  }, []);
 
   const handleIOSClick = () => {
     setIsIOSDialogOpen(true);
   };
-  
+
   const handleAndroidClick = () => {
     setIsAndroidDialogOpen(true);
   };
-  
+
   const downloadAndroidApp = () => {
     // Create a link element
     const link = document.createElement('a');
@@ -37,7 +54,7 @@ const HeroSection = () => {
     link.click();
     // Clean up
     document.body.removeChild(link);
-    
+
     setIsAndroidDialogOpen(false);
     toast({
       title: "Download Started",
@@ -55,20 +72,20 @@ const HeroSection = () => {
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-gray-800 animate-fade-in-up">
                 Digitizing Industrial <span className="text-blue-600">Coating Workflows</span>
               </h1>
-              
+
               <p className="text-lg text-gray-700 md:text-xl animate-fade-in-up animate-delay-200">
                 i-Copedia replaces manual logs, estimation sheets, and basic tools with a unified app for tracking jobs, calculating materials, and generating professional reports.
               </p>
-              
+
               <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center md:justify-start animate-fade-in-up animate-delay-300">
-                <Button 
+                <Button
                   className="bg-blue-500 hover:bg-blue-600 transition-colors duration-300 text-white"
                   onClick={handleIOSClick}
                 >
                   <Download size={18} />
                   Download for iOS
                 </Button>
-                <Button 
+                <Button
                   className="bg-blue-700 hover:bg-blue-800 transition-colors duration-300 text-white"
                   onClick={handleAndroidClick}
                 >
@@ -78,11 +95,11 @@ const HeroSection = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="md:col-span-5 animate-fade-in-up animate-delay-400">
             <div className="bg-white p-6 rounded-md shadow-lg border border-gray-200">
               <h3 className="text-xl font-bold mb-5 text-gray-800 border-b pb-2">App Capabilities</h3>
-              
+
               <div className="space-y-4">
                 <div className="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-md transition-colors">
                   <div className="bg-blue-100 p-2 rounded-full">
@@ -93,7 +110,7 @@ const HeroSection = () => {
                     <p className="text-gray-600 text-sm">Advanced calculators and tools for industrial coating professionals</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-md transition-colors">
                   <div className="bg-blue-100 p-2 rounded-full">
                     <Clock className="h-5 w-5 text-blue-600" />
@@ -103,7 +120,7 @@ const HeroSection = () => {
                     <p className="text-gray-600 text-sm">Monitor job progress and team assignments with live updates</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-md transition-colors">
                   <div className="bg-blue-100 p-2 rounded-full">
                     <LineChart className="h-5 w-5 text-blue-600" />
@@ -114,7 +131,7 @@ const HeroSection = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="mt-5 text-center">
                 <a href="#features" className="inline-block px-4 py-2 bg-gray-100 text-blue-600 rounded-md hover:bg-gray-200 transition-colors text-sm font-medium">View All Features</a>
               </div>
@@ -122,7 +139,7 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-      
+
       {/* iOS Coming Soon Dialog */}
       <Dialog open={isIOSDialogOpen} onOpenChange={setIsIOSDialogOpen}>
         <DialogContent className="sm:max-w-md p-0 overflow-hidden">
@@ -154,9 +171,9 @@ const HeroSection = () => {
               We're working hard to bring i-Copedia to iOS devices. Please check back soon or sign up for our newsletter to be notified when it launches.
             </p>
             <div className="flex justify-end">
-              <Button 
-                variant="outline" 
-                className="border-gray-300 sm:flex-1" 
+              <Button
+                variant="outline"
+                className="border-gray-300 sm:flex-1"
                 onClick={() => setIsIOSDialogOpen(false)}
               >
                 Close
@@ -165,7 +182,7 @@ const HeroSection = () => {
           </div>
         </DialogContent>
       </Dialog>
-      
+
       {/* Android Download Confirmation Dialog */}
       <Dialog open={isAndroidDialogOpen} onOpenChange={setIsAndroidDialogOpen}>
         <DialogContent className="sm:max-w-md p-0 overflow-hidden">
@@ -195,11 +212,11 @@ const HeroSection = () => {
                 </p>
               </div>
             </div>
-            
+
             <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
               <div className="flex justify-between text-sm text-gray-600 mb-2">
                 <span>Application Size</span>
-                <span className="font-medium">31.2 MB</span>
+                <span className="font-medium">{appSize}</span>
               </div>
               <div className="flex justify-between text-sm text-gray-600 mb-2">
                 <span>Version</span>
@@ -210,17 +227,17 @@ const HeroSection = () => {
                 <span className="font-medium">8.0 or higher</span>
               </div>
             </div>
-            
+
             <div className="flex flex-col sm:flex-row gap-3 justify-end">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="border-gray-300 sm:flex-1"
                 onClick={() => setIsAndroidDialogOpen(false)}
               >
                 Cancel
               </Button>
-              <Button 
-                className="bg-blue-600 hover:bg-blue-700 gap-2 sm:flex-1" 
+              <Button
+                className="bg-blue-600 hover:bg-blue-700 gap-2 sm:flex-1"
                 onClick={downloadAndroidApp}
               >
                 <CheckCircle2 size={18} />
