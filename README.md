@@ -1,134 +1,68 @@
-# i-Copedia - Industrial Coating Workflow Application
+# iCOPEDIA - Revolutionizing Industrial Coating Workflows
 
-i-Copedia is a specialized application designed to digitize and streamline industrial coating workflows. It replaces manual logs, estimation sheets, and basic tools with a unified app that offers comprehensive job tracking, material calculation, and reporting capabilities.
+![iCOPEDIA Banner](public/hero-image.png)
 
-## About the Project
+## About iCOPEDIA
 
-**Purpose**: i-Copedia aims to improve efficiency and accuracy in industrial coating operations by providing a digital solution for managing all aspects of coating projects.
+iCOPEDIA is a professional mobile application designed to transform industrial coating operations through comprehensive digital workflow management. This landing page serves as the official portal for the iCOPEDIA app, providing information on its features and download options.
 
-## Key Features
+## Mission
 
-- **Job & Process Management**: Add, edit, and track coating jobs with real-time status updates
-- **BOQ Creation**: Generate structured Bills of Quantities with material details
-- **Report Generation**: Create professional reports with job data, materials, and QC feedback
-- **Advanced Engineering Tools**: Built-in calculators for DFT/WFT conversions, coverage estimation, and more
-- **Product & Equipment Management**: Store and access coating product information and equipment calibration data
-- **Tutorial System**: In-app guidance for navigating features and tools
+Our mission is to digitize and streamline industrial coating workflows, replacing manual logs, estimation sheets, and basic tools with a unified application that enhances efficiency, accuracy, and quality control in coating operations.
 
-## Technologies Used
+## The iCOPEDIA App
 
-This project is built with:
+The iCOPEDIA mobile app is a specialized solution for coating professionals, QC engineers, project managers, and industrial maintenance teams. It offers a complete suite of tools for managing coating projects from start to finish.
 
-- Vite
-- TypeScript
-- React
-- React Router
-- shadcn-ui components
-- Tailwind CSS
-- Lucide React icons
+### Key Features
 
-## Getting Started
+- **Comprehensive Job Management**
+  - Create, track, and manage coating jobs in real-time
+  - Assign tasks to team members and monitor progress
+  - Store project specifications and client requirements
 
-### Prerequisites
+- **Material & Resource Planning**
+  - Generate accurate Bills of Quantities (BOQ)
+  - Calculate precise material quantities needed for each project
+  - Track inventory and material consumption
 
-- Node.js & npm - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- **Quality Control & Documentation**
+  - Document inspection results with photo attachments
+  - Create detailed QC reports with customizable parameters
+  - Maintain compliance with industry standards
 
-### Installation
+- **Technical Calculators & Tools**
+  - Built-in calculators for DFT/WFT conversions
+  - Coverage estimation based on surface area and material specifications
+  - Equipment calibration tracking
 
-```sh
-# Clone the repository
-git clone <REPOSITORY_URL>
+- **Reporting & Analytics**
+  - Generate professional client-ready reports
+  - Analyze project performance and identify improvement areas
+  - Export data in multiple formats for further processing
 
-# Navigate to the project directory
-cd icopedia-blog-page
+## Industrial Applications
 
-# Install dependencies
-npm install
+iCOPEDIA serves various sectors including:
 
-# Start the development server
-npm run dev
-```
+- Oil & Gas
+- Marine & Offshore
+- Infrastructure
+- Power Generation
+- Manufacturing
+- Commercial Construction
 
-## App Structure
+## Technology
 
-- `/src/components`: UI components including app sections
-- `/src/components/ui`: Shadcn UI components
-- `/src/hooks`: Custom React hooks
-- `/src/pages`: Page components and routing
+The iCOPEDIA app is built with modern technology to ensure reliability, security, and performance. The application is regularly updated with new features and improvements based on user feedback and industry developments.
 
-## Deployment
+## Contact & Support
 
-The application is currently configured for development. For production deployment:
+For more information about iCOPEDIA or assistance with the app:
 
-```sh
-# Build the project
-npm run build
+- Email: info@icopedia.com
+- Phone: +91 XXXX-XXXXXX
 
-# Preview the production build locally
-npm run preview
-```
+---
 
-## Contact
-
-For more information about i-Copedia, please contact:
-- Email: contact@icopedia.com
-- Phone: +91 (022) 1234-5678
-
-# iCOPEDIA Landing Page
-
-This is a landing page for the iCOPEDIA app, designed to showcase the app's features and provide download options.
-
-## Deployment to Vercel
-
-This project is set up for easy deployment to Vercel. Follow these steps:
-
-1. Make sure you have the Vercel CLI installed:
-   ```
-   npm install -g vercel
-   ```
-
-2. Login to Vercel:
-   ```
-   vercel login
-   ```
-
-3. Deploy the project:
-   ```
-   vercel
-   ```
-
-4. For production deployment:
-   ```
-   vercel --prod
-   ```
-
-## Development
-
-To run the project locally:
-
-```
-npm install
-npm run dev
-```
-
-## Direct App Download
-
-The app download functionality is implemented to serve the APK file directly from the server. The APK file is stored in the `/public` folder and is delivered to users when they click the download button.
-
-To update the APK file:
-
-1. Replace the file at `/public/iCopedia.apk` with your updated APK
-2. Deploy the changes to Vercel
-
-The download functionality is implemented in three places:
-- HeroSection component (Android and iOS buttons)
-- AboutSection component (Download App button)
-- Navigation component (Download App button in the navbar)
-
-## Built With
-
-- React
-- Vite
-- Tailwind CSS
-- Shadcn UI
-- Lucide React Icons
+© 2023 iCOPEDIA. All rights reserved.
