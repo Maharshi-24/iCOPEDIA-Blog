@@ -71,38 +71,17 @@
     @apply border-border;
   }
 
+  html {
+    @apply hide-scrollbar;
+  }
+
   body {
     @apply bg-wellness-cream text-wellness-darkText font-sans antialiased;
     font-family: 'Poppins', sans-serif;
     scroll-behavior: smooth;
   }
 
-  /* Custom Scrollbar Styling */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: rgba(240, 240, 240, 0.8);
-    border-radius: 10px;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: rgba(59, 130, 246, 0.5); /* Blue color with transparency */
-    border-radius: 10px;
-    transition: all 0.3s ease;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(37, 99, 235, 0.7); /* Darker blue on hover */
-  }
-
-  /* Firefox scrollbar styling */
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(59, 130, 246, 0.5) rgba(240, 240, 240, 0.8);
-  }
+  /* Scrollbar styling removed in favor of hiding scrollbars completely */
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-serif tracking-tight text-wellness-navy;
@@ -141,12 +120,12 @@
   }
 
   .hide-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
 
   .hide-scrollbar::-webkit-scrollbar {
-    display: none;
+    display: none; /* Chrome, Safari and Opera */
   }
 }
 
