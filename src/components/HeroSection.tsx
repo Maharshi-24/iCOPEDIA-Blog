@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getFileSize } from "@/lib/file-utils";
 import { Button } from "@/components/ui/button";
-import { Download, Smartphone, Wrench, Clock, LineChart, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Download, Smartphone, Calculator, Clock, LineChart, CheckCircle2, AlertTriangle } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -70,11 +70,11 @@ const HeroSection = () => {
           <div className="md:col-span-7 text-center md:text-left">
             <div className="space-y-6 max-w-2xl mx-auto md:mx-0">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-gray-800 animate-fade-in-up">
-                Digitizing Industrial <span className="text-blue-600">Coating Workflows</span>
+                Digitizing Industrial/Protective <span className="text-blue-600">Coatings Ecosystem</span>
               </h1>
 
               <p className="text-lg text-gray-700 md:text-xl animate-fade-in-up animate-delay-200">
-                i-Copedia replaces manual logs, estimation sheets, and basic tools with a unified app for tracking jobs, calculating materials, and generating professional reports.
+                ICOPEDIA replaces manual logs, estimation sheets, and basic tools with a unified app for tracking jobs, calculating materials, and generating professional reports.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center md:justify-start animate-fade-in-up animate-delay-300">
@@ -103,10 +103,10 @@ const HeroSection = () => {
               <div className="space-y-4">
                 <div className="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-md transition-colors">
                   <div className="bg-blue-100 p-2 rounded-full">
-                    <Wrench className="h-5 w-5 text-blue-600" />
+                    <Calculator className="h-5 w-5 text-blue-600" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-800">Precision Engineering</h4>
+                    <h4 className="font-medium text-gray-800">Advanced Calculators</h4>
                     <p className="text-gray-600 text-sm">Advanced calculators and tools for industrial coating professionals</p>
                   </div>
                 </div>
@@ -116,8 +116,8 @@ const HeroSection = () => {
                     <Clock className="h-5 w-5 text-blue-600" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-800">Real-time Tracking</h4>
-                    <p className="text-gray-600 text-sm">Monitor job progress and team assignments with live updates</p>
+                    <h4 className="font-medium text-gray-800">Real-time Data</h4>
+                    <p className="text-gray-600 text-sm">On hand data for ease of working, better control, lower people dependency, faster decision making & optimize daily operations</p>
                   </div>
                 </div>
 
@@ -126,8 +126,8 @@ const HeroSection = () => {
                     <LineChart className="h-5 w-5 text-blue-600" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-800">Data-driven Reporting</h4>
-                    <p className="text-gray-600 text-sm">Generate comprehensive BOQs and detailed technical reports</p>
+                    <h4 className="font-medium text-gray-800">Data-driven Operation</h4>
+                    <p className="text-gray-600 text-sm">Pre feed technical data which enables smooth and independent working</p>
                   </div>
                 </div>
               </div>
@@ -168,7 +168,7 @@ const HeroSection = () => {
               </div>
             </div>
             <p className="text-gray-600 mb-4">
-              We're working hard to bring i-Copedia to iOS devices. Please check back soon or sign up for our newsletter to be notified when it launches.
+              We're working hard to bring ICOPEDIA to iOS devices. Please check back soon or sign up for our newsletter to be notified when it launches.
             </p>
             <div className="flex justify-end">
               <Button
@@ -208,7 +208,7 @@ const HeroSection = () => {
               <div>
                 <h4 className="font-semibold text-gray-900 text-lg mb-1">Ready to Install</h4>
                 <p className="text-gray-600">
-                  You are about to download the i-Copedia Android application. This app will help you manage coating workflows, calculate materials, and generate professional reports.
+                  You are about to download the ICOPEDIA Android application. This app will help you manage coating workflows, calculate materials, and generate professional reports.
                 </p>
               </div>
             </div>

@@ -91,9 +91,9 @@ const AboutSection = () => {
 
           <div className="order-1 md:order-2">
             <div className="animate-fade-in-up">
-              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-800">About iCOPEDIA</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-800">About ICOPEDIA</h2>
               <p className="text-gray-700 mb-6">
-                I-Copedia digitizes the coating workflow in industrial environments. It replaces manual logs,
+                ICOPEDIA digitizes the coating workflow in industrial environments. It replaces manual logs,
                 estimation sheets, and basic tools with a unified app that streamlines the entire coating process.
               </p>
               <p className="text-gray-700 mb-8">
@@ -162,7 +162,7 @@ const AboutSection = () => {
               <div>
                 <h4 className="font-semibold text-gray-900 text-lg mb-1">Ready to Install</h4>
                 <p className="text-gray-600">
-                  You are about to download the i-Copedia Android application. This app provides comprehensive tools for industrial coating management.
+                  You are about to download the ICOPEDIA Android application. This app provides comprehensive tools for industrial coating management.
                 </p>
               </div>
             </div>

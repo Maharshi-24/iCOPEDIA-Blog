@@ -88,8 +88,8 @@ const Navigation = () => {
       }`}
     >
       <div className="container flex items-center justify-between">
-        <a className="flex items-center gap-2 text-2xl font-bold text-gray-800">
-          <span className="text-blue-600">i</span>COPEDIA
+        <a className="flex items-center text-2xl font-bold text-gray-800">
+          <span className="text-blue-600">I</span>COPEDIA
         </a>
 
         {/* Desktop Navigation */}
@@ -101,12 +101,7 @@ const Navigation = () => {
             >
               Features
             </button>
-            <button
-              onClick={() => scrollToSection('screenshots')}
-              className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
-            >
-              Screenshots
-            </button>
+
             <button
               onClick={() => scrollToSection('about')}
               className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
@@ -120,15 +115,6 @@ const Navigation = () => {
               Contact
             </button>
           </nav>
-
-          {/* Download button */}
-          <Button
-            className="bg-blue-600 hover:bg-blue-700 transform hover:scale-105 transition-all duration-300 text-white font-medium shadow-sm"
-            onClick={handleDownloadClick}
-          >
-            <Download size={18} className="mr-1" />
-            Download App
-          </Button>
         </div>
 
         {/* Mobile Menu Button */}
@@ -149,12 +135,7 @@ const Navigation = () => {
               >
                 Features
               </button>
-              <button
-                onClick={() => scrollToSection('screenshots')}
-                className="text-gray-700 hover:text-blue-600 font-medium p-2 transition-colors"
-              >
-                Screenshots
-              </button>
+
               <button
                 onClick={() => scrollToSection('about')}
                 className="text-gray-700 hover:text-blue-600 font-medium p-2 transition-colors"
@@ -167,13 +148,7 @@ const Navigation = () => {
               >
                 Contact
               </button>
-              <Button
-                className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm w-full transition-colors"
-                onClick={handleDownloadClick}
-              >
-                <Download size={18} className="mr-1" />
-                Download App
-              </Button>
+
             </nav>
           </div>
         )}
@@ -204,7 +179,7 @@ const Navigation = () => {
               <div>
                 <h4 className="font-semibold text-gray-900 text-lg mb-1">Ready to Install</h4>
                 <p className="text-gray-600">
-                  You are about to download the i-Copedia Android application. This app provides comprehensive tools for industrial coating management.
+                  You are about to download the iCOPEDIA Android application. This app provides comprehensive tools for industrial coating management.
                 </p>
               </div>
             </div>

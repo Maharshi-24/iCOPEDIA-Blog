@@ -76,7 +76,7 @@ const ContactSection = () => {
                   type="text"
                   id="name"
                   {...register('name', { required: 'Name is required' })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 />
                 {errors.name && (
                   <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
@@ -97,7 +97,7 @@ const ContactSection = () => {
                       message: 'Invalid email address',
                     },
                   })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 />
                 {errors.email && (
                   <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
@@ -112,7 +112,7 @@ const ContactSection = () => {
                   id="message"
                   rows={4}
                   {...register('message', { required: 'Message is required' })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 />
                 {errors.message && (
                   <p className="mt-1 text-sm text-red-600">{errors.message.message}</p>
@@ -140,8 +140,8 @@ const ContactSection = () => {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-900">Email</p>
-                    <a 
-                      href="mailto:maharshi2406@gmail.com" 
+                    <a
+                      href="mailto:maharshi2406@gmail.com"
                       className="text-app-blue hover:underline"
                     >
                       maharshi2406@gmail.com
@@ -154,8 +154,8 @@ const ContactSection = () => {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-900">Phone</p>
-                    <a 
-                      href="tel:+916356824000" 
+                    <a
+                      href="tel:+916356824000"
                       className="text-app-blue hover:underline"
                     >
                       +91 6356824000
