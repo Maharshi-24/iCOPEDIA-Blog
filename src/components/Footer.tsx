@@ -1,8 +1,24 @@
 import { ArrowUp, Mail, MapPin, Phone, Facebook, Twitter, Linkedin, Instagram } from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 const Footer = () => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const showComingSoonToast = (platform: string) => {
+    toast("Coming Soon", {
+      description: `Our ${platform} page will be available soon!`,
+      position: "bottom-center",
+    });
   };
 
   const currentYear = new Date().getFullYear();
@@ -30,6 +46,35 @@ const Footer = () => {
                 <Mail size={18} className="text-blue-400 flex-shrink-0" />
                 <p className="text-gray-400">maharshi2406@gmail.com</p>
               </div>
+              <div className="flex items-center space-x-4 mt-4">
+                <a
+                  href="https://www.linkedin.com/in/maharshi-desai-30143a279/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  <Linkedin size={20} />
+                </a>
+                <button
+                  onClick={() => showComingSoonToast('Facebook')}
+                  className="text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  <Facebook size={20} />
+                </button>
+                <button
+                  onClick={() => showComingSoonToast('Twitter')}
+                  className="text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  <Twitter size={20} />
+                </button>
+                <button
+                  onClick={() => showComingSoonToast('Instagram')}
+                  className="text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  <Instagram size={20} />
+                </button>
+
+              </div>
             </div>
           </div>
 
@@ -37,24 +82,28 @@ const Footer = () => {
             <h4 className="font-bold text-lg mb-4 text-blue-400">App</h4>
             <ul className="space-y-3">
               <li>
-                <a href="#features" className="text-gray-400 hover:text-white transition-colors">
+                <button
+                  onClick={() => scrollToSection('features')}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
                   Features
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#screenshots" className="text-gray-400 hover:text-white transition-colors">
-                  Screenshots
-                </a>
-              </li>
-              <li>
-                <a href="#about" className="text-gray-400 hover:text-white transition-colors">
+                <button
+                  onClick={() => scrollToSection('about')}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
                   About
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#contact" className="text-gray-400 hover:text-white transition-colors">
+                <button
+                  onClick={() => scrollToSection('contact')}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
                   Contact
-                </a>
+                </button>
               </li>
             </ul>
           </div>
@@ -83,9 +132,7 @@ const Footer = () => {
                 </a>
               </li>
             </ul>
-            <div className="mt-6 text-gray-400">
-              <p>I don't have any newsletter</p>
-            </div>
+
           </div>
         </div>
 
