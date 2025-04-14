@@ -1,7 +1,7 @@
 import Navigation from "@/components/Navigation";
 import HeroSection from "@/components/HeroSection";
 import FeaturesSection from "@/components/FeaturesSection";
-import ScreenshotsSection from "@/components/ScreenshotsSection";
+// Screenshots section removed
 import AboutSection from "@/components/AboutSection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
@@ -13,7 +13,7 @@ const Index = () => {
       <main>
         <HeroSection />
         <FeaturesSection />
-        <ScreenshotsSection />
+        {/* Screenshots section removed */}
         <AboutSection />
         <ContactSection />
       </main>

@@ -1,10 +1,16 @@
-import { 
-  Briefcase, 
-  FileText, 
+import {
+  Briefcase,
+  FileText,
   Calculator,
   FileBarChart,
   Box,
-  VideoIcon
+  VideoIcon,
+  Database,
+  ClipboardList,
+  BarChart3,
+  Users,
+  Bot,
+  Target
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CSSProperties } from "react";
@@ -30,34 +36,49 @@ const FeatureCard = ({ icon, title, description, className, style }: FeatureCard
 const FeaturesSection = () => {
   const features = [
     {
-      icon: <Briefcase className="h-6 w-6 text-blue-600" />,
-      title: "Job & Process Management",
-      description: "Add, edit, and track coating jobs. View job statuses and assign jobs to workers with live updates.",
+      icon: <Calculator className="h-6 w-6 text-blue-600" />,
+      title: "Calculators",
+      description: "Coverage Estimation, Quantity Estimation, Part Quantity Calculator, DFT to WFT to Corrected WFT Estimation, Unit Converter assisted with sharing feature.",
+    },
+    {
+      icon: <Database className="h-6 w-6 text-blue-600" />,
+      title: "Product Details",
+      description: "Unified representation of product key technical details of renowned manufactures assisted with sharing feature.",
     },
     {
       icon: <FileText className="h-6 w-6 text-blue-600" />,
-      title: "BOQ Creation",
-      description: "Input material details, surface area, and layers to automatically generate structured BOQs for each job.",
-    },
-    {
-      icon: <FileBarChart className="h-6 w-6 text-blue-600" />,
-      title: "Report Generation",
-      description: "Generate professional reports containing job data, materials used, DFT/WFT records, and QC feedback.",
-    },
-    {
-      icon: <Calculator className="h-6 w-6 text-blue-600" />,
-      title: "Advanced Calculators",
-      description: "Built-in calculators for DFT to WFT, coverage estimation, quantity estimation, unit conversion and more.",
+      title: "BOQ (Bill of Quantity)",
+      description: "Project coating/material required estimation with a pre feed data customizable with specific project parameters.",
     },
     {
       icon: <Box className="h-6 w-6 text-blue-600" />,
-      title: "Product & Equipment",
-      description: "Access coating product information and manage equipment calibration data with detailed records.",
+      title: "Instrument Calibration",
+      description: "Data Base for key Instruments records at once place for calibration certificate and advance auto reminder prior to expiry.",
     },
     {
-      icon: <VideoIcon className="h-6 w-6 text-blue-600" />,
-      title: "Video Tutorials",
-      description: "In-app tutorials showing how to navigate the app, use calculators, track jobs, and utilize BOQ tools.",
+      icon: <ClipboardList className="h-6 w-6 text-blue-600" />,
+      title: "Daily Reports",
+      description: "Daily activity records to keep a track on progress.",
+    },
+    {
+      icon: <BarChart3 className="h-6 w-6 text-blue-600" />,
+      title: "Inventory Tracker",
+      description: "Digital tracker to keep stock in check.",
+    },
+    {
+      icon: <Users className="h-6 w-6 text-blue-600" />,
+      title: "Inspector Directory",
+      description: "Find a third party inspector make a direct contact and hire as required.",
+    },
+    {
+      icon: <Bot className="h-6 w-6 text-blue-600" />,
+      title: "AI Bot",
+      description: "AI enabled Bot to provide you with your general queries on Industrial coating as your first level of understanding on the subject matter.",
+    },
+    {
+      icon: <Target className="h-6 w-6 text-blue-600" />,
+      title: "Targeted Reach",
+      description: "Reach to right audience with your product innovation, new product launch, awards etc.",
     },
   ];
 
