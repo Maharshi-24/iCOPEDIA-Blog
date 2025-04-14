@@ -1,0 +1,109 @@
+/* Prevent horizontal scrolling and ensure content fits */
+html, body {
+  width: 100%;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+/* Percentage-based sizing for top section */
+.hero-heading, h1, .main-title {
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: calc(16px + 1.5vw);
+  line-height: 1.2;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  padding: 0 15px; /* Increased right padding */
+  box-sizing: border-box;
+}
+
+/* Left align the top paragraph */
+.hero-description, .app-description {
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: calc(12px + 0.4vw);
+  text-align: left;
+  padding: 0 15px; /* Increased right padding */
+  box-sizing: border-box;
+}
+
+/* Capabilities section adjustment */
+.capabilities-section, .features-section, .top-features {
+  width: 95%;
+  padding-right: 20px; /* Added explicit right padding */
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
+/* iPhone 12 Pro specific adjustments */
+@media screen and (min-width: 390px) and (max-width: 400px), 
+       screen and (device-width: 390px) and (device-height: 844px) {
+  .hero-heading, h1, .main-title {
+    width: 95%;
+    font-size: 20px;
+    padding: 0 15px; /* Increased right padding */
+  }
+  
+  .hero-description, .app-description {
+    width: 95%;
+    font-size: 14px;
+    padding: 0 15px; /* Increased right padding */
+  }
+  
+  .capabilities-section, .features-section, .top-features {
+    padding-right: 20px;
+  }
+}
+
+/* Responsive buttons */
+.download-button, .btn-download, .button {
+  width: 80%;
+  max-width: 250px;
+  font-size: calc(12px + 0.3vw);
+  padding: 2% 4%;
+  margin: 2% auto;
+  display: block;
+}
+
+/* Container adjustments */
+.container, .wrapper, .content, .section {
+  width: 95%;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 2.5%;
+  padding-right: 2.5%;
+}
+
+/* Ensure all media is responsive */
+img, video, iframe, embed, object {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Justify text in about page */
+.about-page p, .about-section p, #about p {
+  text-align: justify;
+}
+
+/* Additional adjustments for very small screens */
+@media screen and (max-width: 375px) {
+  .hero-heading, h1, .main-title {
+    width: 95%;
+    font-size: calc(14px + 1vw);
+  }
+  
+  .download-button, .btn-download, .button {
+    width: 90%;
+    font-size: calc(11px + 0.2vw);
+  }
+}
