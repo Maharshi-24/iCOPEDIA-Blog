@@ -40,7 +40,7 @@ router.post('/contact', async (req, res) => {
     // Email content
     const mailOptions = {
       from: import.meta.env.VITE_EMAIL_USER,
-      to: 'maharshi2406@gmail.com',
+      to: 'info@iCOPEDIA.com',
       subject: `New Contact Form Submission from ${name}`,
       text: `
         Name: ${name}
@@ -66,4 +66,4 @@ router.post('/contact', async (req, res) => {
   }
 });
 
-export default router; 
+export default router;

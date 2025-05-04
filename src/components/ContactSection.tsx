@@ -141,10 +141,10 @@ const ContactSection = () => {
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-900">Email</p>
                     <a
-                      href="mailto:maharshi2406@gmail.com"
+                      href="mailto:info@iCOPEDIA.com"
                       className="text-app-blue hover:underline"
                     >
-                      maharshi2406@gmail.com
+                      info@iCOPEDIA.com
                     </a>
                   </div>
                 </div>
@@ -155,10 +155,10 @@ const ContactSection = () => {
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-900">Phone</p>
                     <a
-                      href="tel:+916356824000"
+                      href="tel:+917043679707"
                       className="text-app-blue hover:underline"
                     >
-                      +91 6356824000
+                      +91 7043679707
                     </a>
                   </div>
                 </div>
@@ -169,7 +169,8 @@ const ContactSection = () => {
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-900">Address</p>
                     <p className="text-gray-500">
-                      A-104, Paragaraj Soc, Harni-Warasiya ring road, Vadodara
+                      505 Neptune Prime OP Road, Vadodara<br/>
+                      390 020 Gujarat, INDIA
                     </p>
                   </div>
                 </div>

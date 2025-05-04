@@ -36,15 +36,15 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-start space-x-3">
                 <MapPin size={18} className="text-blue-400 mt-1 flex-shrink-0" />
-                <p className="text-gray-400">A-104, Paragaraj Soc, Harni-Warasiya ring road, Vadodara</p>
+                <p className="text-gray-400">505 Neptune Prime OP Road, Vadodara<br/>390 020 Gujarat, INDIA</p>
               </div>
               <div className="flex items-center space-x-3">
                 <Phone size={18} className="text-blue-400 flex-shrink-0" />
-                <p className="text-gray-400">+91 6356824000</p>
+                <p className="text-gray-400">+91 7043679707</p>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail size={18} className="text-blue-400 flex-shrink-0" />
-                <p className="text-gray-400">maharshi2406@gmail.com</p>
+                <p className="text-gray-400">info@iCOPEDIA.com</p>
               </div>
               <div className="flex items-center space-x-4 mt-4">
                 <a

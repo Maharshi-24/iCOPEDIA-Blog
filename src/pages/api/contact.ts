@@ -50,7 +50,7 @@ export default async function handler(
     // Email content
     const mailOptions = {
       from: import.meta.env.VITE_EMAIL_USER,
-      to: 'maharshi2406@gmail.com', // Your email address
+      to: 'info@iCOPEDIA.com', // Your email address
       subject: `New Contact Form Submission from ${name}`,
       text: `
         Name: ${name}
@@ -74,4 +74,4 @@ export default async function handler(
     console.error('Error sending email:', error);
     return res.status(500).json({ message: 'Error sending email' });
   }
-} 
+}
