@@ -89,7 +89,7 @@ const Navigation = () => {
     >
       <div className="container flex items-center justify-between">
         <a className="flex items-center text-2xl font-bold text-gray-800">
-          <span className="text-blue-600">I</span>COPEDIA
+          <span className="text-blue-600">i</span>COPEDIA
         </a>
 
         {/* Desktop Navigation */}

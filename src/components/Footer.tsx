@@ -28,7 +28,7 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
           <div className="md:col-span-4">
-            <h3 className="text-2xl font-bold mb-4">ICOPEDIA</h3>
+            <h3 className="text-2xl font-bold mb-4">iCOPEDIA</h3>
             <p className="text-gray-400 mb-6">
               Digitizing Industrial/Protective Coatings Ecosystem with advanced tools for job tracking,
               material calculations, and comprehensive reporting solutions.
@@ -140,7 +140,7 @@ const Footer = () => {
 
         <div className="flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
-            &copy; {currentYear} ICOPEDIA. All rights reserved.
+            &copy; {currentYear} iCOPEDIA. All rights reserved.
           </p>
           <div className="mt-4 md:mt-0 flex space-x-4 text-sm text-gray-500">
             <a href="#" className="hover:text-gray-400 transition-colors">Privacy Policy</a>

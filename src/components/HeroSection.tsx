@@ -74,7 +74,7 @@ const HeroSection = () => {
               </h1>
 
               <p className="text-lg text-gray-700 md:text-xl animate-fade-in-up animate-delay-200">
-                ICOPEDIA replaces manual logs, estimation sheets, and basic tools with a unified app for tracking jobs, calculating materials, and generating professional reports.
+                iCOPEDIA replaces manual logs, estimation sheets, and basic tools with a unified app for tracking jobs, calculating materials, and generating professional reports.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center md:justify-start animate-fade-in-up animate-delay-300">
@@ -168,7 +168,7 @@ const HeroSection = () => {
               </div>
             </div>
             <p className="text-gray-600 mb-4">
-              We're working hard to bring ICOPEDIA to iOS devices. Please check back soon or sign up for our newsletter to be notified when it launches.
+              We're working hard to bring iCOPEDIA to iOS devices. Please check back soon or sign up for our newsletter to be notified when it launches.
             </p>
             <div className="flex justify-end">
               <Button
@@ -208,7 +208,7 @@ const HeroSection = () => {
               <div>
                 <h4 className="font-semibold text-gray-900 text-lg mb-1">Ready to Install</h4>
                 <p className="text-gray-600">
-                  You are about to download the ICOPEDIA Android application. This app will help you manage coating workflows, calculate materials, and generate professional reports.
+                  You are about to download the iCOPEDIA Android application. This app will help you manage coating workflows, calculate materials, and generate professional reports.
                 </p>
               </div>
             </div>
