@@ -9,9 +9,27 @@ interface OtpEntry {
 }
 
 const OtpViewer = () => {
-    const [otpList, setOtpList] = useState<OtpEntry[]>([]);
+    // Initialize from session storage to persist data across reloads/disconnects
+    const [otpList, setOtpList] = useState<OtpEntry[]>(() => {
+        try {
+            const saved = sessionStorage.getItem('otp_cache');
+            return saved ? JSON.parse(saved) : [];
+        } catch (error) {
+            console.error('Failed to load OTPs from cache:', error);
+            return [];
+        }
+    });
     const [isConnected, setIsConnected] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    // Update session storage whenever otpList changes
+    useEffect(() => {
+        try {
+            sessionStorage.setItem('otp_cache', JSON.stringify(otpList));
+        } catch (error) {
+            console.error('Failed to save OTPs to cache:', error);
+        }
+    }, [otpList]);
 
     useEffect(() => {
         // Initialize Supabase client
@@ -23,30 +41,77 @@ const OtpViewer = () => {
             return;
         }
 
-        const supabase = createClient(supabaseUrl, supabaseAnonKey);
+        // Configure client with more aggressive keep-alive settings
+        const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+            realtime: {
+                heartbeatIntervalMs: 2000, // Send heartbeats more frequently to keep connection alive
+                params: {
+                    eventsPerSecond: 10,
+                },
+            },
+        });
 
-        // Subscribe to OTP broadcast channel
-        const channel = supabase
-            .channel('otp-broadcast')
-            .on('broadcast', { event: 'new-otp' }, (payload) => {
-                console.log('📱 Received OTP:', payload);
-                const otpData = payload.payload as OtpEntry;
-                setOtpList((prev) => [otpData, ...prev].slice(0, 20)); // Keep last 20 OTPs
-            })
-            .subscribe((status) => {
-                console.log('Channel status:', status);
-                if (status === 'SUBSCRIBED') {
-                    setIsConnected(true);
-                    setError(null);
-                } else if (status === 'CHANNEL_ERROR') {
-                    setError('Failed to connect to OTP channel');
-                    setIsConnected(false);
-                }
-            });
+        let channel: any = null;
+        let reconnectTimer: any = null;
+
+        const connect = () => {
+            if (channel) {
+                supabase.removeChannel(channel);
+            }
+
+            console.log('Attempting to connect to OTP channel...');
+            channel = supabase
+                .channel('otp-broadcast')
+                .on('broadcast', { event: 'new-otp' }, (payload) => {
+                    console.log('📱 Received OTP:', payload);
+                    const otpData = payload.payload as OtpEntry;
+                    setOtpList((prev) => {
+                        const updated = [otpData, ...prev].slice(0, 50);
+                        return updated;
+                    });
+                })
+                .subscribe((status) => {
+                    console.log('Channel status:', status);
+                    if (status === 'SUBSCRIBED') {
+                        setIsConnected(true);
+                        setError(null);
+                        if (reconnectTimer) clearTimeout(reconnectTimer);
+                    } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+                        setIsConnected(false);
+                        setError(`Connection lost (${status}). Reconnecting...`);
+                        // Try to reconnect after a short delay
+                        if (!reconnectTimer) {
+                            reconnectTimer = setTimeout(connect, 3000);
+                        }
+                    }
+                });
+        };
+
+        connect();
+
+        // Reconnect immediately when tab becomes visible or browser comes online
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                console.log('Tab visible, checking connection...');
+                // If we're not explicitly connected (or just to be safe), reconnect
+                connect();
+            }
+        };
+
+        const handleOnline = () => {
+            console.log('Browser online, reconnecting...');
+            connect();
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('online', handleOnline);
 
         // Cleanup on unmount
         return () => {
-            supabase.removeChannel(channel);
+            if (channel) supabase.removeChannel(channel);
+            if (reconnectTimer) clearTimeout(reconnectTimer);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('online', handleOnline);
         };
     }, []);
 
@@ -87,8 +152,8 @@ const OtpViewer = () => {
 
                     {/* Status Badge */}
                     <div className={`mt-4 md:mt-0 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors duration-200 ${isConnected
-                            ? 'bg-green-50 text-green-700 border-green-200'
-                            : 'bg-red-50 text-red-700 border-red-200'
+                        ? 'bg-green-50 text-green-700 border-green-200'
+                        : 'bg-red-50 text-red-700 border-red-200'
                         }`}>
                         <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />
                         {isConnected ? 'Connected' : 'Disconnected'}
@@ -122,8 +187,8 @@ const OtpViewer = () => {
                         <div
                             key={`${entry.phone}-${entry.timestamp}`}
                             className={`group p-5 rounded-lg border transition-all duration-200 ${index === 0
-                                    ? 'bg-white border-blue-200 shadow-md ring-1 ring-blue-50 z-10'
-                                    : 'bg-white border-gray-200 hover:border-gray-300 shadow-sm'
+                                ? 'bg-white border-blue-200 shadow-md ring-1 ring-blue-50 z-10'
+                                : 'bg-white border-gray-200 hover:border-gray-300 shadow-sm'
                                 }`}
                         >
                             <div className="flex items-center justify-between">
