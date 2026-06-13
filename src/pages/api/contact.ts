@@ -7,6 +7,15 @@ type ContactFormData = {
   message: string;
 };
 
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -39,18 +48,26 @@ export default async function handler(
     }
 
     // Create a transporter
+    const emailUser = process.env.EMAIL_USER || process.env.VITE_EMAIL_USER;
+    const emailPass = process.env.EMAIL_PASS || process.env.VITE_EMAIL_PASS;
+    const contactTo = process.env.CONTACT_TO_EMAIL || 'info@iCOPEDIA.com';
+
+    if (!emailUser || !emailPass) {
+      return res.status(500).json({ message: 'Email service is not configured' });
+    }
+
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: import.meta.env.VITE_EMAIL_USER,
-        pass: import.meta.env.VITE_EMAIL_PASS,
+        user: emailUser,
+        pass: emailPass,
       },
     });
 
     // Email content
     const mailOptions = {
-      from: import.meta.env.VITE_EMAIL_USER,
-      to: 'info@iCOPEDIA.com', // Your email address
+      from: emailUser,
+      to: contactTo, // Your email address
       subject: `New Contact Form Submission from ${name}`,
       text: `
         Name: ${name}
@@ -59,10 +76,10 @@ export default async function handler(
       `,
       html: `
         <h2>New Contact Form Submission</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+        <p><strong>Email:</strong> ${escapeHtml(email)}</p>
         <p><strong>Message:</strong></p>
-        <p>${message}</p>
+        <p>${escapeHtml(message).replace(/\n/g, '<br>')}</p>
       `,
     };
 
