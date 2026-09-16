@@ -1,22 +1,9 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Download, Menu, X, CheckCircle2 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter
-} from "@/components/ui/dialog";
-import { toast } from "sonner";
-import { getFileSize } from "@/lib/file-utils";
+import { Menu, X } from "lucide-react";
 
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isDownloadDialogOpen, setIsDownloadDialogOpen] = useState(false);
-  const [appSize, setAppSize] = useState("Loading...");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,46 +17,6 @@ const Navigation = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  // Fetch the app size when the component mounts
-  useEffect(() => {
-    const fetchAppSize = async () => {
-      try {
-        const size = await getFileSize('/iCopedia.apk');
-        setAppSize(size);
-      } catch (error) {
-        console.error('Failed to fetch app size:', error);
-        setAppSize('Unknown size');
-      }
-    };
-
-    fetchAppSize();
-  }, []);
-
-  const handleDownloadClick = () => {
-    setIsDownloadDialogOpen(true);
-  };
-
-  const downloadAndroidApp = () => {
-    // Create a link element
-    const link = document.createElement('a');
-    // Set the href to your APK file location
-    link.href = '/iCopedia.apk'; // Point to the APK file in the public folder
-    // Set download attribute to suggest a filename
-    link.download = 'iCopedia.apk';
-    // Append to the body
-    document.body.appendChild(link);
-    // Trigger the download
-    link.click();
-    // Clean up
-    document.body.removeChild(link);
-
-    setIsDownloadDialogOpen(false);
-    toast.success("Download Started", {
-      description: "Your download has started. Please check your downloads folder.",
-      duration: 5000,
-    });
-  };
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -153,71 +100,6 @@ const Navigation = () => {
           </div>
         )}
       </div>
-
-      {/* Download Confirmation Dialog */}
-      <Dialog open={isDownloadDialogOpen} onOpenChange={setIsDownloadDialogOpen}>
-        <DialogContent className="sm:max-w-md p-0 overflow-hidden">
-          <div className="bg-gradient-to-br from-blue-700 to-blue-900 p-6 text-white">
-            <div className="flex justify-between items-center">
-              <h3 className="text-2xl font-bold text-white">Download Android App</h3>
-              <div className="bg-white/20 p-3 rounded-full">
-                <div className="flex items-center justify-center">
-                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M2 17L12 22L22 17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="p-6">
-            <div className="flex items-start gap-4 mb-6">
-              <div className="bg-blue-100 p-3 rounded-full flex-shrink-0 mt-1">
-                <Download size={24} className="text-blue-600" />
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-900 text-lg mb-1">Ready to Install</h4>
-                <p className="text-gray-600">
-                  You are about to download the iCOPEDIA Android application. This app provides comprehensive tools for industrial coating management.
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
-              <div className="flex justify-between text-sm text-gray-600 mb-2">
-                <span>Application Size</span>
-                <span className="font-medium">{appSize}</span>
-              </div>
-              <div className="flex justify-between text-sm text-gray-600 mb-2">
-                <span>Version</span>
-                <span className="font-medium">1.0.0</span>
-              </div>
-              <div className="flex justify-between text-sm text-gray-600">
-                <span>Required Android Version</span>
-                <span className="font-medium">8.0 or higher</span>
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3 justify-end">
-              <Button
-                variant="outline"
-                className="border-gray-300 sm:flex-1"
-                onClick={() => setIsDownloadDialogOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                className="bg-blue-600 hover:bg-blue-700 gap-2 sm:flex-1"
-                onClick={downloadAndroidApp}
-              >
-                <CheckCircle2 size={18} />
-                Download Now
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </header>
   );
 };

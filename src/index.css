@@ -91,10 +91,6 @@
 }
 
 @layer components {
-  .btn-download {
-    @apply inline-flex items-center justify-center gap-2 rounded-md px-6 py-3 font-medium text-wellness-darkText bg-wellness-yellow transition-colors hover:bg-wellness-yellow/90;
-  }
-
   .btn-primary {
     @apply bg-wellness-yellow shadow-md;
   }
