@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from "react";
+import { QRCodeSVG } from "qrcode.react";
 
 const TITLE = "COMING SOON";
+const WHATSAPP_NUMBER = "919274722707";
+const WHATSAPP_DISPLAY = "+91 92747 22707";
+const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+  "Hi iCOPEDIA, I'd like to know more.",
+)}`;
 const MARQUEE = [
   "Industrial Coatings",
   "Protective Systems",
@@ -177,39 +183,11 @@ const ComingSoon = () => {
           gap: 1rem;
         }
 
-        .cs-mark {
-          font-size: clamp(1.05rem, 1.6vw, 1.35rem);
-          font-weight: 700;
-          letter-spacing: .16em;
-          color: var(--paper);
-        }
-        .cs-mark span { color: var(--blue-400); }
-
-        .cs-status {
-          display: inline-flex;
-          align-items: center;
-          gap: .6rem;
-          padding: .5rem .95rem;
-          border: 1px solid rgba(96,165,250,.28);
-          border-radius: 999px;
-          font-size: clamp(.6rem, 1vw, .7rem);
-          letter-spacing: .22em;
-          text-transform: uppercase;
-          color: var(--blue-200);
-          background: rgba(8,21,56,.45);
-          backdrop-filter: blur(8px);
-        }
-        .cs-dot {
-          width: 6px; height: 6px;
-          border-radius: 50%;
-          background: var(--blue-400);
-          box-shadow: 0 0 0 0 rgba(96,165,250,.7);
-          animation: ping 2.4s cubic-bezier(0,0,.2,1) infinite;
-        }
-        @keyframes ping {
-          0%   { box-shadow: 0 0 0 0 rgba(96,165,250,.6); }
-          70%  { box-shadow: 0 0 0 10px rgba(96,165,250,0); }
-          100% { box-shadow: 0 0 0 0 rgba(96,165,250,0); }
+        .cs-logo {
+          height: clamp(56px, 7.5vw, 86px);
+          width: auto;
+          display: block;
+          user-select: none;
         }
 
         .cs-main {
@@ -276,45 +254,54 @@ const ComingSoon = () => {
         }
         .is-ready .cs-char { opacity: 1; transform: none; }
 
-        .cs-copy {
-          font-family: 'Poppins', system-ui, sans-serif;
-          font-size: clamp(.92rem, 1.55vw, 1.12rem);
-          line-height: 1.65;
-          font-weight: 300;
-          color: rgba(234,241,255,.62);
-          max-width: 46ch;
-          transition-delay: .95s;
-        }
-
-        .cs-rule {
-          position: relative;
-          width: min(100%, 460px);
-          height: 1px;
-          background: rgba(96,165,250,.18);
-          overflow: hidden;
-          transition-delay: 1.1s;
-        }
-        .cs-rule::after {
-          content: "";
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(90deg, transparent, var(--blue-400), transparent);
-          transform: translateX(-100%);
-          animation: sweep 3.2s ease-in-out infinite;
-        }
-        @keyframes sweep {
-          0%   { transform: translateX(-100%); }
-          60%  { transform: translateX(100%); }
-          100% { transform: translateX(100%); }
-        }
-
         .cs-contact {
           display: flex;
           flex-wrap: wrap;
           align-items: center;
-          gap: clamp(.9rem, 2vw, 1.75rem);
-          transition-delay: 1.25s;
+          gap: clamp(1.25rem, 3vw, 2.5rem);
+          transition-delay: 1.05s;
         }
+
+        .cs-wa {
+          display: inline-flex;
+          align-items: center;
+          gap: 1rem;
+          padding: .7rem 1.1rem .7rem .7rem;
+          border: 1px solid rgba(96,165,250,.28);
+          border-radius: 16px;
+          background: rgba(8,21,56,.45);
+          backdrop-filter: blur(8px);
+          color: var(--paper);
+          text-decoration: none;
+          transition: border-color .4s ease, transform .4s cubic-bezier(.16,1,.3,1);
+        }
+        .cs-wa:hover {
+          border-color: rgba(96,165,250,.6);
+          transform: translateY(-2px);
+        }
+        .cs-qr {
+          display: block;
+          padding: 6px;
+          border-radius: 10px;
+          background: #fff;
+          line-height: 0;
+        }
+        .cs-wa-text {
+          display: flex;
+          flex-direction: column;
+          gap: .3rem;
+        }
+        .cs-wa-label {
+          font-size: clamp(.6rem, 1vw, .68rem);
+          letter-spacing: .22em;
+          text-transform: uppercase;
+          color: var(--blue-400);
+        }
+        .cs-wa-num {
+          font-family: 'Poppins', system-ui, sans-serif;
+          font-size: clamp(.82rem, 1.35vw, .95rem);
+        }
+        .cs-wa-tap { display: none; }
         .cs-link {
           font-family: 'Poppins', system-ui, sans-serif;
           font-size: clamp(.82rem, 1.35vw, .95rem);
@@ -334,11 +321,6 @@ const ComingSoon = () => {
           transition: transform .5s cubic-bezier(.16,1,.3,1);
         }
         .cs-link:hover::after { transform: scaleX(1); transform-origin: left; }
-        .cs-sep {
-          width: 3px; height: 3px;
-          border-radius: 50%;
-          background: rgba(96,165,250,.45);
-        }
 
         /* ---------- marquee ---------- */
 
@@ -402,7 +384,12 @@ const ComingSoon = () => {
         }
 
         @media (max-width: 640px) {
-          .cs-head { align-items: flex-start; }
+          .cs-contact { flex-direction: column; align-items: flex-start; }
+          /* on a phone the QR can't be scanned from itself, so it becomes a tap target */
+          .cs-qr { display: none; }
+          .cs-wa { padding: .75rem 1.1rem; }
+          .cs-wa-scan { display: none; }
+          .cs-wa-tap { display: inline; }
           .cs-meta { flex-direction: column; align-items: flex-start; gap: .5rem; }
         }
 
@@ -428,13 +415,14 @@ const ComingSoon = () => {
 
       <div className="cs-shell">
         <header className="cs-head">
-          <div className="cs-mark cs-rise">
-            <span>i</span>COPEDIA
-          </div>
-          <div className="cs-status cs-rise" style={{ transitionDelay: "0.3s" }}>
-            <span className="cs-dot" />
-            In Development
-          </div>
+          <img
+            src="/icopedia-logo.png"
+            alt="iCOPEDIA — Coatings Simplified"
+            className="cs-logo cs-rise"
+            width={483}
+            height={489}
+            draggable={false}
+          />
         </header>
 
         <main className="cs-main">
@@ -463,21 +451,27 @@ const ComingSoon = () => {
             })}
           </h1>
 
-          <p className="cs-copy cs-rise">
-            We are rebuilding the platform for industrial and protective coatings —
-            inspection, specification and asset integrity in one place. Something
-            considered is on the way.
-          </p>
-
-          <div className="cs-rule cs-rise" />
-
           <div className="cs-contact cs-rise">
             <a className="cs-link" href="mailto:contact@icopedia.co">
               contact@icopedia.co
             </a>
-            <span className="cs-sep" />
-            <a className="cs-link" href="mailto:support@icopedia.co">
-              support@icopedia.co
+            <a
+              className="cs-wa"
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Chat with iCOPEDIA on WhatsApp at ${WHATSAPP_DISPLAY}`}
+            >
+              <span className="cs-qr">
+                <QRCodeSVG value={WHATSAPP_URL} size={88} level="M" fgColor="#04070f" />
+              </span>
+              <span className="cs-wa-text">
+                <span className="cs-wa-label">
+                  <span className="cs-wa-scan">Scan to WhatsApp us</span>
+                  <span className="cs-wa-tap">Chat on WhatsApp</span>
+                </span>
+                <span className="cs-wa-num">{WHATSAPP_DISPLAY}</span>
+              </span>
             </a>
           </div>
         </main>
