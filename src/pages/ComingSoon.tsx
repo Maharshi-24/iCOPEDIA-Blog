@@ -3,7 +3,6 @@ import { QRCodeSVG } from "qrcode.react";
 
 const TITLE = "COMING SOON";
 const WHATSAPP_NUMBER = "919274722707";
-const WHATSAPP_DISPLAY = "+91 92747 22707";
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
   "Hi iCOPEDIA, I'd like to know more.",
 )}`;
@@ -297,10 +296,6 @@ const ComingSoon = () => {
           text-transform: uppercase;
           color: var(--blue-400);
         }
-        .cs-wa-num {
-          font-family: 'Poppins', system-ui, sans-serif;
-          font-size: clamp(.82rem, 1.35vw, .95rem);
-        }
         .cs-wa-tap { display: none; }
         .cs-link {
           font-family: 'Poppins', system-ui, sans-serif;
@@ -460,7 +455,7 @@ const ComingSoon = () => {
               href={WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`Chat with iCOPEDIA on WhatsApp at ${WHATSAPP_DISPLAY}`}
+              aria-label="Chat with iCOPEDIA on WhatsApp"
             >
               <span className="cs-qr">
                 <QRCodeSVG value={WHATSAPP_URL} size={88} level="M" fgColor="#04070f" />
@@ -470,7 +465,6 @@ const ComingSoon = () => {
                   <span className="cs-wa-scan">Scan to WhatsApp us</span>
                   <span className="cs-wa-tap">Chat on WhatsApp</span>
                 </span>
-                <span className="cs-wa-num">{WHATSAPP_DISPLAY}</span>
               </span>
             </a>
           </div>
