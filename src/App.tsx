@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import ComingSoon from "./pages/ComingSoon";
 import NotFound from "./pages/NotFound";
 import OtpViewer from "./pages/OtpViewer";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 // Create the client outside of the component
 const queryClient = new QueryClient();
@@ -26,6 +27,8 @@ const App = () => {
               <Route path="/" element={<ComingSoon />} />
               <Route path="/home" element={<Index />} />
               <Route path="/otp-viewer" element={<OtpViewer />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
