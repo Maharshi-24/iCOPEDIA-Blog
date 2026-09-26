@@ -216,6 +216,16 @@ const SECTIONS: Section[] = [
           by law.
         </p>
         <p>We complete deletion within 30 days and confirm by email.</p>
+        <h3 id="delete-data" className="mb-2 mt-6 scroll-mt-6 text-lg font-semibold text-[#0f172a]">
+          Delete some of your data and keep your account
+        </h3>
+        <p>
+          You can delete your notes, bills of quantities, calibration records, glossary chats and
+          Community posts yourself in the app at any time. To have any other data deleted without
+          closing your account, such as daily reports, uploaded photos and documents or your
+          Directory listing, email <Mail subject="Delete my iCOPEDIA data" /> and tell us which
+          data to remove. We complete these requests within 30 days.
+        </p>
       </>
     ),
   },
