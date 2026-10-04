@@ -4,12 +4,15 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import Index from "./pages/Index";
 import ComingSoon from "./pages/ComingSoon";
 import NotFound from "./pages/NotFound";
 import OtpViewer from "./pages/OtpViewer";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+
+// Admin is lazy-loaded so public visitors never download it.
+const AdminApp = lazy(() => import("./admin/AdminApp"));
 
 // Create the client outside of the component
 const queryClient = new QueryClient();
@@ -29,6 +32,7 @@ const App = () => {
               <Route path="/otp-viewer" element={<OtpViewer />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/admin/*" element={<Suspense fallback={null}><AdminApp /></Suspense>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
