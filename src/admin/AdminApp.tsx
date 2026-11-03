@@ -135,7 +135,8 @@ function Shell() {
       )}
 
       <main className="px-4 py-6 sm:px-6 lg:ml-60 lg:px-10 lg:py-8">
-        <div className="mx-auto max-w-6xl">
+        {/* The mail client is a three-pane app and needs the full width. */}
+        <div className={cn('mx-auto', location.pathname.startsWith('/admin/email') ? 'max-w-[1600px]' : 'max-w-6xl')}>
           <Routes>
             {NAV.map(({ to, element }) => (
               <Route key={to} index={to === ''} path={to === '' ? undefined : to} element={element} />
