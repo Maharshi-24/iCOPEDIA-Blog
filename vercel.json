@@ -1,8 +1,16 @@
 {
   "rewrites": [
-    { "source": "/((?!api/).*)", "destination": "/" }
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/"
+    }
   ],
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "framework": "vite"
+  "framework": "vite",
+  "functions": {
+    "api/admin-mail.ts": {
+      "maxDuration": 30
+    }
+  }
 }
