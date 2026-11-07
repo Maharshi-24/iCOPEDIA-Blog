@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import {
-  Activity, Bell, Building2, Globe, LayoutDashboard, LogOut, Mail, Menu, Newspaper, Smartphone, UserCheck, Users, Video, X,
+  Activity, BarChart3, Bell, Building2, Globe, LayoutDashboard, LogOut, Mail, Menu, Newspaper, Smartphone, UserCheck, Users, Video, X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AdminAuthProvider, useAdminAuth } from './auth';
 import Login from './Login';
 import { Loading } from './shared';
 import Overview from './pages/Overview';
+import Analytics from './pages/Analytics';
 import LoginAccess from './pages/LoginAccess';
 import Notifications from './pages/Notifications';
 import EmailPage from './pages/Email';
@@ -21,6 +22,7 @@ import ActivityLog from './pages/Activity';
 
 const NAV = [
   { to: '', label: 'Overview', icon: LayoutDashboard, element: <Overview /> },
+  { to: 'analytics', label: 'Usage analytics', icon: BarChart3, element: <Analytics /> },
   { to: 'login-access', label: 'Login access', icon: UserCheck, element: <LoginAccess /> },
   { to: 'notifications', label: 'Notifications', icon: Bell, element: <Notifications /> },
   { to: 'email', label: 'Email', icon: Mail, element: <EmailPage /> },
