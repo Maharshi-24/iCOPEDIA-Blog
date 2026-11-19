@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import {
-  Activity, BarChart3, Bell, Building2, Globe, LayoutDashboard, LogOut, Mail, Menu, Newspaper, Smartphone, UserCheck, Users, Video, X,
+  Activity, BarChart3, Bell, Building2, Globe, LayoutDashboard, LogOut, Mail, Menu, MessagesSquare, Newspaper, ShieldCheck, Smartphone, UserCheck, Users, Video, X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AdminAuthProvider, useAdminAuth } from './auth';
@@ -18,6 +18,8 @@ import Companies from './pages/Companies';
 import Organizations from './pages/Organizations';
 import Videos from './pages/Videos';
 import News from './pages/News';
+import Community from './pages/Community';
+import Verification from './pages/Verification';
 import ActivityLog from './pages/Activity';
 
 const NAV = [
@@ -32,6 +34,8 @@ const NAV = [
   { to: 'organizations', label: 'Domains', icon: Globe, element: <Organizations /> },
   { to: 'videos', label: 'Tutorial videos', icon: Video, element: <Videos /> },
   { to: 'news', label: 'News', icon: Newspaper, element: <News /> },
+  { to: 'community', label: 'Community', icon: MessagesSquare, element: <Community /> },
+  { to: 'verification', label: 'Verification', icon: ShieldCheck, element: <Verification /> },
   { to: 'activity', label: 'Change history', icon: Activity, element: <ActivityLog /> },
 ];
 
