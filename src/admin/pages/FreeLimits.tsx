@@ -6,7 +6,12 @@ import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/lib/supabase';
 import { attempt, Empty, Loading, PageHeader, Panel, Pill, Spinner, timeAgo } from '../shared';
 
-// Table free_usage_limits (backend migration 20261119160000_boq_limit_settings.sql).
+// Table usage_limits (backend migrations 20261119160000_boq_limit_settings and
+// 20261119170000_boq_limits_into_usage_limits). default_limit is the per-day
+// number. Only the features listed in ENFORCED are checked by the server
+// today; the table's other rows belong to the retired trial system.
+const ENFORCED: Record<string, string> = { boq_create: 'Bill of Quantities' };
+
 type Limit = {
   feature: string;
   label: string;
@@ -17,14 +22,28 @@ type Limit = {
   updated_at: string;
 };
 
+type Row = {
+  feature_key: string; enabled: boolean; period: 'daily' | 'weekly';
+  default_limit: number; weekly_limit: number; updated_at: string;
+};
+
 export default function FreeLimits() {
   const [rows, setRows] = useState<Limit[] | null>(null);
 
   const load = useCallback(async () => {
-    const { data } = await supabase.from('free_usage_limits')
-      .select('feature, label, enabled, period, daily_limit, weekly_limit, updated_at')
-      .order('feature');
-    setRows((data as Limit[]) ?? []);
+    const { data } = await supabase.from('usage_limits')
+      .select('feature_key, enabled, period, default_limit, weekly_limit, updated_at')
+      .in('feature_key', Object.keys(ENFORCED))
+      .order('feature_key');
+    setRows(((data as Row[]) ?? []).map((r) => ({
+      feature: r.feature_key,
+      label: ENFORCED[r.feature_key] ?? r.feature_key,
+      enabled: r.enabled,
+      period: r.period,
+      daily_limit: r.default_limit,
+      weekly_limit: r.weekly_limit,
+      updated_at: r.updated_at,
+    })));
   }, []);
   useEffect(() => { load(); }, [load]);
 
@@ -72,9 +91,9 @@ function LimitCard({ row, onSaved }: { row: Limit; onSaved: () => void }) {
   async function save() {
     setSaving(true);
     const ok = await attempt(
-      () => supabase.from('free_usage_limits')
-        .update({ enabled, period, daily_limit: d, weekly_limit: w })
-        .eq('feature', row.feature),
+      () => supabase.from('usage_limits')
+        .update({ enabled, period, default_limit: d, weekly_limit: w })
+        .eq('feature_key', row.feature),
       `${row.label} limit saved`,
     );
     setSaving(false);
