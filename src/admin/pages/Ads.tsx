@@ -42,6 +42,8 @@ const PUBLIC_PREFIX = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/`;
 const MAX_MB = 50; // bucket limit
 
 const TYPE_LABEL: Record<AdType, string> = { direct: 'Our ad', sponsor: 'Sponsor', google: 'Google' };
+/** Matches the switches at the top: "Our ads", "Sponsor ads", "Google ads". */
+const TYPE_GROUP: Record<AdType, string> = { direct: 'Our ads', sponsor: 'Sponsor ads', google: 'Google ads' };
 const TYPE_TONE: Record<AdType, 'blue' | 'amber' | 'slate'> = { direct: 'blue', sponsor: 'amber', google: 'slate' };
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
@@ -488,6 +490,22 @@ function showable(ads: Ad[], s: Settings) {
   return ads.filter((a) => adStatus(a).label === 'live' && on[a.type] && a.type !== 'google' && !!a.media_url);
 }
 
+const TYPE_SETTING: Record<AdType, 'direct_enabled' | 'sponsor_enabled' | 'google_enabled'> = {
+  direct: 'direct_enabled', sponsor: 'sponsor_enabled', google: 'google_enabled',
+};
+
+/** Whether the app shows this ad right now, and if not, why. */
+function rotationStatus(ad: Ad, slotAds: Ad[], scrollable: boolean, s: Settings): { label: string; tone: 'green' | 'amber' | 'slate' | 'red' } {
+  const st = adStatus(ad);
+  if (st.label !== 'live') return st;
+  if (ad.type === 'google') return { label: 'Google ads not in the app yet', tone: 'slate' };
+  if (!s[TYPE_SETTING[ad.type]]) return { label: `“${TYPE_GROUP[ad.type]}” switched off`, tone: 'amber' };
+  if (!ad.media_url) return { label: 'no image', tone: 'red' };
+  const shown = showable(slotAds, s);
+  if (!scrollable && shown[0]?.id !== ad.id) return { label: 'not shown: slot not scrollable', tone: 'slate' };
+  return { label: scrollable && shown.length > 1 ? 'in rotation' : 'showing', tone: 'green' };
+}
+
 /** A slot in the phone preview, rotating like the app: each ad for its own
  * duration, then the next, back to the first after the last. */
 function SlotPreview({ ads, scrollable, settings }: { ads: Ad[]; scrollable: boolean; settings: Settings }) {
@@ -704,10 +722,26 @@ function SlotPanel({ slot, tiles, settings, slots, ads, onChanged, onDeleted }: 
             <div className="text-sm font-medium text-slate-900">Ads in this slot</div>
             <Button size="sm" onClick={() => setEditing('new')} className="bg-slate-900 text-white hover:bg-slate-800"><Plus className="mr-1 h-4 w-4" /> Add ad</Button>
           </div>
+          {(['direct', 'sponsor'] as const)
+            .filter((t) => !settings[TYPE_SETTING[t]] && ads.some((a) => a.type === t && a.active))
+            .map((t) => (
+              <div key={t} className="mb-2 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                <span>“{TYPE_GROUP[t]}” is switched off at the top of this page, so those ads in this slot aren’t shown in the app.</span>
+                <Button size="sm" variant="outline" className="h-7 bg-white" disabled={busy}
+                  onClick={async () => {
+                    setBusy(true);
+                    const ok = await attempt(() => supabase.from('ad_settings').update({ [TYPE_SETTING[t]]: true }).eq('id', true), `${TYPE_GROUP[t]} turned on`);
+                    setBusy(false);
+                    if (ok) onChanged();
+                  }}>
+                  Turn on {TYPE_GROUP[t].toLowerCase()}
+                </Button>
+              </div>
+            ))}
           {ads.length === 0 ? <Empty>No ads yet.</Empty> : (
             <ul className="divide-y divide-slate-100 rounded-lg border border-slate-200">
               {ads.map((ad, i) => {
-                const st = adStatus(ad);
+                const st = rotationStatus(ad, ads, slot.scrollable, settings);
                 return (
                   <li key={ad.id} className="flex items-center gap-3 p-3">
                     <div className="h-12 w-16 shrink-0 overflow-hidden rounded border border-slate-200 bg-slate-50"><AdThumb ad={ad} /></div>
