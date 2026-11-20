@@ -106,7 +106,7 @@ function Shell() {
 
   const brand = (
     <div className="flex items-center gap-2.5 px-3">
-      <img src="/icopedia-logo.png" alt="" className="h-8 w-8 rounded-md object-contain" />
+      <img src="/icopedia-mark.svg" alt="" className="h-8 w-8 object-contain" />
       <div className="text-sm font-semibold text-slate-900">iCOPEDIA Admin</div>
     </div>
   );

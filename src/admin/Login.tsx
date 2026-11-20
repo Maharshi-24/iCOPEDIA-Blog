@@ -59,7 +59,7 @@ export default function Login({ notAdmin }: { notAdmin?: boolean }) {
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
       <div className="w-full max-w-sm">
         <div className="mb-6 flex items-center gap-3">
-          <img src="/icopedia-logo.png" alt="" className="h-10 w-10 rounded-lg object-contain" />
+          <img src="/icopedia-mark.svg" alt="" className="h-10 w-10 object-contain" />
           <div>
             <div className="text-lg font-semibold text-slate-900">iCOPEDIA Admin</div>
             <div className="text-xs text-slate-500">Sign in with your admin mobile number</div>
