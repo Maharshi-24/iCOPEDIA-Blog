@@ -4,6 +4,7 @@ import {
   Activity, BarChart3, Gauge, LayoutGrid, Megaphone, Bell, Building2, Globe, LayoutDashboard, LogOut, Mail, Menu, MessagesSquare, Newspaper, ShieldCheck, Smartphone, UserCheck, Users, Video, X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Toaster } from '@/components/ui/sonner';
 import { AdminAuthProvider, useAdminAuth } from './auth';
 import Login from './Login';
 import { Loading } from './shared';
@@ -64,6 +65,8 @@ export default function AdminApp() {
 
   return (
     <AdminAuthProvider>
+      {/* Toasts are admin-only, so the provider lives here, not on public pages. */}
+      <Toaster />
       <Gate />
     </AdminAuthProvider>
   );

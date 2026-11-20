@@ -2,19 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f3f4f2" />
+    <!--seo:start-->
     <title>iCOPEDIA</title>
-    <meta name="description" content="Digitizing Industrial/Protective Coatings Ecosystem" />
-    <meta name="author" content="ICOPEDIA" />
-
-    <meta property="og:title" content="ICOPEDIA" />
-    <meta property="og:description" content="Digitizing Industrial/Protective Coatings Ecosystem" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://icopedia.co/og-image.png" />
-
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@icopedia" />
-    <meta name="twitter:image" content="https://icopedia.co/og-image.png" />
+    <meta name="description" content="Free app for protective coating professionals: calculators, bills of quantities, project reports, instrument records, product data and Ustad, an AI coating assistant." />
+    <!--seo:end-->
 
     <!-- Favicon -->
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
@@ -23,16 +16,21 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
 
-    <!-- Google Fonts -->
+    <!--admin-fonts:start-->
+    <!-- Poppins and Montserrat are used by the admin panel only. Public pages
+         use self-hosted Archivo, so the prerender step drops this block. -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!--admin-fonts:end-->
   </head>
 
   <body>
     <div id="root"></div>
-    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
+    <!--editor:start-->
+    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! (Lovable editor; left out of prerendered public pages) -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+    <!--editor:end-->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
