@@ -9,6 +9,8 @@ export function ContactForm({ defaultRole = "Coating professional" }: { defaultR
   const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
   const [message, setMessage] = useState("");
+  // Honeypot: off-screen and skipped by keyboard and screen readers, so only bots fill it.
+  const [website, setWebsite] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
   async function submit(e: FormEvent) {
@@ -21,7 +23,7 @@ export function ContactForm({ defaultRole = "Coating professional" }: { defaultR
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ name: name.trim(), email: email.trim(), message: body }),
+        body: JSON.stringify({ name: name.trim(), email: email.trim(), message: body, website }),
       });
       if (!res.ok) throw new Error(String(res.status));
       setState("sent");
@@ -48,7 +50,7 @@ export function ContactForm({ defaultRole = "Coating professional" }: { defaultR
   const label = "mb-1.5 block text-sm font-semibold text-[#23282D]";
 
   return (
-    <form onSubmit={submit} className="-mx-4 bg-white px-4 py-6 sm:mx-0 sm:p-8">
+    <form onSubmit={submit} className="relative -mx-4 bg-white px-4 py-6 sm:mx-0 sm:p-8">
       <fieldset>
         <legend className={label}>You are</legend>
         <div className="grid gap-2 sm:grid-cols-2">
@@ -65,6 +67,11 @@ export function ContactForm({ defaultRole = "Coating professional" }: { defaultR
           ))}
         </div>
       </fieldset>
+
+      <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+        <label htmlFor="c-website">Website</label>
+        <input id="c-website" name="website" tabIndex={-1} autoComplete="off" value={website} onChange={(e) => setWebsite(e.target.value)} />
+      </div>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
         <div>

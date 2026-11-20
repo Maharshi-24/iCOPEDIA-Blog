@@ -5,7 +5,24 @@ type ContactFormData = {
   name: string;
   email: string;
   message: string;
+  /** Honeypot: hidden on the form, so only bots fill it in. */
+  website?: string;
 };
+
+/**
+ * Only accept posts made by a page on the same site. Browsers always send
+ * Origin on a POST from fetch(); scripts hitting the endpoint directly usually
+ * don't, or send another site.
+ */
+function sameSite(req: VercelRequest): boolean {
+  const origin = req.headers.origin;
+  if (!origin) return false;
+  try {
+    return new URL(origin).host === req.headers.host;
+  } catch {
+    return false;
+  }
+}
 
 function escapeHtml(value: string): string {
   return value
@@ -22,10 +39,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  try {
-    const { name, email, message } = (req.body ?? {}) as Partial<ContactFormData>;
+  if (!sameSite(req)) {
+    return res.status(403).json({ message: 'Forbidden' });
+  }
 
-    if (!name || !email || !message) {
+  try {
+    const { name: rawName, email, message, website } = (req.body ?? {}) as Partial<ContactFormData>;
+
+    // A filled honeypot means a bot: answer as if it worked, send nothing.
+    if (website) {
+      return res.status(200).json({ message: 'Message sent successfully!' });
+    }
+
+    if (typeof rawName !== 'string' || typeof email !== 'string' || typeof message !== 'string' || !rawName || !email || !message) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+    // The name goes into the subject line: no line breaks or control characters.
+    const name = rawName.replace(/[\u0000-\u001f\u007f]+/g, ' ').trim();
+    if (!name) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
