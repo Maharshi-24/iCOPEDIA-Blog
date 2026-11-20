@@ -127,6 +127,7 @@ export default function Ads() {
               <SlotPanel
                 key={selectedSlot.id}
                 slot={selectedSlot}
+                tiles={tiles}
                 settings={settings}
                 slots={slots}
                 ads={ads.filter((a) => a.slot_id === selectedSlot.id)}
@@ -208,6 +209,53 @@ const TILE_LABELS: Record<string, string> = {
 const FREE_HIDDEN_DEFAULT = new Set(['product_details', 'daily_report', 'instruments']);
 
 export type HomeTile = { key: string; label: string; visible_for_free: boolean };
+type Phone = (typeof PHONES)[number];
+type Size = { w: number; h: number };
+
+/** Free users' tile rows, following the Home tiles page. */
+function freeTileRows(tiles: HomeTile[] | null) {
+  const visible = (key: string) => {
+    const t = tiles?.find((x) => x.key === key);
+    return t ? t.visible_for_free : !FREE_HIDDEN_DEFAULT.has(key);
+  };
+  return TILE_ROWS.map((r) => r.filter(visible)).filter((r) => r.length > 0);
+}
+
+/** The ad grid's size on [phone], in logical px; `left` is the gap between tiles and bottom bar. */
+function adCanvas(phone: Phone, tiles: HomeTile[] | null) {
+  const tilesH = APP.tilesPadY * 2 + freeTileRows(tiles).length * (APP.tile + APP.tileGap);
+  const left = phone.h - phone.status - APP.header - tilesH - APP.nav;
+  return { left, w: phone.w - APP.adPad.x * 2, h: left - APP.adPad.top - APP.adPad.bottom };
+}
+
+/** A slot's size on a canvas, the same maths as the app (8 px gaps). */
+function slotSize(r: Rect, canvas: Size, s: Settings): Size {
+  const cellW = (canvas.w - APP.adGap * (s.cols - 1)) / s.cols;
+  const cellH = (canvas.h - APP.adGap * (s.rows - 1)) / s.rows;
+  return { w: r.w * cellW + (r.w - 1) * APP.adGap, h: r.h * cellH + (r.h - 1) * APP.adGap };
+}
+
+const ratioText = (w: number, h: number) => (h <= 0 ? '—' : w >= h ? `${(w / h).toFixed(2).replace(/\.?0+$/, '')} : 1` : `1 : ${(h / w).toFixed(2).replace(/\.?0+$/, '')}`);
+const even = (n: number) => Math.max(2, Math.round(n / 2) * 2);
+
+/** Image size to make for a slot: its size on the Standard phone at 3x, plus
+ * the middle part that stays visible ("Fill") on every phone that shows ads. */
+function creativeSpec(r: Rect, s: Settings, tiles: HomeTile[] | null) {
+  const sizes = PHONES.map((p) => {
+    const c = adCanvas(p, tiles);
+    return { phone: p, size: slotSize(r, c, s), hidden: c.h < s.min_height };
+  });
+  const std = sizes.find((x) => x.phone.key === 'standard')!.size;
+  const target = { w: even(std.w * 3), h: even(std.h * 3) };
+  const a = target.w / target.h;
+  let safeW = 1, safeH = 1;
+  for (const x of sizes) {
+    if (x.hidden || x.size.h <= 0) continue;
+    const ap = x.size.w / x.size.h;
+    if (ap > a) safeH = Math.min(safeH, a / ap); else safeW = Math.min(safeW, ap / a);
+  }
+  return { sizes, target, safe: { w: even(target.w * safeW), h: even(target.h * safeH) } };
+}
 
 function LayoutEditor({ settings, slots, ads, tiles, selected, onSelect, onChanged }: {
   settings: Settings; slots: Slot[]; ads: Ad[]; tiles: HomeTile[] | null; selected: string | null;
@@ -222,16 +270,9 @@ function LayoutEditor({ settings, slots, ads, tiles, selected, onSelect, onChang
   const phone = PHONES.find((p) => p.key === phoneKey)!;
   const scale = PREVIEW_W / phone.w;
 
-  const visible = (key: string) => {
-    const t = tiles?.find((x) => x.key === key);
-    return t ? t.visible_for_free : !FREE_HIDDEN_DEFAULT.has(key);
-  };
   const label = (key: string) => tiles?.find((x) => x.key === key)?.label ?? TILE_LABELS[key] ?? key;
-  const tileRows = TILE_ROWS.map((r) => r.filter(visible)).filter((r) => r.length > 0);
-  const tilesH = APP.tilesPadY * 2 + tileRows.length * (APP.tile + APP.tileGap);
-  const left = phone.h - phone.status - APP.header - tilesH - APP.nav; // space between tiles and bottom bar
-  const canvasW = phone.w - APP.adPad.x * 2;
-  const canvasH = left - APP.adPad.top - APP.adPad.bottom;
+  const tileRows = freeTileRows(tiles);
+  const { left, w: canvasW, h: canvasH } = adCanvas(phone, tiles); // left: space between tiles and bottom bar
   const hidden = canvasH < settings.min_height;
   const cellW = (canvasW - APP.adGap * (cols - 1)) / cols;
   const cellH = (canvasH - APP.adGap * (rows - 1)) / rows;
@@ -373,8 +414,8 @@ function LayoutEditor({ settings, slots, ads, tiles, selected, onSelect, onChang
                   ))}
                   {slots.map((s) => {
                     const live = drag && drag.id === s.id ? drag.rect : s;
-                    const first = ads.find((a) => a.slot_id === s.id && a.active) ?? ads.find((a) => a.slot_id === s.id);
-                    const count = ads.filter((a) => a.slot_id === s.id).length;
+                    const slotAds = ads.filter((a) => a.slot_id === s.id);
+                    const count = slotAds.length;
                     const isSel = s.id === selected;
                     return (
                       <div
@@ -388,9 +429,7 @@ function LayoutEditor({ settings, slots, ads, tiles, selected, onSelect, onChang
                         style={place(live)}
                         onPointerDown={(e) => begin(e, 'move', s)}
                       >
-                        {first ? <AdThumb ad={first} /> : (
-                          <div className="flex h-full items-center justify-center text-[13px] font-medium text-slate-400">Empty slot</div>
-                        )}
+                        <SlotPreview ads={slotAds} scrollable={s.scrollable} settings={settings} />
                         {count > 1 && (
                           <span className="absolute right-1.5 top-1.5 rounded bg-black/60 px-1.5 text-[11px] font-medium text-white">
                             {s.scrollable ? `${count} rotating` : `1 of ${count}`}
@@ -437,6 +476,54 @@ function LayoutEditor({ settings, slots, ads, tiles, selected, onSelect, onChang
       </div>
       {hidden && slots.length > 0 && (
         <p className="text-xs text-amber-700">Pick a bigger phone above to edit slots, or lower “Hide if less than” below.</p>
+      )}
+    </div>
+  );
+}
+
+/** The ads the app would show in a slot right now: live, type switched on,
+ * with media (Google ads aren't in the app yet). */
+function showable(ads: Ad[], s: Settings) {
+  const on = { direct: s.direct_enabled, sponsor: s.sponsor_enabled, google: s.google_enabled };
+  return ads.filter((a) => adStatus(a).label === 'live' && on[a.type] && a.type !== 'google' && !!a.media_url);
+}
+
+/** A slot in the phone preview, rotating like the app: each ad for its own
+ * duration, then the next, back to the first after the last. */
+function SlotPreview({ ads, scrollable, settings }: { ads: Ad[]; scrollable: boolean; settings: Settings }) {
+  const all = showable(ads, settings);
+  const list = scrollable ? all : all.slice(0, 1);
+  const [i, setI] = useState(0);
+  const idx = list.length ? i % list.length : 0;
+  const current = list[idx];
+  const seconds = current?.duration_seconds ?? 0;
+  const many = list.length > 1;
+
+  useEffect(() => {
+    if (!many) return;
+    const t = setTimeout(() => setI((n) => n + 1), seconds * 1000);
+    return () => clearTimeout(t);
+  }, [i, many, seconds]);
+
+  if (!current) {
+    return (
+      <div className="flex h-full items-center justify-center px-2 text-center text-[13px] font-medium text-slate-400">
+        {ads.length ? 'No live ads (off, scheduled, or type switched off)' : 'Empty slot'}
+      </div>
+    );
+  }
+  return (
+    <div className="relative h-full w-full">
+      <AdThumb key={current.id} ad={current} />
+      <span className="absolute left-1.5 top-1.5 rounded bg-black/55 px-1.5 text-[11px] font-semibold text-white">
+        {current.type === 'sponsor' ? `Sponsored${current.sponsor_name ? ` · ${current.sponsor_name}` : ''}` : 'Ad'}
+      </span>
+      {many && (
+        <div className="pointer-events-none absolute bottom-1.5 left-0 right-0 flex justify-center gap-1">
+          {list.map((a, j) => (
+            <span key={a.id} className={cn('h-1.5 rounded-full bg-white shadow', j === idx ? 'w-4 opacity-95' : 'w-1.5 opacity-60')} />
+          ))}
+        </div>
       )}
     </div>
   );
@@ -510,9 +597,10 @@ function GridSettings({ settings, slots, onSaved }: { settings: Settings; slots:
 
 // ------------------------------------------------------------------- slot
 
-function SlotPanel({ slot, settings, slots, ads, onChanged, onDeleted }: {
-  slot: Slot; settings: Settings; slots: Slot[]; ads: Ad[]; onChanged: () => void; onDeleted: () => void;
+function SlotPanel({ slot, tiles, settings, slots, ads, onChanged, onDeleted }: {
+  slot: Slot; tiles: HomeTile[] | null; settings: Settings; slots: Slot[]; ads: Ad[]; onChanged: () => void; onDeleted: () => void;
 }) {
+  const spec = creativeSpec(slot, settings, tiles);
   const [pos, setPos] = useState({ x: String(slot.x + 1), y: String(slot.y + 1), w: String(slot.w), h: String(slot.h) });
   const [editing, setEditing] = useState<Ad | 'new' | null>(null);
   const [busy, setBusy] = useState(false);
@@ -592,6 +680,8 @@ function SlotPanel({ slot, settings, slots, ads, onChanged, onDeleted }: {
           )}
         </div>
 
+        <CreativeSize spec={spec} shape={shapeName(slot, settings)} />
+
         <div className="grid gap-3 sm:grid-cols-2">
           <label htmlFor="slot-scroll" className="flex cursor-pointer items-start justify-between gap-3 rounded-lg border border-slate-200 p-3">
             <div className="min-w-0 flex-1">
@@ -651,6 +741,7 @@ function SlotPanel({ slot, settings, slots, ads, onChanged, onDeleted }: {
       {editing && (
         <AdDialog
           slotId={slot.id}
+          target={spec.target}
           ad={editing === 'new' ? null : editing}
           nextSort={ads.length}
           onClose={() => setEditing(null)}
@@ -658,6 +749,56 @@ function SlotPanel({ slot, settings, slots, ads, onChanged, onDeleted }: {
         />
       )}
     </Panel>
+  );
+}
+
+function CreativeSize({ spec, shape }: { spec: ReturnType<typeof creativeSpec>; shape: string }) {
+  const { target, safe, sizes } = spec;
+  const brief = [
+    `iCOPEDIA app ad (${shape})`,
+    `Size: ${target.w} × ${target.h} px (ratio ${ratioText(target.w, target.h)})`,
+    `Keep text and logos inside the middle ${safe.w} × ${safe.h} px; the edges can be cropped on some phones.`,
+    'Format: JPG, PNG, WebP, GIF or MP4 video (plays muted, looping), up to 50 MB.',
+    'A small "Ad" / "Sponsored" label sits in the top-left corner; keep that corner free of important text.',
+  ].join('\n');
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(brief);
+      toast.success('Size brief copied');
+    } catch {
+      toast.error('Could not copy. Select the text and copy it instead.');
+    }
+  }
+
+  return (
+    <div className="rounded-lg border border-blue-200 bg-blue-50/60 p-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div className="text-sm font-medium text-slate-900">Image size for this slot</div>
+          <div className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">
+            {target.w} × {target.h} px
+          </div>
+          <div className="text-xs text-slate-600">
+            Ratio {ratioText(target.w, target.h)} · keep text inside the middle {safe.w} × {safe.h} px
+          </div>
+        </div>
+        <Button size="sm" variant="outline" onClick={copy} className="bg-white">Copy brief for designer</Button>
+      </div>
+      <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+        {sizes.map((x) => (
+          <div key={x.phone.key} className="rounded-md bg-white px-2.5 py-2 ring-1 ring-slate-200">
+            <div className="font-medium text-slate-700">{x.phone.label}</div>
+            <div className="text-slate-500">
+              {x.hidden ? 'ads hidden' : `${Math.round(x.size.w)} × ${Math.round(x.size.h)} px on screen`}
+            </div>
+          </div>
+        ))}
+      </div>
+      <p className="mt-2 text-xs text-slate-500">
+        Made at 3× the size it shows on a standard phone, so it stays sharp. The slot is a slightly different shape on each phone; with “Fill the slot” the edges outside the middle area may be cut off.
+      </p>
+    </div>
   );
 }
 
@@ -677,8 +818,26 @@ function mediaTypeOf(file: File): MediaType {
   return 'image';
 }
 
-function AdDialog({ slotId, ad, nextSort, onClose, onSaved }: {
-  slotId: string; ad: Ad | null; nextSort: number; onClose: () => void; onSaved: () => void;
+/** Width and height of an image or video, read in the browser. */
+function mediaSize(src: string, video: boolean): Promise<Size | null> {
+  return new Promise((resolve) => {
+    if (video) {
+      const v = document.createElement('video');
+      v.preload = 'metadata';
+      v.onloadedmetadata = () => resolve({ w: v.videoWidth, h: v.videoHeight });
+      v.onerror = () => resolve(null);
+      v.src = src;
+    } else {
+      const img = new Image();
+      img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
+      img.onerror = () => resolve(null);
+      img.src = src;
+    }
+  });
+}
+
+function AdDialog({ slotId, target, ad, nextSort, onClose, onSaved }: {
+  slotId: string; target: Size; ad: Ad | null; nextSort: number; onClose: () => void; onSaved: () => void;
 }) {
   const [type, setType] = useState<AdType>(ad?.type ?? 'direct');
   const [title, setTitle] = useState(ad?.title ?? '');
@@ -695,11 +854,24 @@ function AdDialog({ slotId, ad, nextSort, onClose, onSaved }: {
   const [endsAt, setEndsAt] = useState(toLocalInput(ad?.ends_at ?? null));
   const [saving, setSaving] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
+  const [actual, setActual] = useState<Size | null>(null);
 
   useEffect(() => () => { if (fileUrl) URL.revokeObjectURL(fileUrl); }, [fileUrl]);
 
   const mediaType: MediaType = file ? mediaTypeOf(file) : ad?.media_type ?? 'image';
   const mediaSrc = fileUrl ?? ad?.media_url ?? null;
+
+  useEffect(() => {
+    let live = true;
+    setActual(null);
+    if (mediaSrc) mediaSize(mediaSrc, mediaType === 'video').then((sz) => { if (live) setActual(sz); });
+    return () => { live = false; };
+  }, [mediaSrc, mediaType]);
+
+  // How far the file's shape is from the slot's (1 = same).
+  const off = actual && actual.h > 0 ? (actual.w / actual.h) / (target.w / target.h) : 1;
+  const shapeOk = off > 0.9 && off < 1.1;
+  const small = actual ? actual.w < target.w * 0.66 : false;
   const d = Number(duration);
   const problems = [
     type !== 'google' && !mediaSrc && 'Add an image, GIF or video.',
@@ -862,7 +1034,19 @@ function AdDialog({ slotId, ad, nextSort, onClose, onSaved }: {
               <input ref={fileInput} type="file" className="hidden"
                 accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime"
                 onChange={(e) => { pick(e.target.files?.[0]); e.target.value = ''; }} />
-              <p className="text-xs text-slate-500">Up to {MAX_MB} MB. Videos play muted and loop.</p>
+              <p className="text-xs text-slate-500">
+                Make it <span className="font-medium text-slate-700">{target.w} × {target.h} px</span> ({ratioText(target.w, target.h)}). Up to {MAX_MB} MB. Videos play muted and loop.
+              </p>
+              {actual && (
+                <p className={cn('text-xs', shapeOk && !small ? 'text-emerald-700' : 'text-amber-700')}>
+                  This file: {actual.w} × {actual.h} px ({ratioText(actual.w, actual.h)}).{' '}
+                  {!shapeOk
+                    ? (fit === 'cover'
+                      ? `It’s ${off > 1 ? 'wider' : 'taller'} than the slot, so ${off > 1 ? 'the sides' : 'the top and bottom'} will be cut off. Use “Show all of it” or a ${target.w} × ${target.h} px file.`
+                      : 'It will show with empty bands around it in the background colour.')
+                    : small ? 'Right shape, but small: it may look blurry.' : 'Right shape for this slot.'}
+                </p>
+              )}
               <div>
                 <Label htmlFor="ad-fit" className="text-xs">Fit</Label>
                 <select id="ad-fit" className={select} value={fit} onChange={(e) => setFit(e.target.value as 'cover' | 'contain')}>
