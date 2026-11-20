@@ -1,11 +1,14 @@
 import { PointerEvent as ReactPointerEvent, useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowDown, ArrowUp, Bell, Home, ImagePlus, Menu, Pencil, Plus, Sparkles, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, Bell, CalendarDays, Home, ImagePlus, Menu, Pencil, Plus, Sparkles, Trash2, X } from 'lucide-react';
+import { addDays, differenceInCalendarDays, format, startOfDay } from 'date-fns';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 import { supabase, SUPABASE_URL } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { attempt, Confirm, Empty, friendlyError, Loading, PageHeader, Panel, Pill, Spinner } from '../shared';
@@ -897,6 +900,128 @@ const toLocalInput = (iso: string | null) => {
 };
 const fromLocalInput = (v: string) => (v ? new Date(v).toISOString() : null);
 
+// ------------------------------------------------------- date and time picker
+
+// Values are "YYYY-MM-DDTHH:mm" in local time, or "" for not set, the same
+// format toLocalInput / fromLocalInput use.
+const pad2 = (n: number) => String(n).padStart(2, '0');
+const toLocalValue = (d: Date) =>
+  `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+const fromLocalValue = (v: string) => (v ? new Date(v) : null);
+const whenText = (d: Date) => `${format(d, 'EEE, d MMM yyyy')} · ${format(d, 'h:mm a')}`;
+const at = (day: Date, h: number, m: number) => { const d = new Date(day); d.setHours(h, m, 0, 0); return d; };
+
+function DateTimeField({ id, label, value, onChange, empty, fallback, notBefore, presets }: {
+  id: string; label: string; value: string; onChange: (v: string) => void;
+  /** Shown when not set, e.g. "Starts right away". */
+  empty: string;
+  /** Where the picker opens when nothing is set yet. */
+  fallback: () => Date;
+  /** Days before this can't be picked (the end can't come before the start). */
+  notBefore?: Date | null;
+  presets: { label: string; value: () => string }[];
+}) {
+  const [open, setOpen] = useState(false);
+  const current = fromLocalValue(value);
+  const [draft, setDraft] = useState<Date>(() => current ?? fallback());
+
+  function openChange(o: boolean) {
+    if (o) setDraft(current ?? fallback());
+    setOpen(o);
+  }
+
+  const h24 = draft.getHours();
+  const hour12 = ((h24 + 11) % 12) + 1;
+  const pm = h24 >= 12;
+  const minute = draft.getMinutes();
+  const minutes = Array.from({ length: 12 }, (_, i) => i * 5);
+  if (!minutes.includes(minute)) {
+    minutes.push(minute);
+    minutes.sort((a, b) => a - b);
+  }
+  const setTime = (h12: number, m: number, isPm: boolean) =>
+    setDraft(at(draft, (h12 % 12) + (isPm ? 12 : 0), m));
+  const sel = 'h-9 rounded-md border border-slate-200 bg-white px-2 text-sm';
+
+  return (
+    <div>
+      <Label htmlFor={id}>{label}</Label>
+      <Popover open={open} onOpenChange={openChange}>
+        <div className="relative mt-1">
+          <PopoverTrigger asChild>
+            <button id={id} type="button"
+              className={cn('flex h-10 w-full items-center gap-2 rounded-md border border-slate-200 bg-white pl-3 pr-9 text-left text-sm hover:border-slate-300',
+                !current && 'text-slate-500')}>
+              <CalendarDays className="h-4 w-4 shrink-0 text-slate-500" />
+              <span className="truncate">{current ? whenText(current) : empty}</span>
+            </button>
+          </PopoverTrigger>
+          {current && (
+            <button type="button" aria-label={`Clear ${label.toLowerCase()}`} onClick={() => onChange('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700">
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="single"
+            selected={draft}
+            defaultMonth={draft}
+            onSelect={(day) => day && setDraft(at(day, draft.getHours(), draft.getMinutes()))}
+            disabled={notBefore ? { before: startOfDay(notBefore) } : undefined}
+            initialFocus
+          />
+          <div className="flex items-center gap-2 border-t border-slate-100 px-3 py-3">
+            <span className="mr-1 text-xs font-medium text-slate-600">Time</span>
+            <select aria-label="Hour" className={sel} value={hour12} onChange={(e) => setTime(Number(e.target.value), minute, pm)}>
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((h) => <option key={h} value={h}>{h}</option>)}
+            </select>
+            <span className="text-slate-400">:</span>
+            <select aria-label="Minute" className={sel} value={minute} onChange={(e) => setTime(hour12, Number(e.target.value), pm)}>
+              {minutes.map((m) => <option key={m} value={m}>{pad2(m)}</option>)}
+            </select>
+            <div className="ml-1 inline-flex rounded-md border border-slate-200 p-0.5" role="radiogroup" aria-label="AM or PM">
+              {(['AM', 'PM'] as const).map((x) => (
+                <button key={x} type="button" role="radio" aria-checked={(x === 'PM') === pm}
+                  onClick={() => setTime(hour12, minute, x === 'PM')}
+                  className={cn('rounded px-2.5 py-1 text-xs font-semibold', (x === 'PM') === pm ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100')}>
+                  {x}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="flex items-center justify-between gap-2 border-t border-slate-100 px-3 py-2">
+            <Button type="button" size="sm" variant="ghost" onClick={() => { onChange(''); setOpen(false); }}>Clear</Button>
+            <Button type="button" size="sm" className="bg-slate-900 text-white hover:bg-slate-800"
+              onClick={() => { onChange(toLocalValue(draft)); setOpen(false); }}>
+              Set {format(draft, 'd MMM')}, {format(draft, 'h:mm a')}
+            </Button>
+          </div>
+        </PopoverContent>
+      </Popover>
+      <div className="mt-1.5 flex flex-wrap gap-1.5">
+        {presets.map((p) => (
+          <button key={p.label} type="button" onClick={() => onChange(p.value())}
+            className="rounded-full border border-slate-200 bg-white px-2.5 py-0.5 text-xs text-slate-600 hover:border-slate-300 hover:bg-slate-50">
+            {p.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** "Runs from now until you switch it off", "Runs Fri, 21 Nov · 9:00 AM → …" */
+function scheduleText(start: string, end: string) {
+  const s = fromLocalValue(start), e = fromLocalValue(end);
+  if (!s && !e) return 'Runs from now until you switch it off.';
+  if (s && !e) return `Starts ${whenText(s)} and runs until you switch it off.`;
+  if (!s && e) return `Runs from now until ${whenText(e)}.`;
+  const days = differenceInCalendarDays(e!, s!);
+  return `Runs ${whenText(s!)} → ${whenText(e!)}${days > 0 ? ` (${days} day${days === 1 ? '' : 's'})` : ''}.`;
+}
+
 function mediaTypeOf(file: File): MediaType {
   if (file.type === 'image/gif') return 'gif';
   if (file.type.startsWith('video/')) return 'video';
@@ -1101,21 +1226,38 @@ function AdDialog({ slotId, slotChoices, target, ad, onClose, onSaved }: {
               </>
             )}
 
-            <div className="grid grid-cols-3 gap-3">
-              <div>
-                <Label htmlFor="ad-duration">Duration (s)</Label>
-                <Input id="ad-duration" type="number" min={2} max={120} value={duration} onChange={(e) => setDuration(e.target.value)} className="mt-1" />
-              </div>
-              <div>
-                <Label htmlFor="ad-start">Starts</Label>
-                <Input id="ad-start" type="datetime-local" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} className="mt-1 px-2 text-xs" />
-              </div>
-              <div>
-                <Label htmlFor="ad-end">Ends</Label>
-                <Input id="ad-end" type="datetime-local" value={endsAt} onChange={(e) => setEndsAt(e.target.value)} className="mt-1 px-2 text-xs" />
-              </div>
+            <div className="max-w-[12rem]">
+              <Label htmlFor="ad-duration">Duration (seconds)</Label>
+              <Input id="ad-duration" type="number" min={2} max={120} value={duration} onChange={(e) => setDuration(e.target.value)} className="mt-1" />
+              <p className="mt-1 text-xs text-slate-500">How long it shows before a scrollable slot moves on.</p>
             </div>
-            <p className="-mt-2 text-xs text-slate-500">Duration is how long it shows before a scrollable slot moves on. Leave the dates empty to run it until you switch it off.</p>
+
+            <div className="rounded-lg border border-slate-200 bg-slate-50/60 p-3">
+              <div className="mb-2 text-sm font-medium text-slate-900">Schedule</div>
+              <div className="grid gap-3">
+                <DateTimeField
+                  id="ad-start" label="Starts" value={startsAt} onChange={setStartsAt}
+                  empty="Right away"
+                  fallback={() => { const d = new Date(); d.setMinutes(Math.ceil(d.getMinutes() / 5) * 5, 0, 0); return d; }}
+                  presets={[
+                    { label: 'Now', value: () => '' },
+                    { label: 'Tomorrow, 9:00 AM', value: () => toLocalValue(at(addDays(new Date(), 1), 9, 0)) },
+                  ]}
+                />
+                <DateTimeField
+                  id="ad-end" label="Ends" value={endsAt} onChange={setEndsAt}
+                  empty="No end date"
+                  notBefore={fromLocalValue(startsAt) ?? new Date()}
+                  fallback={() => at(addDays(fromLocalValue(startsAt) ?? new Date(), 7), 23, 55)}
+                  presets={[
+                    { label: 'No end', value: () => '' },
+                    { label: 'In 7 days', value: () => toLocalValue(at(addDays(fromLocalValue(startsAt) ?? new Date(), 7), 23, 55)) },
+                    { label: 'In 30 days', value: () => toLocalValue(at(addDays(fromLocalValue(startsAt) ?? new Date(), 30), 23, 55)) },
+                  ]}
+                />
+              </div>
+              <p className="mt-3 text-xs text-slate-600">{scheduleText(startsAt, endsAt)}</p>
+            </div>
           </div>
 
           {/* Media */}
