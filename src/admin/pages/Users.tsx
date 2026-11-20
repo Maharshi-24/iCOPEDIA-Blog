@@ -83,7 +83,7 @@ export default function UsersPage() {
       >
         {!users ? <Loading /> : filtered.length === 0 ? <Empty>No users match.</Empty> : (
           <div className="-mx-5 overflow-x-auto">
-            <table className="w-full min-w-[760px] text-sm">
+            <table className="stack-table w-full text-sm sm:min-w-[760px]">
               <thead className="border-y border-slate-100 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
                 <tr>
                   <th className="px-5 py-2 font-medium">Name</th>
@@ -107,17 +107,19 @@ export default function UsersPage() {
                         </div>
                         <div className="text-xs text-slate-500">{[u.user_type, u.email, u.city].filter(Boolean).join(' · ')}</div>
                       </td>
-                      <td className="whitespace-nowrap px-3 py-2.5">
-                        <div className="font-mono text-xs">{u.phone_no || '—'}</div>
-                        {u.phone_no && (canLogIn
-                          ? <span className="text-xs text-emerald-700">can log in</span>
-                          : <button className="text-xs font-medium text-amber-700 underline" onClick={() => allowLogin(u)}>blocked: allow login</button>)}
+                      <td data-label="Phone" className="whitespace-nowrap px-3 py-2.5">
+                        <div>
+                          <div className="font-mono text-xs">{u.phone_no || '—'}</div>
+                          {u.phone_no && (canLogIn
+                            ? <span className="text-xs text-emerald-700">can log in</span>
+                            : <button className="text-xs font-medium text-amber-700 underline" onClick={() => allowLogin(u)}>blocked: allow login</button>)}
+                        </div>
                       </td>
-                      <td className="px-3 py-2.5"><Pill tone={ROLE_TONE[u.app_role] ?? 'slate'}>{ROLE_LABEL[u.app_role] ?? u.app_role}</Pill></td>
-                      <td className="px-3 py-2.5 text-slate-600">{(u.company_id && companyName.get(u.company_id)) || u.company_name || '—'}</td>
-                      <td className="whitespace-nowrap px-3 py-2.5 text-slate-500">{fmtDate(u.created_at, false)}</td>
-                      <td className="px-5 py-2.5 text-right">
-                        <Button variant="outline" size="sm" onClick={() => setEditing(u)}>Change role</Button>
+                      <td data-label="Role" className="px-3 py-2.5"><Pill tone={ROLE_TONE[u.app_role] ?? 'slate'}>{ROLE_LABEL[u.app_role] ?? u.app_role}</Pill></td>
+                      <td data-label="Company" className="px-3 py-2.5 text-slate-600">{(u.company_id && companyName.get(u.company_id)) || u.company_name || '—'}</td>
+                      <td data-label="Joined" className="whitespace-nowrap px-3 py-2.5 text-slate-500">{fmtDate(u.created_at, false)}</td>
+                      <td className="px-5 py-2.5 text-right max-sm:!pt-2.5">
+                        <Button variant="outline" size="sm" className="max-sm:w-full" onClick={() => setEditing(u)}>Change role</Button>
                       </td>
                     </tr>
                   );

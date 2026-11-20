@@ -115,7 +115,7 @@ export default function LoginAccess() {
       <Panel
         title={`Allowed numbers${rows ? ` (${rows.filter((r) => r.is_active).length} active)` : ''}`}
         actions={
-          <div className="relative w-48 sm:w-64">
+          <div className="relative w-full sm:w-64">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
             <Input className="h-9 pl-8" placeholder="Search" value={query} onChange={(e) => setQuery(e.target.value)} />
           </div>
@@ -123,7 +123,7 @@ export default function LoginAccess() {
       >
         {!rows ? <Loading /> : filtered.length === 0 ? <Empty>No numbers match.</Empty> : (
           <div className="-mx-5 overflow-x-auto">
-            <table className="w-full min-w-[640px] text-sm">
+            <table className="stack-table w-full text-sm sm:min-w-[640px]">
               <thead className="border-y border-slate-100 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
                 <tr>
                   <th className="px-5 py-2 font-medium">Number</th>
@@ -139,11 +139,11 @@ export default function LoginAccess() {
                   const p = profileByPhone.get(phoneKey(r.phone));
                   return (
                     <tr key={r.id} className={r.is_active ? '' : 'text-slate-400'}>
-                      <td className="whitespace-nowrap px-5 py-2.5 font-mono">{r.phone}</td>
-                      <td className="px-3 py-2.5">
+                      <td className="whitespace-nowrap px-5 py-2.5 font-mono max-sm:font-semibold">{r.phone}</td>
+                      <td data-label="Note" className="px-3 py-2.5">
                         <NoteCell value={r.description ?? ''} onSave={(description) => update(r, { description: description || null })} />
                       </td>
-                      <td className="px-3 py-2.5">
+                      <td data-label="App account" className="px-3 py-2.5">
                         {p ? (
                           <span className="flex items-center gap-1.5">
                             {p.full_name || 'Unnamed'}
@@ -151,8 +151,8 @@ export default function LoginAccess() {
                           </span>
                         ) : <span className="text-slate-400">not signed up yet</span>}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-2.5 text-slate-500">{timeAgo(lastAttempt.get(r.phone))}</td>
-                      <td className="px-3 py-2.5">
+                      <td data-label="Last OTP" className="whitespace-nowrap px-3 py-2.5 text-slate-500">{timeAgo(lastAttempt.get(r.phone))}</td>
+                      <td data-label="Can log in" className="px-3 py-2.5">
                         <Switch checked={r.is_active} onCheckedChange={(v) => update(r, { is_active: v })} aria-label="Can log in" />
                       </td>
                       <td className="px-5 py-2.5 text-right">
@@ -183,7 +183,7 @@ function NoteCell({ value, onSave }: { value: string; onSave: (v: string) => voi
   useEffect(() => setDraft(value), [value]);
   return (
     <input
-      className="w-full min-w-[140px] rounded border border-transparent bg-transparent px-1.5 py-1 hover:border-slate-200 focus:border-slate-300 focus:bg-white focus:outline-none"
+      className="w-full rounded border sm:min-w-[140px] max-sm:-ml-1.5 border-transparent bg-transparent px-1.5 py-1 hover:border-slate-200 focus:border-slate-300 focus:bg-white focus:outline-none"
       value={draft}
       placeholder="Add note"
       onChange={(e) => setDraft(e.target.value)}

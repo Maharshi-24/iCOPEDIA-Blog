@@ -873,7 +873,7 @@ function CreativeSize({ spec, shape }: { spec: ReturnType<typeof creativeSpec>; 
         </div>
         <Button size="sm" variant="outline" onClick={copy} className="bg-white">Copy brief for designer</Button>
       </div>
-      <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+      <div className="mt-3 grid gap-2 text-xs sm:grid-cols-3">
         {sizes.map((x) => (
           <div key={x.phone.key} className="rounded-md bg-white px-2.5 py-2 ring-1 ring-slate-200">
             <div className="font-medium text-slate-700">{x.phone.label}</div>
@@ -1198,7 +1198,7 @@ function AdDialog({ slotId, slotChoices, target, ad, onClose, onSaved }: {
                   </div>
                 )}
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid gap-3 sm:grid-cols-2">
                   <div>
                     <Label htmlFor="ad-action">When tapped</Label>
                     <select id="ad-action" className={select} value={actionKind} onChange={(e) => setActionKind(e.target.value as ActionKind)}>

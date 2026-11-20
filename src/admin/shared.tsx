@@ -32,7 +32,7 @@ export function Panel({ title, description, children, className, actions }: {
   return (
     <section className={cn('rounded-xl border border-slate-200 bg-white p-5 shadow-sm', className)}>
       {(title || actions) && (
-        <div className="mb-4 flex items-start justify-between gap-3">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             {title && <h2 className="text-base font-semibold text-slate-900">{title}</h2>}
             {description && <p className="mt-0.5 text-sm text-slate-500">{description}</p>}
