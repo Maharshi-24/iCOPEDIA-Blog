@@ -38,6 +38,16 @@ type Ad = {
 };
 
 const BUCKET = 'ads';
+
+// Table names the page uses. Ad blockers (Brave Shields, uBlock) block
+// requests like PATCH /rest/v1/ads?id=eq.…, which broke editing with
+// "Failed to fetch", so the page goes through the views promo_items /
+// promo_slots / promo_settings (backend migration 20261120130000). Until that
+// migration is run it falls back to the tables themselves.
+const VIEWS = { ads: 'promo_items', slots: 'promo_slots', settings: 'promo_settings' };
+const TABLES = { ads: 'ads', slots: 'ad_slots', settings: 'ad_settings' };
+let T = VIEWS;
+const missing = (m?: string) => !!m && /does not exist|schema cache|Could not find the table/i.test(m);
 const PUBLIC_PREFIX = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/`;
 const MAX_MB = 50; // bucket limit
 
@@ -88,11 +98,17 @@ export default function Ads() {
   const [selected, setSelected] = useState<string | null>(null);
   const [tiles, setTiles] = useState<HomeTile[] | null>(null);
 
+  const [usingTables, setUsingTables] = useState(false);
+
   const load = useCallback(async () => {
+    // Views first; fall back to the tables if the views aren't installed yet.
+    const probe = await supabase.from(VIEWS.settings).select('cols').limit(1);
+    T = missing(probe.error?.message) ? TABLES : VIEWS;
+    setUsingTables(T === TABLES);
     const [s, sl, a, t] = await Promise.all([
-      supabase.from('ad_settings').select('direct_enabled, sponsor_enabled, google_enabled, cols, rows, min_height').maybeSingle(),
-      supabase.from('ad_slots').select('id, x, y, w, h, scrollable, active').order('y').order('x'),
-      supabase.from('ads').select('*').order('sort').order('created_at'),
+      supabase.from(T.settings).select('direct_enabled, sponsor_enabled, google_enabled, cols, rows, min_height').maybeSingle(),
+      supabase.from(T.slots).select('id, x, y, w, h, scrollable, active').order('y').order('x'),
+      supabase.from(T.ads).select('*').order('sort').order('created_at'),
       // For the phone preview: which Home tiles free users see.
       supabase.from('home_tiles').select('key, label, visible_for_free'),
     ]);
@@ -123,6 +139,12 @@ export default function Ads() {
         title="Ads"
         description="Shown only to free users, in the empty space under the Home tiles. That space is a different height on every phone, so you lay ads out on a grid that stretches to fit it exactly: Home never scrolls and the bottom bar and tiles always stay in view. Changes reach the app the next time Home loads; no app update needed."
       />
+      {usingTables && !error && (
+        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          Editing or deleting ads may fail with “Failed to fetch” in browsers with an ad blocker (Brave Shields, uBlock).
+          Run backend migration <code>20261120130000_promo_views_and_terms.sql</code> in the Supabase SQL editor to fix it.
+        </div>
+      )}
       {error ? <Panel><Empty>{error}</Empty></Panel> : !settings ? <Panel><Loading /></Panel> : (
         <div className="space-y-4">
           <TypesPanel settings={settings} onSaved={load} />
@@ -176,7 +198,7 @@ function TypesPanel({ settings, onSaved }: { settings: Settings; onSaved: () => 
   const [busy, setBusy] = useState<string | null>(null);
   async function toggle(key: 'direct_enabled' | 'sponsor_enabled' | 'google_enabled', on: boolean) {
     setBusy(key);
-    const ok = await attempt(() => supabase.from('ad_settings').update({ [key]: on }).eq('id', true), on ? 'Turned on' : 'Turned off');
+    const ok = await attempt(() => supabase.from(T.settings).update({ [key]: on }).eq('id', true), on ? 'Turned on' : 'Turned off');
     setBusy(null);
     if (ok) onSaved();
   }
@@ -348,9 +370,9 @@ function LayoutEditor({ settings, slots, ads, tiles, selected, onSelect, onChang
   async function save(id: string | null, rect: Rect) {
     setBusy(true);
     if (id) {
-      await attempt(() => supabase.from('ad_slots').update(rect).eq('id', id));
+      await attempt(() => supabase.from(T.slots).update(rect).eq('id', id));
     } else {
-      const { data, error } = await supabase.from('ad_slots').insert(rect).select('id').single();
+      const { data, error } = await supabase.from(T.slots).insert(rect).select('id').single();
       if (error) toast.error(friendlyError(error.message));
       else onSelect((data as { id: string }).id);
     }
@@ -600,7 +622,7 @@ function GridSettings({ settings, slots, onSaved }: { settings: Settings; slots:
 
   async function save() {
     setSaving(true);
-    const ok = await attempt(() => supabase.from('ad_settings').update({ cols: c, rows: r, min_height: m }).eq('id', true), 'Grid saved');
+    const ok = await attempt(() => supabase.from(T.settings).update({ cols: c, rows: r, min_height: m }).eq('id', true), 'Grid saved');
     setSaving(false);
     if (ok) onSaved();
   }
@@ -655,7 +677,7 @@ function SlotPanel({ slot, tiles, settings, slots, ads, allAds, onChanged, onDel
 
   async function update(patch: Partial<Slot>, msg?: string) {
     setBusy(true);
-    const ok = await attempt(() => supabase.from('ad_slots').update(patch).eq('id', slot.id), msg);
+    const ok = await attempt(() => supabase.from(T.slots).update(patch).eq('id', slot.id), msg);
     setBusy(false);
     if (ok) onChanged();
   }
@@ -666,7 +688,7 @@ function SlotPanel({ slot, tiles, settings, slots, ads, allAds, onChanged, onDel
     if (j < 0 || j >= list.length) return;
     [list[index], list[j]] = [list[j], list[index]];
     setBusy(true);
-    const results = await Promise.all(list.map((a, i) => supabase.from('ads').update({ sort: i }).eq('id', a.id)));
+    const results = await Promise.all(list.map((a, i) => supabase.from(T.ads).update({ sort: i }).eq('id', a.id)));
     setBusy(false);
     const failed = results.find((r) => r.error);
     if (failed?.error) toast.error(friendlyError(failed.error.message));
@@ -674,12 +696,12 @@ function SlotPanel({ slot, tiles, settings, slots, ads, allAds, onChanged, onDel
   }
 
   async function deleteAd(ad: Ad) {
-    const ok = await attempt(() => supabase.from('ads').delete().eq('id', ad.id), 'Ad deleted');
+    const ok = await attempt(() => supabase.from(T.ads).delete().eq('id', ad.id), 'Ad deleted');
     if (ok) { await removeStored(ad.media_url); onChanged(); }
   }
 
   async function deleteSlot() {
-    const ok = await attempt(() => supabase.from('ad_slots').delete().eq('id', slot.id), 'Slot deleted');
+    const ok = await attempt(() => supabase.from(T.slots).delete().eq('id', slot.id), 'Slot deleted');
     if (ok) {
       await Promise.all(ads.map((a) => removeStored(a.media_url)));
       onDeleted();
@@ -756,7 +778,7 @@ function SlotPanel({ slot, tiles, settings, slots, ads, allAds, onChanged, onDel
                 <Button size="sm" variant="outline" className="h-7 bg-white" disabled={busy}
                   onClick={async () => {
                     setBusy(true);
-                    const ok = await attempt(() => supabase.from('ad_settings').update({ [TYPE_SETTING[t]]: true }).eq('id', true), `${TYPE_GROUP[t]} turned on`);
+                    const ok = await attempt(() => supabase.from(T.settings).update({ [TYPE_SETTING[t]]: true }).eq('id', true), `${TYPE_GROUP[t]} turned on`);
                     setBusy(false);
                     if (ok) onChanged();
                   }}>
@@ -783,7 +805,7 @@ function SlotPanel({ slot, tiles, settings, slots, ads, allAds, onChanged, onDel
                     </div>
                     </button>
                     <Switch checked={ad.active} aria-label="Show this ad" disabled={busy}
-                      onCheckedChange={async (v) => { if (await attempt(() => supabase.from('ads').update({ active: v }).eq('id', ad.id))) onChanged(); }} />
+                      onCheckedChange={async (v) => { if (await attempt(() => supabase.from(T.ads).update({ active: v }).eq('id', ad.id))) onChanged(); }} />
                     <div className="flex">
                       <Button size="icon" variant="ghost" className="h-8 w-8" disabled={busy || i === 0} aria-label="Move up" onClick={() => reorder(i, -1)}><ArrowUp className="h-4 w-4" /></Button>
                       <Button size="icon" variant="ghost" className="h-8 w-8" disabled={busy || i === ads.length - 1} aria-label="Move down" onClick={() => reorder(i, 1)}><ArrowDown className="h-4 w-4" /></Button>
@@ -986,8 +1008,8 @@ function AdDialog({ slotId, slotChoices, target, ad, onClose, onSaved }: {
       // New ads, and ads moved to another slot, go to the end of that slot's rotation.
       const sort = slotChoices.find((x) => x.id === slotSel)?.count ?? 0;
       const ok = ad
-        ? await attempt(() => supabase.from('ads').update(moving ? { ...row, sort } : row).eq('id', ad.id), moving ? 'Ad moved' : 'Ad saved')
-        : await attempt(() => supabase.from('ads').insert({ ...row, sort }), 'Ad added');
+        ? await attempt(() => supabase.from(T.ads).update(moving ? { ...row, sort } : row).eq('id', ad.id), moving ? 'Ad moved' : 'Ad saved')
+        : await attempt(() => supabase.from(T.ads).insert({ ...row, sort }), 'Ad added');
       if (!ok) {
         if (file && media_url) await removeStored(media_url);
         return;

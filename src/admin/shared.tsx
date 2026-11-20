@@ -129,6 +129,7 @@ export async function attempt(fn: () => PromiseLike<{ error: { message: string }
 
 export function friendlyError(message: string) {
   if (/duplicate key/i.test(message)) return 'That already exists.';
+  if (/Failed to fetch|NetworkError|Load failed/i.test(message)) return 'Could not reach the server. Check your connection; if you use an ad blocker (Brave Shields, uBlock), turn it off for icopedia.co and try again.';
   if (/row-level security|permission denied|admin only/i.test(message)) return 'Not allowed: your account is not an admin.';
   if (/test_phone_numbers_phone_e164/.test(message)) return 'Phone must look like +919876543210.';
   return message;
