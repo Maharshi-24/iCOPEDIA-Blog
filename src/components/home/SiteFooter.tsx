@@ -3,12 +3,12 @@ import { EMAIL, PHONE_DISPLAY, PLAY_URL, whatsapp } from "./site";
 export function SiteFooter() {
   const year = new Date().getFullYear();
   const heading = "mb-3 text-sm font-semibold text-white";
-  const item = "text-sm text-white/65 hover:text-white hover:underline hover:underline-offset-4";
+  const item = "inline-block py-1.5 text-[15px] sm:py-1 sm:text-sm text-white/65 hover:text-white hover:underline hover:underline-offset-4";
 
   return (
     <footer className="bg-[#23282D] text-white">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-12">
-        <div className="md:col-span-5">
+      <div className="mx-auto grid max-w-6xl grid-cols-2 gap-x-6 gap-y-10 px-4 py-12 sm:px-6 sm:py-14 md:grid-cols-12">
+        <div className="col-span-2 md:col-span-5">
           <a href="/" className="flex items-center gap-2.5">
             <img src="/icopedia-mark.svg" alt="" className="h-8 w-8" />
             <span className="semi-wide text-xl font-extrabold">
@@ -30,9 +30,9 @@ export function SiteFooter() {
           </address>
         </div>
 
-        <div className="md:col-span-3">
+        <div className="row-span-2 md:col-span-3 md:row-span-1">
           <p className={heading}>App</p>
-          <ul className="space-y-2.5">
+          <ul className="space-y-1.5">
             <li><a className={item} href="/#tools">Tools</a></li>
             <li><a className={item} href="/#plans">Free and company plans</a></li>
             <li><a className={item} href="/#manufacturers">Manufacturers</a></li>
@@ -42,7 +42,7 @@ export function SiteFooter() {
 
         <div className="md:col-span-2">
           <p className={heading}>Help</p>
-          <ul className="space-y-2.5">
+          <ul className="space-y-1.5">
             <li><a className={item} href="/support">Help and FAQ</a></li>
             <li><a className={item} href="/#contact">Contact us</a></li>
           </ul>
@@ -50,7 +50,7 @@ export function SiteFooter() {
 
         <div className="md:col-span-2">
           <p className={heading}>Legal</p>
-          <ul className="space-y-2.5">
+          <ul className="space-y-1.5">
             <li><a className={item} href="/terms">Terms of Use</a></li>
             <li><a className={item} href="/privacy-policy">Privacy Policy</a></li>
           </ul>

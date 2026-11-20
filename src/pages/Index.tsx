@@ -53,14 +53,14 @@ function Hero({ onCompany }: { onCompany: () => void }) {
   return (
     <section className="pt-28 sm:pt-36">
       <div className={wrap}>
-        <h1 className="wide max-w-[14ch] text-[3.1rem] font-black leading-[0.95] sm:text-[5.25rem] lg:text-[6.25rem]">
+        <h1 className="wide max-w-[14ch] text-[clamp(2.4rem,11vw,3.1rem)] font-black leading-[0.95] sm:text-[5.25rem] lg:text-[6.25rem]">
           Every coat, worked out.
         </h1>
-        <p className="load-in mt-7 max-w-[56ch] text-lg leading-relaxed text-[#3A4046] sm:text-xl" style={{ ["--load-delay" as string]: "90ms" }}>
+        <p className="load-in mt-6 max-w-[56ch] text-[17px] leading-relaxed sm:mt-7 sm:text-lg text-[#3A4046] sm:text-xl" style={{ ["--load-delay" as string]: "90ms" }}>
           iCOPEDIA is the app for people who estimate, apply and inspect protective coatings. Calculators, bills of
           quantities, site reports, instrument records, manufacturers' product data and an AI assistant, free to start.
         </p>
-        <div className="load-in mt-9 flex flex-col gap-3 sm:flex-row" style={{ ["--load-delay" as string]: "180ms" }}>
+        <div className="load-in mt-8 flex flex-col gap-3 sm:mt-9 sm:flex-row" style={{ ["--load-delay" as string]: "180ms" }}>
           <PrimaryLink href={PLAY_URL}>Get it on Google Play</PrimaryLink>
           <SecondaryLink href="/#contact" onClick={onCompany}>Set up your company</SecondaryLink>
         </div>
@@ -112,14 +112,14 @@ const STAGES = [
 
 function Tools() {
   return (
-    <section id="tools" className="scroll-mt-16 border-t-2 border-[#23282D] bg-white py-20 sm:py-28">
+    <section id="tools" className="scroll-mt-16 border-t-2 border-[#23282D] bg-white py-16 sm:py-28">
       <div className={wrap}>
-        <h2 className={h2} data-reveal>From estimate to sign-off</h2>
+        <h2 className={h2} data-reveal>From estimate to sign‑off</h2>
         <p className={lead}>The app follows the job. Here's where each tool fits.</p>
 
-        <ol className="mt-14">
+        <ol className="mt-10 sm:mt-14">
           {STAGES.map((s, i) => (
-            <li key={s.stage} data-reveal className="grid gap-6 border-t border-[#D6D9D4] py-10 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.6fr)] md:gap-12">
+            <li key={s.stage} data-reveal className="grid gap-6 border-t border-[#D6D9D4] py-8 sm:py-10 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.6fr)] md:gap-12">
               <div>
                 <p className="num text-sm font-semibold text-[#6B7278]">Stage {i + 1} of {STAGES.length}</p>
                 <h3 className="wide mt-1 text-3xl sm:text-4xl">{s.stage}</h3>
@@ -215,38 +215,38 @@ function CellView({ v }: { v: Cell }) {
 
 function Plans({ onCompany }: { onCompany: () => void }) {
   return (
-    <section id="plans" className="scroll-mt-16 py-20 sm:py-28">
+    <section id="plans" className="scroll-mt-16 py-16 sm:py-28">
       <div className={wrap}>
         <h2 className={h2} data-reveal>Free for you, ready for your team</h2>
         <p className={lead}>
           Anyone can sign up with a mobile number and use iCOPEDIA at no cost. Companies get the full app for their whole team.
         </p>
 
-        <div className="mt-12 overflow-x-auto" data-reveal data-reveal-delay="100">
-          <table className="w-full min-w-[560px] border-collapse text-left text-[15px]">
+        <div className="mt-10 sm:mt-12 sm:overflow-x-auto" data-reveal data-reveal-delay="100">
+          <table role="table" className="plans-table w-full border-collapse text-left text-[15px] sm:min-w-[560px]">
             <caption className="sr-only">What free and company accounts include</caption>
             <thead>
-              <tr className="border-b-2 border-[#23282D] align-bottom">
-                <th scope="col" className="w-[44%] py-4 pr-4 font-normal text-[#565D63]">Included</th>
-                <th scope="col" className="w-[28%] px-4 py-4">
-                  <span className="semi-wide block text-2xl font-extrabold">Free</span>
-                  <span className="num mt-1 block font-normal text-[#565D63]"><span style={{ fontFamily: "system-ui, sans-serif" }}>₹</span>0, for individuals</span>
+              <tr role="row" className="border-b-2 border-[#23282D] align-bottom">
+                <th role="columnheader" scope="col" className="w-[44%] py-4 pr-4 font-normal text-[#565D63]">Included</th>
+                <th role="columnheader" scope="col" className="w-[28%] bg-[#F3F4F2] px-3 py-3 sm:px-4 sm:py-4">
+                  <span className="semi-wide block text-xl font-extrabold sm:text-2xl">Free</span>
+                  <span className="num mt-0.5 block text-[13px] font-normal leading-snug text-[#565D63] sm:mt-1 sm:text-[15px]"><span style={{ fontFamily: "system-ui, sans-serif" }}>₹</span>0, for individuals</span>
                 </th>
-                <th scope="col" className="w-[28%] bg-[#23282D] px-4 py-4 text-white">
-                  <span className="semi-wide block text-2xl font-extrabold">Company</span>
-                  <span className="mt-1 block font-normal text-white/70">Pricing on request</span>
+                <th role="columnheader" scope="col" className="w-[28%] bg-[#23282D] px-3 py-3 text-white sm:px-4 sm:py-4">
+                  <span className="semi-wide block text-xl font-extrabold sm:text-2xl">Company</span>
+                  <span className="mt-0.5 block text-[13px] font-normal leading-snug text-white/70 sm:mt-1 sm:text-[15px]">Pricing on request</span>
                 </th>
               </tr>
             </thead>
             <tbody>
               {PLAN_ROWS.map(([label, free, company]) => (
-                <tr key={label} className="border-b border-[#D6D9D4]">
-                  <th scope="row" className="py-3.5 pr-4 font-semibold">{label}</th>
-                  <td className="px-4 py-3.5 text-[#3A4046]"><CellView v={free} /></td>
-                  <td className="bg-white px-4 py-3.5 text-[#3A4046]"><CellView v={company} /></td>
+                <tr role="row" key={label} className="border-b border-[#D6D9D4]">
+                  <th role="rowheader" scope="row" className="pt-3.5 pr-4 align-top font-semibold leading-snug sm:py-3.5">{label}</th>
+                  <td role="cell" className="px-3 pb-3.5 pt-1.5 align-top leading-snug text-[#3A4046] sm:px-4 sm:py-3.5"><CellView v={free} /></td>
+                  <td role="cell" className="bg-white px-3 pb-3.5 pt-1.5 align-top leading-snug text-[#3A4046] sm:px-4 sm:py-3.5"><CellView v={company} /></td>
                 </tr>
               ))}
-              <tr>
+              <tr className="plans-cta hidden sm:table-row">
                 <td />
                 <td className="px-4 pt-6 align-top">
                   <PrimaryLink href={PLAY_URL}>Download free</PrimaryLink>
@@ -257,6 +257,10 @@ function Plans({ onCompany }: { onCompany: () => void }) {
               </tr>
             </tbody>
           </table>
+        </div>
+        <div className="mt-6 grid gap-3 sm:hidden">
+          <PrimaryLink href={PLAY_URL}>Download free</PrimaryLink>
+          <SecondaryLink href="/#contact" onClick={onCompany}>Talk to us about a company account</SecondaryLink>
         </div>
         <p className="mt-8 max-w-[70ch] text-sm leading-relaxed text-[#565D63]">
           Ads are marked “Ad” or “Sponsored”, and we never give your personal details to sponsors. The app shows your exact
@@ -289,7 +293,7 @@ const SETUP = [
 
 function Manufacturers({ onCompany }: { onCompany: () => void }) {
   return (
-    <section id="manufacturers" className="scroll-mt-16 border-t-2 border-[#23282D] bg-white py-20 sm:py-28">
+    <section id="manufacturers" className="scroll-mt-16 border-t-2 border-[#23282D] bg-white py-16 sm:py-28">
       <div className={`${wrap} grid gap-14 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]`}>
         <div>
           <h2 className={h2} data-reveal>For manufacturers</h2>
@@ -335,7 +339,7 @@ function Manufacturers({ onCompany }: { onCompany: () => void }) {
         </figure>
       </div>
 
-      <div className={`${wrap} mt-20`}>
+      <div className={`${wrap} mt-16 sm:mt-20`}>
         <h3 className="semi-wide text-2xl sm:text-3xl">How we set up your company</h3>
         <ol className="mt-8 grid gap-8 md:grid-cols-3">
           {SETUP.map(([t, d], i) => (
@@ -403,7 +407,7 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
 
 function Faq() {
   return (
-    <section id="faq" className="scroll-mt-16 py-20 sm:py-28">
+    <section id="faq" className="scroll-mt-16 py-16 sm:py-28">
       <div className={`${wrap} grid gap-10 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)]`}>
         <div>
           <h2 className={h2} data-reveal>Questions</h2>
@@ -432,7 +436,7 @@ function Faq() {
 
 function Contact({ role, formKey }: { role: Role; formKey: number }) {
   return (
-    <section id="contact" className="scroll-mt-16 border-t-2 border-[#23282D] bg-[#E6E8E4] py-20 sm:py-28">
+    <section id="contact" className="scroll-mt-16 border-t-2 border-[#23282D] bg-[#E6E8E4] py-16 sm:py-28">
       <div className={`${wrap} grid gap-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]`}>
         <div>
           <h2 className={h2} data-reveal>Talk to us</h2>

@@ -17,20 +17,20 @@ const Mail = ({ subject }: { subject?: string }) => (
 );
 
 const DataTable = ({ rows, head = ["Data", "What and why"] }: { rows: string[][]; head?: string[] }) => (
-  <div className="my-6 overflow-x-auto border-t-2 border-[#23282D]">
-    <table className="w-full min-w-[480px] border-collapse text-left text-[15px] leading-relaxed">
-      <thead>
+  <div className="my-6 border-t-2 border-[#23282D]">
+    <table className="block w-full border-collapse text-left text-[15px] leading-relaxed sm:table">
+      <thead className="sr-only sm:not-sr-only sm:table-header-group">
         <tr className="border-b border-[#D6D9D4] text-[13px] text-[#565D63]">
           {head.map((h) => (
             <th key={h} scope="col" className="py-2.5 pr-4 font-semibold">{h}</th>
           ))}
         </tr>
       </thead>
-      <tbody>
+      <tbody className="block sm:table-row-group">
         {rows.map(([a, b]) => (
-          <tr key={a} className="border-b border-[#E6E8E4] align-top">
-            <th scope="row" className="w-[32%] py-3 pr-4 font-semibold text-[#23282D]">{a}</th>
-            <td className="py-3 text-[#3A4046]">{b}</td>
+          <tr key={a} className="block border-b border-[#E6E8E4] py-3 align-top sm:table-row sm:py-0">
+            <th scope="row" className="block font-semibold text-[#23282D] sm:table-cell sm:w-[32%] sm:py-3 sm:pr-4">{a}</th>
+            <td className="mt-1 block text-[#3A4046] sm:mt-0 sm:table-cell sm:py-3">{b}</td>
           </tr>
         ))}
       </tbody>

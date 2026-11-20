@@ -19,15 +19,23 @@
   color: var(--ink);
   background: var(--zinc);
   -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
 }
 
-/* :where keeps these at element specificity so Tailwind utilities still win,
-   and they load after the site-wide Montserrat heading rule. */
-:where(.ico) :is(h1, h2, h3, h4) {
-  font-family: "Archivo Variable", system-ui, sans-serif;
-  color: inherit;
-  font-weight: 800;
-  letter-spacing: -0.015em;
+/* Heading defaults (Archivo, weight 800, ink) live in index.css's base layer,
+   so they beat Tailwind's preflight and lose to utilities regardless of the
+   order this file loads in. */
+
+/* Plans table on phones: each feature becomes a full-width label with the
+   Free and Company values side by side beneath it, under a sticky header. */
+@media (max-width: 639.98px) {
+  .ico .plans-table, .ico .plans-table tbody { display: block; }
+  .ico .plans-table thead { display: block; position: sticky; top: 4rem; z-index: 5; }
+  .ico .plans-table tr { display: grid; grid-template-columns: 1fr 1fr; }
+  .ico .plans-table th, .ico .plans-table td { width: auto; }
+  .ico .plans-table thead th:first-child { display: none; }
+  .ico .plans-table tbody th { grid-column: 1 / -1; padding-bottom: 0.25rem; }
+  .ico .plans-table tr.plans-cta { display: none; }
 }
 
 .ico .wide { font-stretch: 125%; }

@@ -48,7 +48,7 @@ export function ContactForm({ defaultRole = "Coating professional" }: { defaultR
   const label = "mb-1.5 block text-sm font-semibold text-[#23282D]";
 
   return (
-    <form onSubmit={submit} className="bg-white p-6 sm:p-8">
+    <form onSubmit={submit} className="-mx-4 bg-white px-4 py-6 sm:mx-0 sm:p-8">
       <fieldset>
         <legend className={label}>You are</legend>
         <div className="grid gap-2 sm:grid-cols-2">
@@ -104,7 +104,7 @@ export function ContactForm({ defaultRole = "Coating professional" }: { defaultR
       <button
         type="submit"
         disabled={state === "sending"}
-        className="mt-6 inline-flex items-center gap-2 rounded-[3px] bg-[#23282D] px-6 py-3 text-[15px] font-semibold text-white hover:bg-[#3A4046] disabled:opacity-70"
+        className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-[3px] bg-[#23282D] px-6 py-3.5 text-[16px] sm:w-auto sm:py-3 sm:text-[15px] font-semibold text-white hover:bg-[#3A4046] disabled:opacity-70"
       >
         {state === "sending" && <Loader2 className="h-4 w-4 animate-spin" />}
         {state === "sending" ? "Sending…" : "Send message"}

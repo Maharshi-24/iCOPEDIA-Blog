@@ -83,10 +83,23 @@
 
   /* Scrollbar styling removed in favor of hiding scrollbars completely */
 
-  h1, h2, h3, h4, h5, h6 {
+  /* Admin-panel headings. Public pages (.ico) set their own in home.css, so
+     they are excluded here; utilities still win, as they come later. */
+  :where(h1, h2, h3, h4, h5, h6):not(.ico *) {
     @apply font-serif tracking-tight text-wellness-navy;
     font-family: 'Montserrat', sans-serif;
     font-weight: 600;
+  }
+
+  /* Public-page headings (tokens in components/home/home.css). Kept here so
+     they always land after preflight's `font-weight: inherit` and before the
+     utilities, whatever order the route chunks' CSS loads in. */
+  .ico :where(h1, h2, h3, h4) {
+    font-family: "Archivo Variable", system-ui, sans-serif;
+    color: inherit;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
   }
 }
 

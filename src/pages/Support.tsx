@@ -48,9 +48,9 @@ const Support = () => {
       <SiteNav />
 
       <main>
-        <section className="pb-14 pt-28 sm:pt-36">
+        <section className="pb-10 pt-28 sm:pb-14 sm:pt-36">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <h1 className="wide text-[3rem] font-black leading-[0.95] sm:text-[4.5rem]">Help</h1>
+            <h1 className="wide text-[clamp(2.6rem,12vw,3rem)] font-black leading-[0.95] sm:text-[4.5rem]">Help</h1>
             <p className="load-in mt-5 max-w-[56ch] text-lg leading-relaxed text-[#3A4046]" style={{ ["--load-delay" as string]: "90ms" }}>
               Answers to common questions about the iCOPEDIA app. Can't find yours? Message us and a person will reply.
             </p>
@@ -63,21 +63,24 @@ const Support = () => {
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search, for example OTP, BOQ or delete"
+                placeholder="Try OTP, BOQ or delete"
                 className="w-full rounded-[3px] border-2 border-[#23282D] bg-white py-3.5 pl-12 pr-4 text-[17px] placeholder:text-[#8A9095] focus:outline-none focus:ring-2 focus:ring-[#4C6395]/40"
               />
             </div>
           </div>
         </section>
 
-        <section className="border-t-2 border-[#23282D] bg-white py-14 sm:py-20">
-          <div className="mx-auto grid max-w-6xl gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,0.32fr)_minmax(0,1fr)]">
+        <section className="border-t-2 border-[#23282D] bg-white py-10 sm:py-20">
+          <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] gap-10 px-4 sm:px-6 lg:grid-cols-[minmax(0,0.32fr)_minmax(0,1fr)] lg:gap-12">
             <nav aria-label="Help topics" className="lg:sticky lg:top-24 lg:self-start">
               <p className="text-sm font-semibold text-[#565D63]">Topics</p>
-              <ul className="mt-3 space-y-1">
+              <ul className="hide-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 lg:mx-0 lg:block lg:space-y-1 lg:overflow-visible lg:px-0">
                 {SECTIONS.map((s) => (
-                  <li key={s.id}>
-                    <a href={`#${s.id}`} className="block border-l-[3px] border-transparent py-1.5 pl-3 text-[16px] hover:border-[#F2A900] hover:font-semibold">
+                  <li key={s.id} className="shrink-0">
+                    <a
+                      href={`#${s.id}`}
+                      className="block whitespace-nowrap rounded-full border border-[#BFC4BE] px-3.5 py-2 text-[15px] hover:border-[#23282D] lg:whitespace-normal lg:rounded-none lg:border-0 lg:border-l-[3px] lg:border-transparent lg:px-0 lg:py-1.5 lg:pl-3 lg:text-[16px] lg:hover:border-[#F2A900] lg:hover:font-semibold"
+                    >
                       {s.title}
                     </a>
                   </li>

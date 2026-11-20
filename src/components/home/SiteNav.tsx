@@ -47,12 +47,12 @@ export function SiteNav() {
             href={PLAY_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden rounded-[3px] bg-[#23282D] px-4 py-2 text-sm font-semibold text-white hover:bg-[#3A4046] sm:inline-block"
+            className="hidden whitespace-nowrap rounded-[3px] bg-[#23282D] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#3A4046] min-[360px]:inline-block sm:px-4"
           >
             Get the app
           </a>
           <button
-            className="grid h-10 w-10 place-items-center rounded-[3px] text-[#23282D] hover:bg-[#E6E8E4] lg:hidden"
+            className="-mr-2 grid h-11 w-11 place-items-center rounded-[3px] text-[#23282D] hover:bg-[#E6E8E4] lg:hidden"
             onClick={() => setOpen((o) => !o)}
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
