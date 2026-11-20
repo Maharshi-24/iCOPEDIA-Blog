@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfUse from "./pages/TermsOfUse";
+import Support from "./pages/Support";
 
 // Admin is lazy-loaded so public visitors never download it.
 const AdminApp = lazy(() => import("./admin/AdminApp"));
@@ -33,6 +34,8 @@ const App = () => {
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<TermsOfUse />} />
+              <Route path="/support" element={<Support />} />
+              <Route path="/help" element={<Support />} />
               <Route path="/terms-of-use" element={<TermsOfUse />} />
               <Route path="/admin/*" element={<Suspense fallback={null}><AdminApp /></Suspense>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

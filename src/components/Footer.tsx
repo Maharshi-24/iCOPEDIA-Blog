@@ -146,6 +146,8 @@ const Footer = () => {
             <a href="/privacy-policy" className="hover:text-gray-400 transition-colors">Privacy Policy</a>
             <span>|</span>
             <a href="/terms" className="hover:text-gray-400 transition-colors">Terms of Use</a>
+            <span>|</span>
+            <a href="/support" className="hover:text-gray-400 transition-colors">Support</a>
           </div>
           <button
             onClick={scrollToTop}
