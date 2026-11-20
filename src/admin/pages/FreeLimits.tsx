@@ -29,12 +29,15 @@ type Row = {
 
 export default function FreeLimits() {
   const [rows, setRows] = useState<Limit[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const { data } = await supabase.from('usage_limits')
+    const { data, error } = await supabase.from('usage_limits')
       .select('feature_key, enabled, period, default_limit, weekly_limit, updated_at')
       .in('feature_key', Object.keys(ENFORCED))
       .order('feature_key');
+    // Say why instead of looking like nothing is set up.
+    setError(error ? error.message : null);
     setRows(((data as Row[]) ?? []).map((r) => ({
       feature: r.feature_key,
       label: ENFORCED[r.feature_key] ?? r.feature_key,
@@ -53,7 +56,11 @@ export default function FreeLimits() {
         title="Free user limits"
         description="How much free users can create. Paid, company and admin accounts have no limit. Changes apply on the server straight away; no app update needed."
       />
-      {!rows ? <Panel><Loading /></Panel> : rows.length === 0 ? <Panel><Empty>No limits set up.</Empty></Panel> : (
+      {error ? (
+        <Panel><Empty>Could not load the limits: {error}</Empty></Panel>
+      ) : !rows ? <Panel><Loading /></Panel> : rows.length === 0 ? (
+        <Panel><Empty>The BOQ limit row (usage_limits, boq_create) is missing on the server.</Empty></Panel>
+      ) : (
         <div className="space-y-4">
           {rows.map((r) => <LimitCard key={r.feature} row={r} onSaved={load} />)}
         </div>
