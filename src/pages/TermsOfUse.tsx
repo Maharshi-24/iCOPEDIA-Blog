@@ -1,4 +1,6 @@
 import { Fragment, useEffect } from "react";
+import { LegalLayout } from "@/components/home/LegalLayout";
+import { seoFor } from "@/seo";
 
 // Terms of Use, word for word from store_assets/TOU/iCOPEDIA_Terms_of_Use_and_Privacy_Policy_Final_Draft.docx
 // (part A). Do not edit the wording here; change the Word file and copy it across.
@@ -230,97 +232,56 @@ const TERMS: Terms = {
 
 const slug = (n: number) => `section-${n}`;
 
-/** Clause text with its number in bold and the contact email as a link. */
+/** Clause text with its number in a hanging margin and the contact email as a link. */
 function Clause({ text }: { text: string }) {
   const m = text.match(/^(\d+\.\d+)\s+(.*)$/);
   const [num, rest] = m ? [m[1], m[2]] : [null, text];
   const parts = rest.split(CONTACT_EMAIL);
+  const body = parts.map((p, i) => (
+    <Fragment key={i}>
+      {p}
+      {i < parts.length - 1 && <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>}
+    </Fragment>
+  ));
+  if (!num) return <p>{body}</p>;
   return (
-    <p>
-      {num && <strong className="mr-1.5">{num}</strong>}
-      {parts.map((p, i) => (
-        <Fragment key={i}>
-          {p}
-          {i < parts.length - 1 && (
-            <a className="text-[#1d4ed8] underline underline-offset-2 hover:text-[#1e3a8a]" href={`mailto:${CONTACT_EMAIL}`}>
-              {CONTACT_EMAIL}
-            </a>
-          )}
-        </Fragment>
-      ))}
+    <p className="clause">
+      <span className="clause-no">{num}</span>
+      <span>{body}</span>
     </p>
   );
 }
 
 const TermsOfUse = () => {
   useEffect(() => {
-    document.title = "Terms of Use | iCOPEDIA";
-    if (window.location.hash) {
-      document.getElementById(window.location.hash.slice(1))?.scrollIntoView();
-    } else {
-      window.scrollTo(0, 0);
-    }
+    document.title = seoFor("/terms").title;
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#f7f9fd] font-sans text-[#334155]">
-      <header className="border-b border-[#e2e8f5] bg-[#04070f]">
-        <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-4 sm:px-6">
-          <a href="/" className="text-lg font-semibold tracking-wide text-white">
-            iCOPEDIA<span className="align-super text-[0.6em]">™</span>
-          </a>
-          <a href={`mailto:${CONTACT_EMAIL}`} className="text-sm text-[#93c5fd] hover:text-white">
-            {CONTACT_EMAIL}
-          </a>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
-        <h1 className="text-3xl font-bold text-[#0f172a] sm:text-4xl">Terms of Use</h1>
-        <p className="mt-2 text-sm text-[#64748b]">
-          Effective {EFFECTIVE} · Version {VERSION}
-        </p>
-
-        <div className="policy mt-8 leading-relaxed">
-          {TERMS.intro.map((p) => <p key={p}>{p}</p>)}
+    <LegalLayout
+      title="Terms of Use"
+      meta={<>Effective {EFFECTIVE}. Version {VERSION}.</>}
+      intro={
+        <>
+          {TERMS.intro.map((p) => <p key={p} className="mb-4">{p}</p>)}
           <p>
             Read these Terms together with our{" "}
-            <a href="/privacy-policy" className="text-[#1d4ed8] underline underline-offset-2 hover:text-[#1e3a8a]">Privacy Policy</a>.
+            <a href="/privacy-policy" className="font-semibold text-[#4C6395] underline underline-offset-4">Privacy Policy</a>.
           </p>
-        </div>
-
-        <nav aria-label="Contents" className="mt-8 rounded-xl border border-[#dbe3f3] bg-white px-5 py-4">
-          <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-[#1e3a8a]">Contents</p>
-          <ol className="grid list-decimal gap-x-6 gap-y-1 pl-5 text-[0.95rem] sm:grid-cols-2">
-            {TERMS.sections.map((s) => (
-              <li key={s.n}>
-                <a href={`#${slug(s.n)}`} className="text-[#1d4ed8] hover:underline">{s.title}</a>
-              </li>
-            ))}
-          </ol>
-        </nav>
-
-        <div className="policy mt-10 space-y-10 leading-relaxed">
-          {TERMS.sections.map((s) => (
-            <section key={s.n} id={slug(s.n)} className="scroll-mt-6">
-              <h2 className="mb-3 text-xl font-semibold text-[#0f172a] sm:text-2xl">
-                {s.n}. {s.title}
-              </h2>
-              {s.clauses.map((c) => <Clause key={c} text={c} />)}
-            </section>
-          ))}
-        </div>
-      </main>
-
-      <footer className="border-t border-[#e2e8f5] py-6 text-center text-sm text-[#64748b]">
-        © {new Date().getFullYear()} iCOPEDIA GLOBAL. All rights reserved.
-      </footer>
-
-      <style>{`
-        .policy p { margin: 0 0 0.9rem; }
-        .policy strong { color: #0f172a; }
-      `}</style>
-    </div>
+        </>
+      }
+      toc={TERMS.sections.map((s) => ({ id: slug(s.n), label: s.title }))}
+    >
+      {TERMS.sections.map((s) => (
+        <section key={s.n} id={slug(s.n)} data-reveal>
+          <h2>
+            <span className="sec-no">Section {s.n}</span>
+            {s.title}
+          </h2>
+          {s.clauses.map((c) => <Clause key={c} text={c} />)}
+        </section>
+      ))}
+    </LegalLayout>
   );
 };
 

@@ -1,4 +1,6 @@
 import { useEffect } from "react";
+import { LegalLayout } from "@/components/home/LegalLayout";
+import { seoFor } from "@/seo";
 
 const LAST_UPDATED = "20 November 2026";
 const CONTACT_EMAIL = "hello@icopedia.co";
@@ -8,7 +10,6 @@ type Section = { id: string; title: string; body: React.ReactNode };
 
 const Mail = ({ subject }: { subject?: string }) => (
   <a
-    className="text-[#1d4ed8] underline underline-offset-2 hover:text-[#1e3a8a]"
     href={`mailto:${CONTACT_EMAIL}${subject ? `?subject=${encodeURIComponent(subject)}` : ""}`}
   >
     {CONTACT_EMAIL}
@@ -16,20 +17,20 @@ const Mail = ({ subject }: { subject?: string }) => (
 );
 
 const DataTable = ({ rows, head = ["Data", "What and why"] }: { rows: string[][]; head?: string[] }) => (
-  <div className="my-5 overflow-x-auto rounded-xl border border-[#dbe3f3] bg-white">
-    <table className="w-full min-w-[480px] border-collapse text-left text-[0.92rem]">
+  <div className="my-6 overflow-x-auto border-t-2 border-[#23282D]">
+    <table className="w-full min-w-[480px] border-collapse text-left text-[15px] leading-relaxed">
       <thead>
-        <tr className="bg-[#f1f5fd] text-[#1e3a8a]">
+        <tr className="border-b border-[#D6D9D4] text-[13px] text-[#565D63]">
           {head.map((h) => (
-            <th key={h} className="px-4 py-3 font-semibold">{h}</th>
+            <th key={h} scope="col" className="py-2.5 pr-4 font-semibold">{h}</th>
           ))}
         </tr>
       </thead>
       <tbody>
         {rows.map(([a, b]) => (
-          <tr key={a} className="border-t border-[#e8edf7] align-top">
-            <td className="w-[32%] px-4 py-3 font-medium text-[#0f172a]">{a}</td>
-            <td className="px-4 py-3 text-[#334155]">{b}</td>
+          <tr key={a} className="border-b border-[#E6E8E4] align-top">
+            <th scope="row" className="w-[32%] py-3 pr-4 font-semibold text-[#23282D]">{a}</th>
+            <td className="py-3 text-[#3A4046]">{b}</td>
           </tr>
         ))}
       </tbody>
@@ -50,7 +51,7 @@ const SECTIONS: Section[] = [
           (together, the "Services"). The Services are operated by <strong>iCOPEDIA GLOBAL</strong>,
           a partnership firm registered under the Indian Partnership Act, 1932, at 505, Neptune
           Prime, OP Road, Vadodara 390020, Gujarat, India. Read it together with our{" "}
-          <a className="text-[#1d4ed8] underline underline-offset-2 hover:text-[#1e3a8a]" href="/terms">Terms of Use</a>.
+          <a href="/terms">Terms of Use</a>.
         </p>
         <p>
           iCOPEDIA is a toolkit for coating inspectors and protective-coating professionals:
@@ -245,7 +246,7 @@ const SECTIONS: Section[] = [
           by law.
         </p>
         <p>We complete deletion within 30 days and confirm by email.</p>
-        <h3 id="delete-data" className="mb-2 mt-6 scroll-mt-6 text-lg font-semibold text-[#0f172a]">
+        <h3 id="delete-data">
           Delete some of your data and keep your account
         </h3>
         <p>
@@ -333,7 +334,7 @@ const SECTIONS: Section[] = [
         <p>
           For privacy questions, requests or complaints, contact our Grievance Officer:
         </p>
-        <p className="rounded-xl border border-[#dbe3f3] bg-white px-5 py-4">
+        <p className="border-l-4 border-[#23282D] bg-[#F3F4F2] px-5 py-4">
           <strong>Grievance Officer, iCOPEDIA GLOBAL</strong>
           <br />
           505, Neptune Prime, OP Road, Vadodara 390020, Gujarat, India
@@ -353,69 +354,25 @@ const SECTIONS: Section[] = [
 
 const PrivacyPolicy = () => {
   useEffect(() => {
-    document.title = "Privacy Policy | iCOPEDIA";
-    // Deep links such as /privacy-policy#delete-account should land on the section.
-    if (window.location.hash) {
-      document.getElementById(window.location.hash.slice(1))?.scrollIntoView();
-    } else {
-      window.scrollTo(0, 0);
-    }
+    document.title = seoFor("/privacy-policy").title;
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#f7f9fd] font-sans text-[#334155]">
-      <header className="border-b border-[#e2e8f5] bg-[#04070f]">
-        <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-4 sm:px-6">
-          <a href="/" className="text-lg font-semibold tracking-wide text-white">
-            iCOPEDIA<span className="align-super text-[0.6em]">™</span>
-          </a>
-          <a href={`mailto:${CONTACT_EMAIL}`} className="text-sm text-[#93c5fd] hover:text-white">
-            {CONTACT_EMAIL}
-          </a>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
-        <h1 className="text-3xl font-bold text-[#0f172a] sm:text-4xl">Privacy Policy</h1>
-        <p className="mt-2 text-sm text-[#64748b]">Last updated: {LAST_UPDATED}</p>
-
-        <nav aria-label="Contents" className="mt-8 rounded-xl border border-[#dbe3f3] bg-white px-5 py-4">
-          <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-[#1e3a8a]">Contents</p>
-          <ol className="grid list-decimal gap-x-6 gap-y-1 pl-5 text-[0.95rem] sm:grid-cols-2">
-            {SECTIONS.map((s) => (
-              <li key={s.id}>
-                <a href={`#${s.id}`} className="text-[#1d4ed8] hover:underline">{s.title}</a>
-              </li>
-            ))}
-          </ol>
-        </nav>
-
-        <div className="policy mt-10 space-y-10 leading-relaxed">
-          {SECTIONS.map((s, i) => (
-            <section key={s.id} id={s.id} className="scroll-mt-6">
-              <h2 className="mb-3 text-xl font-semibold text-[#0f172a] sm:text-2xl">
-                {i + 1}. {s.title}
-              </h2>
-              {s.body}
-            </section>
-          ))}
-        </div>
-      </main>
-
-      <footer className="border-t border-[#e2e8f5] py-6 text-center text-sm text-[#64748b]">
-        © {new Date().getFullYear()} iCOPEDIA GLOBAL. All rights reserved.
-      </footer>
-
-      <style>{`
-        .policy p { margin: 0 0 0.9rem; }
-        .policy ul, .policy ol { margin: 0 0 0.9rem; padding-left: 1.25rem; }
-        .policy ul { list-style: disc; }
-        .policy ol { list-style: decimal; }
-        .policy li { margin: 0.3rem 0; }
-        .policy strong { color: #0f172a; }
-        .policy code { font-size: 0.85em; background: #eef2fb; padding: 0.1rem 0.35rem; border-radius: 4px; }
-      `}</style>
-    </div>
+    <LegalLayout
+      title="Privacy Policy"
+      meta={<>Last updated {LAST_UPDATED}.</>}
+      toc={SECTIONS.map((s) => ({ id: s.id, label: s.title }))}
+    >
+      {SECTIONS.map((s, i) => (
+        <section key={s.id} id={s.id} data-reveal>
+          <h2>
+            <span className="sec-no">Section {i + 1}</span>
+            {s.title}
+          </h2>
+          {s.body}
+        </section>
+      ))}
+    </LegalLayout>
   );
 };
 
