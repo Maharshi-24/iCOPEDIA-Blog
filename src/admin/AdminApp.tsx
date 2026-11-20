@@ -24,6 +24,9 @@ import HomeTiles from './pages/HomeTiles';
 import FreeLimits from './pages/FreeLimits';
 import Ads from './pages/Ads';
 import ActivityLog from './pages/Activity';
+// Shows test sign-in codes, so it lives behind the admin login (not in the menu;
+// opened from Login access).
+import OtpViewer from '../pages/OtpViewer';
 
 const NAV = [
   { to: '', label: 'Overview', icon: LayoutDashboard, element: <Overview /> },
@@ -153,6 +156,7 @@ function Shell() {
             {NAV.map(({ to, element }) => (
               <Route key={to} index={to === ''} path={to === '' ? undefined : to} element={element} />
             ))}
+            <Route path="otp-viewer" element={<OtpViewer />} />
             <Route path="*" element={<Navigate to="/admin" replace />} />
           </Routes>
         </div>

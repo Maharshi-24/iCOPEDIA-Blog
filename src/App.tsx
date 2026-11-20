@@ -3,12 +3,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import React, { Suspense, lazy } from 'react';
 import Index from "./pages/Index";
 import ComingSoon from "./pages/ComingSoon";
 import NotFound from "./pages/NotFound";
-import OtpViewer from "./pages/OtpViewer";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfUse from "./pages/TermsOfUse";
 
@@ -30,7 +29,8 @@ const App = () => {
               {/* Coming Soon holds "/" for now. The full site stays at /home. */}
               <Route path="/" element={<ComingSoon />} />
               <Route path="/home" element={<Index />} />
-              <Route path="/otp-viewer" element={<OtpViewer />} />
+              {/* The OTP viewer shows sign-in codes: admins only, inside the admin panel. */}
+              <Route path="/otp-viewer" element={<Navigate to="/admin/otp-viewer" replace />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<TermsOfUse />} />

@@ -84,7 +84,7 @@ export default function LoginAccess() {
         description="The app only sends an OTP to numbers on this list. Add a number here and that person can sign in right away. No app update needed."
         actions={
           <Button variant="outline" asChild>
-            <a href="/otp-viewer" target="_blank" rel="noreferrer"><ExternalLink className="mr-2 h-4 w-4" /> Test OTP viewer</a>
+            <a href="/admin/otp-viewer" target="_blank" rel="noreferrer"><ExternalLink className="mr-2 h-4 w-4" /> Test OTP viewer</a>
           </Button>
         }
       />
