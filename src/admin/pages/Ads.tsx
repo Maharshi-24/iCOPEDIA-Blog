@@ -1,5 +1,5 @@
 import { PointerEvent as ReactPointerEvent, useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowDown, ArrowUp, ImagePlus, Pencil, Plus, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, Bell, Home, ImagePlus, Menu, Pencil, Plus, Sparkles, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -78,12 +78,15 @@ export default function Ads() {
   const [ads, setAds] = useState<Ad[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
+  const [tiles, setTiles] = useState<HomeTile[] | null>(null);
 
   const load = useCallback(async () => {
-    const [s, sl, a] = await Promise.all([
+    const [s, sl, a, t] = await Promise.all([
       supabase.from('ad_settings').select('direct_enabled, sponsor_enabled, google_enabled, cols, rows, min_height').maybeSingle(),
       supabase.from('ad_slots').select('id, x, y, w, h, scrollable, active').order('y').order('x'),
       supabase.from('ads').select('*').order('sort').order('created_at'),
+      // For the phone preview: which Home tiles free users see.
+      supabase.from('home_tiles').select('key, label, visible_for_free'),
     ]);
     const err = s.error ?? sl.error ?? a.error;
     if (err) {
@@ -100,6 +103,7 @@ export default function Ads() {
     setSettings(s.data as Settings);
     setSlots((sl.data ?? []) as Slot[]);
     setAds((a.data ?? []) as Ad[]);
+    setTiles(t.error ? null : ((t.data ?? []) as HomeTile[]));
   }, []);
   useEffect(() => { load(); }, [load]);
 
@@ -114,9 +118,9 @@ export default function Ads() {
       {error ? <Panel><Empty>{error}</Empty></Panel> : !settings ? <Panel><Loading /></Panel> : (
         <div className="space-y-4">
           <TypesPanel settings={settings} onSaved={load} />
-          <div className="grid gap-4 xl:grid-cols-[auto_1fr]">
-            <Panel title="Layout" description="Drag across empty cells to add a slot. Drag a slot to move it, or its corner to resize it.">
-              <LayoutEditor settings={settings} slots={slots} ads={ads} selected={selected} onSelect={setSelected} onChanged={load} />
+          <div className="grid items-start gap-4 lg:grid-cols-[380px_minmax(0,1fr)]">
+            <Panel title="Layout" description="Drag across empty cells to add a slot. Drag a slot to move it, or its blue corner to resize it.">
+              <LayoutEditor settings={settings} slots={slots} ads={ads} tiles={tiles} selected={selected} onSelect={setSelected} onChanged={load} />
               <GridSettings settings={settings} slots={slots} onSaved={load} />
             </Panel>
             {selectedSlot ? (
@@ -131,7 +135,7 @@ export default function Ads() {
               />
             ) : (
               <Panel title="Slot">
-                <Empty>{slots.length ? 'Click a slot on the left to set its ads.' : 'No slots yet. Drag across the grid, or use Bottom bar / Full box.'}</Empty>
+                <Empty>{slots.length ? 'Click a slot in the phone to set its ads.' : 'No slots yet. Drag across the grid, or use Bottom bar / Full box.'}</Empty>
               </Panel>
             )}
           </div>
@@ -161,11 +165,11 @@ function TypesPanel({ settings, onSaved }: { settings: Settings; onSaved: () => 
       <div className="grid gap-3 md:grid-cols-3">
         {rows.map((r) => (
           <label key={r.key} htmlFor={r.key} className="flex cursor-pointer items-start justify-between gap-4 rounded-lg border border-slate-200 p-4">
-            <div>
+            <div className="min-w-0 flex-1">
               <div className="text-sm font-medium text-slate-900">{r.title}</div>
               <div className="mt-0.5 text-xs text-slate-500">{r.text}</div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex shrink-0 items-center gap-2">
               {busy === r.key && <Spinner />}
               <Switch id={r.key} checked={settings[r.key]} disabled={busy !== null} onCheckedChange={(v) => toggle(r.key, v)} />
             </div>
@@ -180,25 +184,57 @@ function TypesPanel({ settings, onSaved }: { settings: Settings; onSaved: () => 
 
 type Drag = { mode: 'draw' | 'move' | 'resize'; id?: string; start: { x: number; y: number }; orig: Rect; rect: Rect };
 
-const PREVIEWS = [
-  { key: 'min', label: 'Little space' },
-  { key: 'typical', label: 'Typical phone', height: 250 },
-  { key: 'tall', label: 'Tall phone', height: 390 },
+// Real phone screens in logical pixels (what the app lays out in). The
+// preview draws the free-user Home at that size and scales it down, so the
+// space left for ads is what that phone really has.
+const PHONES = [
+  { key: 'small', label: 'Small', note: 'Android 360 × 740', w: 360, h: 740, status: 24 },
+  { key: 'standard', label: 'Standard', note: 'iPhone 15 · 393 × 852', w: 393, h: 852, status: 59 },
+  { key: 'large', label: 'Large', note: 'iPhone 15 Pro Max · 430 × 932', w: 430, h: 932, status: 59 },
 ] as const;
-const PHONE_BODY = 560; // preview px under the app header
+type PhoneKey = (typeof PHONES)[number]['key'];
 
-function LayoutEditor({ settings, slots, ads, selected, onSelect, onChanged }: {
-  settings: Settings; slots: Slot[]; ads: Ad[]; selected: string | null;
+// Sizes from the app (home.dart, app_header.dart, navigation_controller.dart).
+const APP = { header: 60, tile: 100, tileGap: 10, tilesPadX: 16, tilesPadY: 8, nav: 85, adPad: { top: 4, x: 16, bottom: 12 }, adGap: 8 };
+const PREVIEW_W = 300; // px the phone screen is drawn at
+
+/** Home's tile rows in app order; a row with no visible tiles is dropped. */
+const TILE_ROWS: string[][] = [['calculators'], ['product_details', 'boq'], ['daily_report', 'instruments'], ['community', 'tutorials'], ['news', 'notes']];
+const TILE_LABELS: Record<string, string> = {
+  calculators: 'Calculators', product_details: 'Product Details', boq: 'Bill of Quantities', daily_report: 'Project Report',
+  instruments: 'Instruments', community: 'Community', tutorials: 'Tutorials', news: 'News', notes: 'Notes',
+};
+/** Used when home_tiles can't be read: the app's own default for free users. */
+const FREE_HIDDEN_DEFAULT = new Set(['product_details', 'daily_report', 'instruments']);
+
+export type HomeTile = { key: string; label: string; visible_for_free: boolean };
+
+function LayoutEditor({ settings, slots, ads, tiles, selected, onSelect, onChanged }: {
+  settings: Settings; slots: Slot[]; ads: Ad[]; tiles: HomeTile[] | null; selected: string | null;
   onSelect: (id: string | null) => void; onChanged: () => void;
 }) {
   const { cols, rows } = settings;
   const ref = useRef<HTMLDivElement>(null);
   const [drag, setDrag] = useState<Drag | null>(null);
-  const [preview, setPreview] = useState<(typeof PREVIEWS)[number]['key']>('typical');
+  const [phoneKey, setPhoneKey] = useState<PhoneKey>('standard');
   const [busy, setBusy] = useState(false);
 
-  const p = PREVIEWS.find((x) => x.key === preview)!;
-  const areaHeight = Math.min(PHONE_BODY - 60, Math.max(settings.min_height + 16, 'height' in p ? p.height : 0));
+  const phone = PHONES.find((p) => p.key === phoneKey)!;
+  const scale = PREVIEW_W / phone.w;
+
+  const visible = (key: string) => {
+    const t = tiles?.find((x) => x.key === key);
+    return t ? t.visible_for_free : !FREE_HIDDEN_DEFAULT.has(key);
+  };
+  const label = (key: string) => tiles?.find((x) => x.key === key)?.label ?? TILE_LABELS[key] ?? key;
+  const tileRows = TILE_ROWS.map((r) => r.filter(visible)).filter((r) => r.length > 0);
+  const tilesH = APP.tilesPadY * 2 + tileRows.length * (APP.tile + APP.tileGap);
+  const left = phone.h - phone.status - APP.header - tilesH - APP.nav; // space between tiles and bottom bar
+  const canvasW = phone.w - APP.adPad.x * 2;
+  const canvasH = left - APP.adPad.top - APP.adPad.bottom;
+  const hidden = canvasH < settings.min_height;
+  const cellW = (canvasW - APP.adGap * (cols - 1)) / cols;
+  const cellH = (canvasH - APP.adGap * (rows - 1)) / rows;
 
   function cellAt(e: ReactPointerEvent) {
     const r = ref.current!.getBoundingClientRect();
@@ -265,110 +301,143 @@ function LayoutEditor({ settings, slots, ads, selected, onSelect, onChanged }: {
     save(null, rect);
   }
 
-  const dragBad = drag && drag.mode !== 'draw'
+  const dragBad = drag
     ? slots.some((s) => s.id !== drag.id && overlaps(s, drag.rect))
-    : drag ? slots.some((s) => overlaps(s, drag.rect)) : false;
+    : false;
 
-  const pct = (r: Rect) => ({
-    left: `${(r.x / cols) * 100}%`, top: `${(r.y / rows) * 100}%`,
-    width: `${(r.w / cols) * 100}%`, height: `${(r.h / rows) * 100}%`,
+  // Same maths as the app: cells with an 8 px gap between them.
+  const place = (r: Rect) => ({
+    left: r.x * (cellW + APP.adGap), top: r.y * (cellH + APP.adGap),
+    width: r.w * cellW + (r.w - 1) * APP.adGap, height: r.h * cellH + (r.h - 1) * APP.adGap,
   });
 
   return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="inline-flex gap-1 rounded-lg border border-slate-200 bg-white p-1" role="radiogroup" aria-label="Preview phone">
-          {PREVIEWS.map((x) => (
-            <button key={x.key} type="button" role="radio" aria-checked={preview === x.key} onClick={() => setPreview(x.key)}
-              className={cn('rounded-md px-3 py-1 text-xs font-medium', preview === x.key ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100')}>
-              {x.label}
-            </button>
-          ))}
+    <div className="space-y-4">
+      <div className="grid grid-cols-3 gap-1 rounded-lg border border-slate-200 bg-white p-1" role="radiogroup" aria-label="Preview phone">
+        {PHONES.map((p) => (
+          <button key={p.key} type="button" role="radio" aria-checked={phoneKey === p.key} onClick={() => setPhoneKey(p.key)}
+            title={p.note}
+            className={cn('rounded-md px-2 py-1.5 text-xs font-medium', phoneKey === p.key ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100')}>
+            {p.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Phone: the free-user Home at real size, scaled down */}
+      <div className="mx-auto rounded-[2.25rem] bg-slate-900 p-2.5 shadow-xl" style={{ width: PREVIEW_W + 20 }}>
+        <div className="overflow-hidden rounded-[1.75rem] bg-white" style={{ width: PREVIEW_W, height: phone.h * scale }}>
+          <div className="flex origin-top-left flex-col" style={{ width: phone.w, height: phone.h, transform: `scale(${scale})` }}>
+            {/* Status bar */}
+            <div className="flex shrink-0 items-end justify-between px-7 pb-1 text-[13px] font-semibold text-slate-800" style={{ height: phone.status }}>
+              <span>9:41</span><span className="tracking-widest">•••</span>
+            </div>
+            {/* App header */}
+            <div className="flex shrink-0 items-center gap-3 px-4 shadow-[0_2px_6px_rgba(0,0,0,0.08)]" style={{ height: APP.header }}>
+              <Menu className="h-6 w-6 text-slate-700" />
+              <img src="/icopedia-mark.svg" alt="" className="h-7 w-7" />
+              <span className="text-lg font-semibold text-slate-800">iCOPEDIA</span>
+            </div>
+            {/* Home tiles */}
+            <div className="shrink-0" style={{ padding: `${APP.tilesPadY}px ${APP.tilesPadX}px` }}>
+              {tileRows.map((row, i) => (
+                <div key={i} className="flex" style={{ gap: APP.tileGap, marginBottom: APP.tileGap }}>
+                  {row.map((k) => (
+                    <div key={k} className="flex flex-1 items-center gap-3 rounded-2xl bg-slate-100 px-4" style={{ height: APP.tile }}>
+                      <div className="h-11 w-11 shrink-0 rounded-xl bg-slate-200" />
+                      <span className="text-[15px] font-medium text-slate-600">{label(k)}</span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+            {/* Ad area: exactly the space left */}
+            <div className="relative min-h-0 flex-1" style={{ padding: `${APP.adPad.top}px ${APP.adPad.x}px ${APP.adPad.bottom}px` }}>
+              {left <= 0 ? null : hidden ? (
+                <div className="flex h-full items-center justify-center rounded-xl border-2 border-dashed border-amber-300 bg-amber-50 px-4 text-center text-[13px] text-amber-800">
+                  Ads hidden on this phone: {Math.max(0, Math.round(canvasH))} px left, needs {settings.min_height}
+                </div>
+              ) : (
+                <div
+                  ref={ref}
+                  className="relative h-full w-full touch-none select-none"
+                  style={{ cursor: drag?.mode === 'move' ? 'grabbing' : 'crosshair' }}
+                  onPointerDown={(e) => begin(e, 'draw')}
+                  onPointerMove={move}
+                  onPointerUp={end}
+                  onPointerCancel={() => setDrag(null)}
+                >
+                  {/* Empty cells */}
+                  {Array.from({ length: rows * cols }).map((_, i) => (
+                    <div key={i} className="pointer-events-none absolute rounded-md border border-dashed border-slate-300 bg-slate-50"
+                      style={place({ x: i % cols, y: Math.floor(i / cols), w: 1, h: 1 })} />
+                  ))}
+                  {slots.map((s) => {
+                    const live = drag && drag.id === s.id ? drag.rect : s;
+                    const first = ads.find((a) => a.slot_id === s.id && a.active) ?? ads.find((a) => a.slot_id === s.id);
+                    const count = ads.filter((a) => a.slot_id === s.id).length;
+                    const isSel = s.id === selected;
+                    return (
+                      <div
+                        key={s.id}
+                        className={cn(
+                          'group absolute cursor-grab overflow-hidden rounded-xl border-2 bg-white',
+                          isSel ? 'border-blue-500 shadow-[0_0_0_4px_rgba(59,130,246,0.25)]' : 'border-slate-300',
+                          !s.active && 'opacity-40',
+                          drag?.id === s.id && dragBad && 'border-red-500',
+                        )}
+                        style={place(live)}
+                        onPointerDown={(e) => begin(e, 'move', s)}
+                      >
+                        {first ? <AdThumb ad={first} /> : (
+                          <div className="flex h-full items-center justify-center text-[13px] font-medium text-slate-400">Empty slot</div>
+                        )}
+                        {count > 1 && (
+                          <span className="absolute right-1.5 top-1.5 rounded bg-black/60 px-1.5 text-[11px] font-medium text-white">
+                            {s.scrollable ? `${count} rotating` : `1 of ${count}`}
+                          </span>
+                        )}
+                        <span
+                          className={cn('absolute bottom-0 right-0 h-5 w-5 cursor-nwse-resize rounded-tl-lg bg-blue-500', isSel ? 'opacity-100' : 'opacity-0 group-hover:opacity-100')}
+                          onPointerDown={(e) => begin(e, 'resize', s)}
+                        />
+                      </div>
+                    );
+                  })}
+                  {drag?.mode === 'draw' && drag.rect.w * drag.rect.h > 1 && (
+                    <div className={cn('pointer-events-none absolute rounded-xl border-2 border-dashed', dragBad ? 'border-red-500 bg-red-50/70' : 'border-blue-500 bg-blue-50/70')}
+                      style={place(drag.rect)} />
+                  )}
+                </div>
+              )}
+            </div>
+            {/* Bottom navigation */}
+            <div className="flex shrink-0 items-center justify-around border-t border-slate-100 bg-white shadow-[0_-5px_10px_rgba(0,0,0,0.05)]" style={{ height: APP.nav }}>
+              {([['Home', Home], ['Alerts', Bell], ['Ustad', Sparkles]] as const).map(([name, Icon], i) => (
+                <div key={name} className={cn('flex flex-col items-center gap-1 text-[12px] font-medium', i === 0 ? 'text-blue-600' : 'text-slate-500')}>
+                  <Icon className="h-6 w-6" />
+                  {name}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
+      </div>
+
+      <p className="text-center text-xs text-slate-500">
+        {phone.note}. {left > 0 ? `${Math.round(Math.max(0, canvasH))} px left for ads` : 'No space left for ads'} on this phone. Home never scrolls; if less than {settings.min_height} px is left, ads are hidden.
+      </p>
+
+      <div className="grid grid-cols-2 gap-2">
         <Button size="sm" variant="outline" disabled={busy} onClick={() => addPreset({ x: 0, y: rows - 1, w: cols, h: 1 }, 'bottom bar')}>
           <Plus className="mr-1 h-3.5 w-3.5" /> Bottom bar
         </Button>
         <Button size="sm" variant="outline" disabled={busy} onClick={() => addPreset({ x: 0, y: 0, w: cols, h: rows }, 'full box')}>
           <Plus className="mr-1 h-3.5 w-3.5" /> Full box
         </Button>
-        {busy && <Spinner />}
       </div>
-
-      {/* Phone preview */}
-      <div className="mx-auto w-[300px] rounded-[2rem] border-[6px] border-slate-800 bg-white shadow-lg">
-        <div className="overflow-hidden rounded-[1.5rem]">
-          <div className="flex h-10 items-center gap-2 border-b border-slate-100 px-4">
-            <img src="/icopedia-mark.svg" alt="" className="h-5 w-5" />
-            <span className="text-xs font-semibold text-slate-700">Home</span>
-          </div>
-          <div className="flex flex-col bg-white" style={{ height: PHONE_BODY }}>
-            {/* Home tiles stand-in: whatever the ad area doesn't use */}
-            <div className="grid flex-1 grid-cols-2 content-start gap-2 overflow-hidden p-3">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className={cn('rounded-lg bg-slate-100', i < 2 ? 'col-span-2 h-14' : 'h-16')} />
-              ))}
-            </div>
-            <div className="px-3 pb-3 pt-1" style={{ height: areaHeight }}>
-              <div
-                ref={ref}
-                className="relative h-full w-full touch-none select-none rounded-lg"
-                style={{
-                  backgroundImage: 'linear-gradient(to right, rgb(226 232 240) 1px, transparent 1px), linear-gradient(to bottom, rgb(226 232 240) 1px, transparent 1px)',
-                  backgroundSize: `${100 / cols}% ${100 / rows}%`,
-                  outline: '1px dashed rgb(203 213 225)',
-                  cursor: drag?.mode === 'move' ? 'grabbing' : 'crosshair',
-                }}
-                onPointerDown={(e) => begin(e, 'draw')}
-                onPointerMove={move}
-                onPointerUp={end}
-                onPointerCancel={() => setDrag(null)}
-              >
-                {slots.map((s) => {
-                  const live = drag && drag.id === s.id ? drag.rect : s;
-                  const first = ads.find((a) => a.slot_id === s.id && a.active) ?? ads.find((a) => a.slot_id === s.id);
-                  const count = ads.filter((a) => a.slot_id === s.id).length;
-                  const isSel = s.id === selected;
-                  return (
-                    <div key={s.id} className="absolute p-[2px]" style={pct(live)}>
-                      <div
-                        className={cn(
-                          'group relative h-full w-full cursor-grab overflow-hidden rounded-md border bg-slate-50',
-                          isSel ? 'border-blue-500 ring-2 ring-blue-200' : 'border-slate-300',
-                          !s.active && 'opacity-40',
-                          drag?.id === s.id && dragBad && 'border-red-500 ring-red-200',
-                        )}
-                        onPointerDown={(e) => begin(e, 'move', s)}
-                      >
-                        {first ? <AdThumb ad={first} /> : (
-                          <div className="flex h-full items-center justify-center text-[10px] text-slate-400">Empty</div>
-                        )}
-                        {count > 1 && (
-                          <span className="absolute right-1 top-1 rounded bg-black/60 px-1 text-[9px] font-medium text-white">
-                            {s.scrollable ? `${count} rotating` : `1 of ${count}`}
-                          </span>
-                        )}
-                        <span
-                          className="absolute bottom-0 right-0 h-3 w-3 cursor-nwse-resize rounded-tl bg-blue-500 opacity-0 group-hover:opacity-100"
-                          style={isSel ? { opacity: 1 } : undefined}
-                          onPointerDown={(e) => begin(e, 'resize', s)}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-                {drag?.mode === 'draw' && drag.rect.w * drag.rect.h > 1 && (
-                  <div className="pointer-events-none absolute p-[2px]" style={pct(drag.rect)}>
-                    <div className={cn('h-full w-full rounded-md border-2 border-dashed', dragBad ? 'border-red-500 bg-red-50/60' : 'border-blue-500 bg-blue-50/60')} />
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <p className="text-center text-xs text-slate-500">
-        Ad area here: {areaHeight - 16} px tall. It only uses the space left above the bottom bar, so Home never scrolls; on a phone with less than {settings.min_height} px left, the ads are hidden.
-      </p>
+      {hidden && slots.length > 0 && (
+        <p className="text-xs text-amber-700">Pick a bigger phone above to edit slots, or lower “Hide if less than” below.</p>
+      )}
     </div>
   );
 }
@@ -411,7 +480,8 @@ function GridSettings({ settings, slots, onSaved }: { settings: Settings; slots:
 
   return (
     <div className="mt-5 border-t border-slate-100 pt-4">
-      <div className="grid grid-cols-3 gap-3">
+      <div className="mb-3 text-sm font-medium text-slate-900">Grid</div>
+      <div className="grid grid-cols-2 gap-3">
         <div>
           <Label htmlFor="ad-cols">Columns</Label>
           <Input id="ad-cols" type="number" min={1} max={12} value={cols} onChange={(e) => setCols(e.target.value)} className="mt-1" />
@@ -420,9 +490,10 @@ function GridSettings({ settings, slots, onSaved }: { settings: Settings; slots:
           <Label htmlFor="ad-rows">Rows</Label>
           <Input id="ad-rows" type="number" min={1} max={24} value={rows} onChange={(e) => setRows(e.target.value)} className="mt-1" />
         </div>
-        <div>
-          <Label htmlFor="ad-min">Hide if less than (px)</Label>
+        <div className="col-span-2">
+          <Label htmlFor="ad-min">Hide ads if less than (px)</Label>
           <Input id="ad-min" type="number" min={40} max={600} value={minH} onChange={(e) => setMinH(e.target.value)} className="mt-1" />
+          <p className="mt-1 text-xs text-slate-500">Phones with less space left than this show no ads.</p>
         </div>
       </div>
       {!valid && <p className="mt-2 text-xs text-red-600">Columns 1–12, rows 1–24, hide-below 40–600 px.</p>}
@@ -503,11 +574,12 @@ function SlotPanel({ slot, settings, slots, ads, onChanged, onDeleted }: {
     >
       <div className="space-y-5">
         <div>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="mb-2 text-sm font-medium text-slate-900">Position <span className="font-normal text-slate-500">(in grid cells)</span></div>
+          <div className="grid max-w-md grid-cols-2 gap-3 sm:grid-cols-4">
             {([['x', 'Column'], ['y', 'Row'], ['w', 'Width'], ['h', 'Height']] as const).map(([k, label]) => (
               <div key={k}>
-                <Label htmlFor={`slot-${k}`} className="text-xs">{label}</Label>
-                <Input id={`slot-${k}`} type="number" min={1} value={pos[k]} onChange={(e) => setPos({ ...pos, [k]: e.target.value })} className="mt-1 h-8" />
+                <Label htmlFor={`slot-${k}`} className="text-xs text-slate-600">{label}</Label>
+                <Input id={`slot-${k}`} type="number" min={1} value={pos[k]} onChange={(e) => setPos({ ...pos, [k]: e.target.value })} className="mt-1 h-9" />
               </div>
             ))}
           </div>
@@ -522,18 +594,18 @@ function SlotPanel({ slot, settings, slots, ads, onChanged, onDeleted }: {
 
         <div className="grid gap-3 sm:grid-cols-2">
           <label htmlFor="slot-scroll" className="flex cursor-pointer items-start justify-between gap-3 rounded-lg border border-slate-200 p-3">
-            <div>
+            <div className="min-w-0 flex-1">
               <div className="text-sm font-medium text-slate-900">Scrollable</div>
               <div className="text-xs text-slate-500">Rotate through all ads and let people swipe. Off shows only the first.</div>
             </div>
-            <Switch id="slot-scroll" checked={slot.scrollable} disabled={busy} onCheckedChange={(v) => update({ scrollable: v })} />
+            <Switch id="slot-scroll" className="shrink-0" checked={slot.scrollable} disabled={busy} onCheckedChange={(v) => update({ scrollable: v })} />
           </label>
           <label htmlFor="slot-active" className="flex cursor-pointer items-start justify-between gap-3 rounded-lg border border-slate-200 p-3">
-            <div>
+            <div className="min-w-0 flex-1">
               <div className="text-sm font-medium text-slate-900">Show slot</div>
               <div className="text-xs text-slate-500">Off hides the slot without deleting its ads.</div>
             </div>
-            <Switch id="slot-active" checked={slot.active} disabled={busy} onCheckedChange={(v) => update({ active: v })} />
+            <Switch id="slot-active" className="shrink-0" checked={slot.active} disabled={busy} onCheckedChange={(v) => update({ active: v })} />
           </label>
         </div>
 
