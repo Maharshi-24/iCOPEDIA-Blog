@@ -143,9 +143,9 @@ const Footer = () => {
             &copy; {currentYear} iCOPEDIA. All rights reserved.
           </p>
           <div className="mt-4 md:mt-0 flex space-x-4 text-sm text-gray-500">
-            <a href="#" className="hover:text-gray-400 transition-colors">Privacy Policy</a>
+            <a href="/privacy-policy" className="hover:text-gray-400 transition-colors">Privacy Policy</a>
             <span>|</span>
-            <a href="#" className="hover:text-gray-400 transition-colors">Terms of Service</a>
+            <a href="/terms" className="hover:text-gray-400 transition-colors">Terms of Use</a>
           </div>
           <button
             onClick={scrollToTop}

@@ -10,6 +10,7 @@ import ComingSoon from "./pages/ComingSoon";
 import NotFound from "./pages/NotFound";
 import OtpViewer from "./pages/OtpViewer";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfUse from "./pages/TermsOfUse";
 
 // Admin is lazy-loaded so public visitors never download it.
 const AdminApp = lazy(() => import("./admin/AdminApp"));
@@ -32,6 +33,8 @@ const App = () => {
               <Route path="/otp-viewer" element={<OtpViewer />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<TermsOfUse />} />
+              <Route path="/terms-of-use" element={<TermsOfUse />} />
               <Route path="/admin/*" element={<Suspense fallback={null}><AdminApp /></Suspense>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
