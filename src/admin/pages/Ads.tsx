@@ -60,6 +60,12 @@ function shapeName(r: Rect, s: Settings) {
   return `${r.w} × ${r.h} cells`;
 }
 
+/** "Bottom bar (row 5)": a slot's name for lists and pickers. */
+function slotName(r: Rect, s: Settings) {
+  const shape = shapeName(r, s);
+  return `${shape.charAt(0).toUpperCase()}${shape.slice(1)} · row ${r.y + 1}${r.w < s.cols ? `, column ${r.x + 1}` : ''}`;
+}
+
 function adStatus(ad: Ad): { label: string; tone: 'green' | 'amber' | 'slate' | 'red' } {
   const now = Date.now();
   if (!ad.active) return { label: 'off', tone: 'slate' };
@@ -133,12 +139,28 @@ export default function Ads() {
                 settings={settings}
                 slots={slots}
                 ads={ads.filter((a) => a.slot_id === selectedSlot.id)}
+                allAds={ads}
                 onChanged={load}
                 onDeleted={() => { setSelected(null); load(); }}
+                onBack={() => setSelected(null)}
               />
             ) : (
-              <Panel title="Slot">
-                <Empty>{slots.length ? 'Click a slot in the phone to set its ads.' : 'No slots yet. Drag across the grid, or use Bottom bar / Full box.'}</Empty>
+              <Panel title="Slots" description={slots.length ? 'Pick a slot to set its ads, or click it in the phone.' : undefined}>
+                {slots.length === 0 ? <Empty>No slots yet. Drag across the grid, or use Bottom bar / Full box.</Empty> : (
+                  <ul className="divide-y divide-slate-100 rounded-lg border border-slate-200">
+                    {slots.map((s) => {
+                      const n = ads.filter((a) => a.slot_id === s.id).length;
+                      return (
+                        <li key={s.id}>
+                          <button type="button" onClick={() => setSelected(s.id)} className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left hover:bg-slate-50">
+                            <span className="text-sm font-medium text-slate-900">{slotName(s, settings)}</span>
+                            <span className="text-xs text-slate-500">{n} ad{n === 1 ? '' : 's'}{!s.active ? ' · hidden' : ''}</span>
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
               </Panel>
             )}
           </div>
@@ -615,8 +637,9 @@ function GridSettings({ settings, slots, onSaved }: { settings: Settings; slots:
 
 // ------------------------------------------------------------------- slot
 
-function SlotPanel({ slot, tiles, settings, slots, ads, onChanged, onDeleted }: {
-  slot: Slot; tiles: HomeTile[] | null; settings: Settings; slots: Slot[]; ads: Ad[]; onChanged: () => void; onDeleted: () => void;
+function SlotPanel({ slot, tiles, settings, slots, ads, allAds, onChanged, onDeleted, onBack }: {
+  slot: Slot; tiles: HomeTile[] | null; settings: Settings; slots: Slot[]; ads: Ad[]; allAds: Ad[];
+  onChanged: () => void; onDeleted: () => void; onBack: () => void;
 }) {
   const spec = creativeSpec(slot, settings, tiles);
   const [pos, setPos] = useState({ x: String(slot.x + 1), y: String(slot.y + 1), w: String(slot.w), h: String(slot.h) });
@@ -665,9 +688,11 @@ function SlotPanel({ slot, tiles, settings, slots, ads, onChanged, onDeleted }: 
 
   return (
     <Panel
-      title={`Slot · ${shapeName(slot, settings)}`}
+      title={slotName(slot, settings)}
       description={slot.scrollable && ads.length > 1 ? 'Rotates through its ads; each shows for its own duration and can be swiped.' : 'Shows its first live ad.'}
       actions={
+        <div className="flex shrink-0 gap-1">
+        {slots.length > 1 && <Button size="sm" variant="ghost" onClick={onBack}>All slots</Button>}
         <Confirm
           trigger={<Button size="sm" variant="ghost" className="text-red-600 hover:bg-red-50 hover:text-red-700"><Trash2 className="mr-1 h-4 w-4" /> Delete slot</Button>}
           title="Delete this slot?"
@@ -676,6 +701,7 @@ function SlotPanel({ slot, tiles, settings, slots, ads, onChanged, onDeleted }: 
           destructive
           onConfirm={deleteSlot}
         />
+        </div>
       }
     >
       <div className="space-y-5">
@@ -743,7 +769,9 @@ function SlotPanel({ slot, tiles, settings, slots, ads, onChanged, onDeleted }: 
               {ads.map((ad, i) => {
                 const st = rotationStatus(ad, ads, slot.scrollable, settings);
                 return (
-                  <li key={ad.id} className="flex items-center gap-3 p-3">
+                  <li key={ad.id} className="flex items-center gap-3 p-3 hover:bg-slate-50">
+                    <button type="button" onClick={() => setEditing(ad)} aria-label={`Edit ${ad.title || ad.sponsor_name || 'ad'}`}
+                      className="flex min-w-0 flex-1 items-center gap-3 text-left">
                     <div className="h-12 w-16 shrink-0 overflow-hidden rounded border border-slate-200 bg-slate-50"><AdThumb ad={ad} /></div>
                     <div className="min-w-0 flex-1">
                       <div className="truncate text-sm font-medium text-slate-900">{ad.title || ad.sponsor_name || '(untitled)'}</div>
@@ -753,12 +781,13 @@ function SlotPanel({ slot, tiles, settings, slots, ads, onChanged, onDeleted }: 
                         <span className="text-xs text-slate-500">{ad.media_type} · {ad.duration_seconds} s · {ad.impressions.toLocaleString('en-IN')} views · {ad.clicks.toLocaleString('en-IN')} taps</span>
                       </div>
                     </div>
+                    </button>
                     <Switch checked={ad.active} aria-label="Show this ad" disabled={busy}
                       onCheckedChange={async (v) => { if (await attempt(() => supabase.from('ads').update({ active: v }).eq('id', ad.id))) onChanged(); }} />
                     <div className="flex">
                       <Button size="icon" variant="ghost" className="h-8 w-8" disabled={busy || i === 0} aria-label="Move up" onClick={() => reorder(i, -1)}><ArrowUp className="h-4 w-4" /></Button>
                       <Button size="icon" variant="ghost" className="h-8 w-8" disabled={busy || i === ads.length - 1} aria-label="Move down" onClick={() => reorder(i, 1)}><ArrowDown className="h-4 w-4" /></Button>
-                      <Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Edit" onClick={() => setEditing(ad)}><Pencil className="h-4 w-4" /></Button>
+                      <Button size="sm" variant="ghost" className="h-8 px-2" onClick={() => setEditing(ad)}><Pencil className="mr-1 h-4 w-4" /> Edit</Button>
                       <Confirm
                         trigger={<Button size="icon" variant="ghost" className="h-8 w-8 text-red-600 hover:bg-red-50" aria-label="Delete"><Trash2 className="h-4 w-4" /></Button>}
                         title="Delete this ad?" confirmLabel="Delete" destructive onConfirm={() => deleteAd(ad)}
@@ -775,9 +804,9 @@ function SlotPanel({ slot, tiles, settings, slots, ads, onChanged, onDeleted }: 
       {editing && (
         <AdDialog
           slotId={slot.id}
+          slotChoices={slots.map((x) => ({ id: x.id, name: slotName(x, settings), count: allAds.filter((a) => a.slot_id === x.id).length }))}
           target={spec.target}
           ad={editing === 'new' ? null : editing}
-          nextSort={ads.length}
           onClose={() => setEditing(null)}
           onSaved={() => { setEditing(null); onChanged(); }}
         />
@@ -870,9 +899,12 @@ function mediaSize(src: string, video: boolean): Promise<Size | null> {
   });
 }
 
-function AdDialog({ slotId, target, ad, nextSort, onClose, onSaved }: {
-  slotId: string; target: Size; ad: Ad | null; nextSort: number; onClose: () => void; onSaved: () => void;
+function AdDialog({ slotId, slotChoices, target, ad, onClose, onSaved }: {
+  slotId: string; slotChoices: { id: string; name: string; count: number }[]; target: Size; ad: Ad | null;
+  onClose: () => void; onSaved: () => void;
 }) {
+  const [slotSel, setSlotSel] = useState(ad?.slot_id ?? slotId);
+  const moving = slotSel !== (ad?.slot_id ?? slotId);
   const [type, setType] = useState<AdType>(ad?.type ?? 'direct');
   const [title, setTitle] = useState(ad?.title ?? '');
   const [file, setFile] = useState<File | null>(null);
@@ -942,7 +974,7 @@ function AdDialog({ slotId, target, ad, nextSort, onClose, onSaved }: {
         media_url = supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
       }
       const row = {
-        slot_id: slotId, type, title: title.trim(),
+        slot_id: slotSel, type, title: title.trim(),
         media_url: type === 'google' ? null : media_url, media_type: mediaType, fit, background,
         sponsor_name: type === 'sponsor' ? sponsor.trim() : null,
         action_kind: type === 'google' ? 'none' : actionKind,
@@ -951,9 +983,11 @@ function AdDialog({ slotId, target, ad, nextSort, onClose, onSaved }: {
         duration_seconds: d,
         starts_at: fromLocalInput(startsAt), ends_at: fromLocalInput(endsAt),
       };
+      // New ads, and ads moved to another slot, go to the end of that slot's rotation.
+      const sort = slotChoices.find((x) => x.id === slotSel)?.count ?? 0;
       const ok = ad
-        ? await attempt(() => supabase.from('ads').update(row).eq('id', ad.id), 'Ad saved')
-        : await attempt(() => supabase.from('ads').insert({ ...row, sort: nextSort }), 'Ad added');
+        ? await attempt(() => supabase.from('ads').update(moving ? { ...row, sort } : row).eq('id', ad.id), moving ? 'Ad moved' : 'Ad saved')
+        : await attempt(() => supabase.from('ads').insert({ ...row, sort }), 'Ad added');
       if (!ok) {
         if (file && media_url) await removeStored(media_url);
         return;
@@ -995,6 +1029,18 @@ function AdDialog({ slotId, target, ad, nextSort, onClose, onSaved }: {
               <Input id="ad-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Diwali offer" className="mt-1" />
               <p className="mt-1 text-xs text-slate-500">For this list and screen readers. Not shown on the ad.</p>
             </div>
+
+            {slotChoices.length > 1 && (
+              <div>
+                <Label htmlFor="ad-slot">Slot</Label>
+                <select id="ad-slot" className={select} value={slotSel} onChange={(e) => setSlotSel(e.target.value)}>
+                  {slotChoices.map((x) => (
+                    <option key={x.id} value={x.id}>{x.name} ({x.count} ad{x.count === 1 ? '' : 's'})</option>
+                  ))}
+                </select>
+                <p className="mt-1 text-xs text-slate-500">Ads in the same slot take turns in one rotation, ours and sponsors’ alike.</p>
+              </div>
+            )}
 
             {type !== 'google' && (
               <>
