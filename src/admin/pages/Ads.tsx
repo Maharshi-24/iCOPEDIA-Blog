@@ -109,7 +109,7 @@ export default function Ads() {
     <>
       <PageHeader
         title="Ads"
-        description="Shown only to free users, in the empty space under the Home tiles. That space is a different height on every phone, so you lay ads out on a grid that stretches to fit. Changes reach the app the next time Home loads; no app update needed."
+        description="Shown only to free users, in the empty space under the Home tiles. That space is a different height on every phone, so you lay ads out on a grid that stretches to fit it exactly: Home never scrolls and the bottom bar and tiles always stay in view. Changes reach the app the next time Home loads; no app update needed."
       />
       {error ? <Panel><Empty>{error}</Empty></Panel> : !settings ? <Panel><Loading /></Panel> : (
         <div className="space-y-4">
@@ -367,7 +367,7 @@ function LayoutEditor({ settings, slots, ads, selected, onSelect, onChanged }: {
         </div>
       </div>
       <p className="text-center text-xs text-slate-500">
-        Ad area here: {areaHeight - 16} px tall. On a phone with little space it is never shorter than {settings.min_height} px; Home scrolls instead.
+        Ad area here: {areaHeight - 16} px tall. It only uses the space left above the bottom bar, so Home never scrolls; on a phone with less than {settings.min_height} px left, the ads are hidden.
       </p>
     </div>
   );
@@ -421,11 +421,11 @@ function GridSettings({ settings, slots, onSaved }: { settings: Settings; slots:
           <Input id="ad-rows" type="number" min={1} max={24} value={rows} onChange={(e) => setRows(e.target.value)} className="mt-1" />
         </div>
         <div>
-          <Label htmlFor="ad-min">Min height (px)</Label>
+          <Label htmlFor="ad-min">Hide if less than (px)</Label>
           <Input id="ad-min" type="number" min={40} max={600} value={minH} onChange={(e) => setMinH(e.target.value)} className="mt-1" />
         </div>
       </div>
-      {!valid && <p className="mt-2 text-xs text-red-600">Columns 1–12, rows 1–24, min height 40–600.</p>}
+      {!valid && <p className="mt-2 text-xs text-red-600">Columns 1–12, rows 1–24, hide-below 40–600 px.</p>}
       {outside > 0 && <p className="mt-2 text-xs text-amber-700">{outside} slot{outside === 1 ? '' : 's'} won’t fit the smaller grid and will be hidden until moved.</p>}
       <div className="mt-3 flex gap-2">
         <Button size="sm" disabled={!dirty || !valid || saving} onClick={save} className="bg-slate-900 text-white hover:bg-slate-800">
