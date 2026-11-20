@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import {
-  Activity, BarChart3, Gauge, LayoutGrid, Bell, Building2, Globe, LayoutDashboard, LogOut, Mail, Menu, MessagesSquare, Newspaper, ShieldCheck, Smartphone, UserCheck, Users, Video, X,
+  Activity, BarChart3, Gauge, LayoutGrid, Megaphone, Bell, Building2, Globe, LayoutDashboard, LogOut, Mail, Menu, MessagesSquare, Newspaper, ShieldCheck, Smartphone, UserCheck, Users, Video, X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AdminAuthProvider, useAdminAuth } from './auth';
@@ -22,6 +22,7 @@ import Community from './pages/Community';
 import Verification from './pages/Verification';
 import HomeTiles from './pages/HomeTiles';
 import FreeLimits from './pages/FreeLimits';
+import Ads from './pages/Ads';
 import ActivityLog from './pages/Activity';
 
 const NAV = [
@@ -29,6 +30,7 @@ const NAV = [
   { to: 'analytics', label: 'Usage analytics', icon: BarChart3, element: <Analytics /> },
   { to: 'home-tiles', label: 'Home tiles', icon: LayoutGrid, element: <HomeTiles /> },
   { to: 'free-limits', label: 'Free user limits', icon: Gauge, element: <FreeLimits /> },
+  { to: 'ads', label: 'Ads', icon: Megaphone, element: <Ads /> },
   { to: 'login-access', label: 'Login access', icon: UserCheck, element: <LoginAccess /> },
   { to: 'notifications', label: 'Notifications', icon: Bell, element: <Notifications /> },
   { to: 'email', label: 'Email', icon: Mail, element: <EmailPage /> },
