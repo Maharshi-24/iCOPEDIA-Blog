@@ -20,20 +20,20 @@ const NotFound = () => {
   return (
     <div className="ico min-h-screen">
       <SiteNav />
-      <main className="pb-24 pt-28 sm:pt-36">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+      <main className="hero-top pb-[var(--section-y)]">
+        <div className="wrap">
           <p className="num text-[15px] font-semibold text-[#6B7278]">Error 404</p>
-          <h1 className="wide mt-2 max-w-[14ch] text-[2.6rem] font-black leading-[0.98] sm:text-[4.25rem]">This page doesn't exist</h1>
-          <p className="mt-5 max-w-[52ch] text-lg leading-relaxed text-[#3A4046]">
+          <h1 className="t-title mt-2 max-w-[14ch]">This page doesn't exist</h1>
+          <p className="t-lead mt-5 max-w-[52ch] text-[#3A4046]">
             The link may be old or mistyped. Try one of these instead.
           </p>
           <ul className="mt-10 grid max-w-4xl gap-6 border-t-2 border-[#23282D] pt-6 sm:grid-cols-3">
             {NEXT.map((n) => (
               <li key={n.href}>
-                <a href={n.href} className="text-[18px] font-bold text-[#23282D] underline underline-offset-4 hover:text-[#4C6395]">
+                <a href={n.href} className="t-h5 text-[#23282D] underline underline-offset-4 hover:text-[#4C6395]">
                   {n.label}
                 </a>
-                <p className="mt-1 text-[15px] leading-relaxed text-[#565D63]">{n.text}</p>
+                <p className="t-body mt-1 text-[#565D63]">{n.text}</p>
               </li>
             ))}
           </ul>

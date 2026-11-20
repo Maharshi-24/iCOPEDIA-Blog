@@ -7,7 +7,7 @@ export function SiteFooter() {
 
   return (
     <footer className="bg-[#23282D] text-white">
-      <div className="mx-auto grid max-w-6xl grid-cols-2 gap-x-6 gap-y-10 px-4 py-12 sm:px-6 sm:py-14 md:grid-cols-12">
+      <div className="wrap grid grid-cols-2 gap-x-6 gap-y-10 py-[clamp(3rem,2.4rem+2.5vw,3.5rem)] md:grid-cols-12">
         <div className="col-span-2 md:col-span-5">
           <a href="/" className="flex items-center gap-2.5">
             <img src="/icopedia-mark.svg" alt="" className="h-8 w-8" />
@@ -57,7 +57,7 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="border-t border-white/10">
-        <p className="mx-auto max-w-6xl px-4 py-6 text-xs text-white/50 sm:px-6">© {year} iCOPEDIA GLOBAL. All rights reserved.</p>
+        <p className="wrap py-6 text-xs text-white/50">© {year} iCOPEDIA GLOBAL. All rights reserved.</p>
       </div>
     </footer>
   );

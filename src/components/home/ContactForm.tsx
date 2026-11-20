@@ -36,7 +36,7 @@ export function ContactForm({ defaultRole = "Coating professional" }: { defaultR
   if (state === "sent") {
     return (
       <div className="border-l-4 border-[#23282D] bg-white p-8" role="status">
-        <p className="semi-wide text-xl font-bold">Message sent</p>
+        <p className="t-h4">Message sent</p>
         <p className="mt-2 text-[15px] leading-relaxed text-[#565D63]">We'll reply to the email address you gave.</p>
         <button onClick={() => setState("idle")} className="mt-5 text-[15px] font-semibold text-[#4C6395] underline underline-offset-4">
           Send another message
@@ -50,7 +50,7 @@ export function ContactForm({ defaultRole = "Coating professional" }: { defaultR
   const label = "mb-1.5 block text-sm font-semibold text-[#23282D]";
 
   return (
-    <form onSubmit={submit} className="relative -mx-4 bg-white px-4 py-6 sm:mx-0 sm:p-8">
+    <form onSubmit={submit} className="bleed bleed-sm-off relative bg-white py-6 sm:!p-8">
       <fieldset>
         <legend className={label}>You are</legend>
         <div className="grid gap-2 sm:grid-cols-2">

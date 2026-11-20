@@ -46,23 +46,23 @@ function Phone({ src, alt, priority = false }: { src: string; alt: string; prior
 
 export function AppScreens() {
   return (
-    <div className="relative mt-12 sm:mt-20">
+    <div className="relative mt-[clamp(3rem,1.8rem+5vw,5rem)]">
       {/* The steel band starts halfway up the phones, so they stand on it. */}
       <div className="absolute inset-x-0 bottom-0 top-[38%] bg-[#23282D]" aria-hidden="true">
         <div className="h-1 bg-[#F2A900]" />
       </div>
 
-      <div className="relative mx-auto max-w-6xl px-4 pb-14 sm:px-6 sm:pb-16">
-        <ul aria-label="App screens" className="hide-scrollbar -mx-4 flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-8 sm:overflow-visible sm:px-0 lg:gap-14">
+      <div className="wrap relative pb-[clamp(3.5rem,3rem+1.5vw,4rem)]">
+        <ul aria-label="App screens" className="hide-scrollbar bleed bleed-sm-off flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2 sm:grid sm:grid-cols-3 sm:gap-8 sm:overflow-visible sm:px-0 lg:gap-14">
           {SCREENS.map((s) => (
             <li
               key={s.title}
-              className={`w-[min(58%,250px)] shrink-0 snap-center sm:w-auto ${s.raised ? "order-first sm:order-none sm:-translate-y-8" : "sm:translate-y-4"}`}
+              className={`w-[var(--phone-w)] shrink-0 snap-center sm:w-auto ${s.raised ? "order-first sm:order-none sm:-translate-y-8" : "sm:translate-y-4"}`}
             >
               <div className="rise mx-auto max-w-[290px]" style={{ animationDelay: `${s.delay}ms` }}>
                 <Phone src={s.src} alt={s.alt} priority={s.raised} />
-                <p className="semi-wide mt-5 text-lg font-bold text-white sm:mt-6">{s.title}</p>
-                <p className="mt-1 text-[14px] leading-relaxed text-white/70 sm:text-[15px]">{s.text}</p>
+                <p className="t-h5 mt-5 text-white sm:mt-6">{s.title}</p>
+                <p className="t-body mt-1 text-white/70">{s.text}</p>
               </div>
             </li>
           ))}

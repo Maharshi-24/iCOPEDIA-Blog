@@ -23,7 +23,7 @@ export function SiteNav() {
 
   return (
     <header className={`site-header fixed inset-x-0 top-0 z-50 border-b bg-[#F3F4F2] ${scrolled || open ? "border-[#D6D9D4]" : "border-transparent"}`}>
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+      <div className="wrap flex h-[var(--header-h)] items-center justify-between">
         <a href="/" className="flex items-center gap-2.5" aria-label="iCOPEDIA home">
           <img src="/icopedia-mark.svg" alt="" className="h-7 w-7" />
           <span className="semi-wide text-lg font-extrabold tracking-tight text-[#23282D]">
@@ -63,7 +63,7 @@ export function SiteNav() {
       </div>
 
       {open && (
-        <nav className="drop-in border-t border-[#D6D9D4] px-4 pb-5 pt-1 lg:hidden" aria-label="Main">
+        <nav className="drop-in max-h-[calc(100dvh-var(--header-h))] overflow-y-auto border-t border-[#D6D9D4] px-[var(--gutter)] pb-5 pt-1 lg:hidden" aria-label="Main">
           {LINKS.map((l) => (
             <a key={l.id} href={`/#${l.id}`} onClick={() => setOpen(false)} className="block w-full border-b border-[#E3E5E1] py-3.5 text-left text-base text-[#23282D]">
               {l.label}

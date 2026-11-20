@@ -15,9 +15,9 @@ import { seoFor } from "@/seo";
 // fields in lib/Frontend/Pages/Product/product_model.dart. Keep it in step
 // with the app and with /terms. Design tokens are in components/home/home.css.
 
-const wrap = "mx-auto max-w-6xl px-4 sm:px-6";
-const h2 = "wide text-[2rem] leading-[1.05] sm:text-[2.75rem]";
-const lead = "mt-4 max-w-[60ch] text-lg leading-relaxed text-[#565D63]";
+const wrap = "wrap";
+const h2 = "t-h2";
+const lead = "t-lead mt-4 max-w-[60ch] text-[#565D63]";
 
 function PrimaryLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
@@ -51,12 +51,12 @@ function SecondaryLink({ href, onClick, children, dark = false }: { href: string
 
 function Hero({ onCompany }: { onCompany: () => void }) {
   return (
-    <section className="pt-28 sm:pt-36">
+    <section className="hero-top">
       <div className={wrap}>
-        <h1 className="wide max-w-[14ch] text-[clamp(2.4rem,11vw,3.1rem)] font-black leading-[0.95] sm:text-[5.25rem] lg:text-[6.25rem]">
+        <h1 className="t-display max-w-[14ch]">
           Every coat, worked out.
         </h1>
-        <p className="load-in mt-6 max-w-[56ch] text-[17px] leading-relaxed sm:mt-7 sm:text-lg text-[#3A4046] sm:text-xl" style={{ ["--load-delay" as string]: "90ms" }}>
+        <p className="load-in t-lead mt-6 max-w-[56ch] text-[#3A4046] sm:mt-7" style={{ ["--load-delay" as string]: "90ms" }}>
           iCOPEDIA is the app for people who estimate, apply and inspect protective coatings. Calculators, bills of
           quantities, site reports, instrument records, manufacturers' product data and an AI assistant, free to start.
         </p>
@@ -112,7 +112,7 @@ const STAGES = [
 
 function Tools() {
   return (
-    <section id="tools" className="scroll-mt-16 border-t-2 border-[#23282D] bg-white py-16 sm:py-28">
+    <section id="tools" className="anchor section-y border-t-2 border-[#23282D] bg-white">
       <div className={wrap}>
         <h2 className={h2} data-reveal>From estimate to sign‑off</h2>
         <p className={lead}>The app follows the job. Here's where each tool fits.</p>
@@ -122,14 +122,14 @@ function Tools() {
             <li key={s.stage} data-reveal className="grid gap-6 border-t border-[#D6D9D4] py-8 sm:py-10 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.6fr)] md:gap-12">
               <div>
                 <p className="num text-sm font-semibold text-[#6B7278]">Stage {i + 1} of {STAGES.length}</p>
-                <h3 className="wide mt-1 text-3xl sm:text-4xl">{s.stage}</h3>
-                <p className="mt-3 max-w-[32ch] text-[17px] leading-relaxed text-[#3A4046]">{s.job}</p>
+                <h3 className="t-h3 mt-1">{s.stage}</h3>
+                <p className="t-lead mt-3 max-w-[32ch] text-[#3A4046]">{s.job}</p>
               </div>
               <dl className="grid gap-x-10 gap-y-6 sm:grid-cols-2">
                 {s.tools.map(([name, text]) => (
                   <div key={name} className="border-l-[3px] border-[#F2A900] pl-4">
-                    <dt className="text-[17px] font-bold">{name}</dt>
-                    <dd className="mt-1 text-[15px] leading-relaxed text-[#565D63]">{text}</dd>
+                    <dt className="t-h5">{name}</dt>
+                    <dd className="t-body mt-1 text-[#565D63]">{text}</dd>
                   </div>
                 ))}
               </dl>
@@ -145,16 +145,16 @@ function Tools() {
 
 function Ustad() {
   return (
-    <section className="bg-[#23282D] py-20 text-white sm:py-28">
+    <section className="section-y bg-[#23282D] text-white">
       <div className={`${wrap} grid gap-14 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]`}>
         <div>
           <h2 className={`${h2} text-white`} data-reveal>Ask Ustad</h2>
-          <p className="mt-4 max-w-[52ch] text-lg leading-relaxed text-white/70">
+          <p className="t-lead mt-4 max-w-[52ch] text-white/70">
             Ustad is the AI coating assistant in the app. Ask about surface preparation, coating systems, testing or defects
             and get a clear first answer in seconds, or look the term up in the built-in coatings glossary.
           </p>
 
-          <div className="mt-10 max-w-lg space-y-3 text-[15px] leading-relaxed" data-reveal data-reveal-delay="120">
+          <div className="t-body mt-10 max-w-lg space-y-3" data-reveal data-reveal-delay="120">
             <p className="text-sm text-white/55">An example question</p>
             <p className="ml-auto w-fit max-w-[85%] rounded-[14px] rounded-br-[3px] bg-[#4C6395] px-4 py-3">
               What causes pinholes in an epoxy coat?
@@ -164,14 +164,14 @@ function Ustad() {
               and spraying in high heat…
             </p>
           </div>
-          <p className="mt-6 max-w-[52ch] text-sm leading-relaxed text-white/55">
+          <p className="t-small mt-6 max-w-[52ch] text-white/55">
             Ustad gives a first answer, not a sign-off. Check it against the product data sheet, the specification and the
             relevant standard before you act.
           </p>
         </div>
 
         <div className="lg:pt-3" data-reveal data-reveal-delay="200">
-          <h3 className="semi-wide text-xl text-white">Learn from the rest of the trade</h3>
+          <h3 className="t-h4 text-white">Learn from the rest of the trade</h3>
           <dl className="mt-6 divide-y divide-white/10 border-y border-white/10">
             {[
               ["Community", "Ask questions and share know-how with people across the industry. Anyone can join a discussion; verified members start new ones."],
@@ -179,8 +179,8 @@ function Ustad() {
               ["News", "What's happening in the coatings industry."],
             ].map(([t, d]) => (
               <div key={t} className="py-5">
-                <dt className="text-[17px] font-bold">{t}</dt>
-                <dd className="mt-1 text-[15px] leading-relaxed text-white/65">{d}</dd>
+                <dt className="t-h5">{t}</dt>
+                <dd className="t-body mt-1 text-white/65">{d}</dd>
               </div>
             ))}
           </dl>
@@ -215,7 +215,7 @@ function CellView({ v }: { v: Cell }) {
 
 function Plans({ onCompany }: { onCompany: () => void }) {
   return (
-    <section id="plans" className="scroll-mt-16 py-16 sm:py-28">
+    <section id="plans" className="anchor section-y">
       <div className={wrap}>
         <h2 className={h2} data-reveal>Free for you, ready for your team</h2>
         <p className={lead}>
@@ -229,11 +229,11 @@ function Plans({ onCompany }: { onCompany: () => void }) {
               <tr role="row" className="border-b-2 border-[#23282D] align-bottom">
                 <th role="columnheader" scope="col" className="w-[44%] py-4 pr-4 font-normal text-[#565D63]">Included</th>
                 <th role="columnheader" scope="col" className="w-[28%] bg-[#F3F4F2] px-3 py-3 sm:px-4 sm:py-4">
-                  <span className="semi-wide block text-xl font-extrabold sm:text-2xl">Free</span>
+                  <span className="t-h4 block">Free</span>
                   <span className="num mt-0.5 block text-[13px] font-normal leading-snug text-[#565D63] sm:mt-1 sm:text-[15px]"><span style={{ fontFamily: "system-ui, sans-serif" }}>₹</span>0, for individuals</span>
                 </th>
                 <th role="columnheader" scope="col" className="w-[28%] bg-[#23282D] px-3 py-3 text-white sm:px-4 sm:py-4">
-                  <span className="semi-wide block text-xl font-extrabold sm:text-2xl">Company</span>
+                  <span className="t-h4 block">Company</span>
                   <span className="mt-0.5 block text-[13px] font-normal leading-snug text-white/70 sm:mt-1 sm:text-[15px]">Pricing on request</span>
                 </th>
               </tr>
@@ -262,7 +262,7 @@ function Plans({ onCompany }: { onCompany: () => void }) {
           <PrimaryLink href={PLAY_URL}>Download free</PrimaryLink>
           <SecondaryLink href="/#contact" onClick={onCompany}>Talk to us about a company account</SecondaryLink>
         </div>
-        <p className="mt-8 max-w-[70ch] text-sm leading-relaxed text-[#565D63]">
+        <p className="t-small mt-8 max-w-[70ch] text-[#565D63]">
           Ads are marked “Ad” or “Sponsored”, and we never give your personal details to sponsors. The app shows your exact
           limits and when they reset.
         </p>
@@ -293,7 +293,7 @@ const SETUP = [
 
 function Manufacturers({ onCompany }: { onCompany: () => void }) {
   return (
-    <section id="manufacturers" className="scroll-mt-16 border-t-2 border-[#23282D] bg-white py-16 sm:py-28">
+    <section id="manufacturers" className="anchor section-y border-t-2 border-[#23282D] bg-white">
       <div className={`${wrap} grid gap-14 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]`}>
         <div>
           <h2 className={h2} data-reveal>For manufacturers</h2>
@@ -309,19 +309,19 @@ function Manufacturers({ onCompany }: { onCompany: () => void }) {
               ["Reach coating professionals directly", "Sponsored placements on the app's Home screen carry your name and link straight to your website, WhatsApp or phone."],
             ].map(([t, d]) => (
               <div key={t}>
-                <dt className="semi-wide text-xl font-bold">{t}</dt>
-                <dd className="mt-2 max-w-[60ch] text-[16px] leading-relaxed text-[#565D63]">{d}</dd>
+                <dt className="t-h5">{t}</dt>
+                <dd className="t-body mt-2 max-w-[60ch] text-[#565D63]">{d}</dd>
               </div>
             ))}
           </dl>
         </div>
 
-        <figure className="self-start lg:sticky lg:top-24" data-reveal data-reveal-delay="150">
+        <figure className="self-start lg:sticky lg:top-[calc(var(--header-h)+2rem)]" data-reveal data-reveal-delay="150">
           <div className="border-2 border-[#23282D] bg-[#F3F4F2]">
             <div className="flex items-center justify-between gap-4 bg-[#23282D] px-5 py-4 text-white">
               <div>
                 <p className="text-sm text-white/65">Your company</p>
-                <p className="semi-wide text-lg font-bold">Your Primer 100</p>
+                <p className="t-h5">Your Primer 100</p>
               </div>
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[3px] bg-white text-xs font-bold text-[#23282D]">Logo</span>
             </div>
@@ -340,13 +340,13 @@ function Manufacturers({ onCompany }: { onCompany: () => void }) {
       </div>
 
       <div className={`${wrap} mt-16 sm:mt-20`}>
-        <h3 className="semi-wide text-2xl sm:text-3xl">How we set up your company</h3>
+        <h3 className="t-h4">How we set up your company</h3>
         <ol className="mt-8 grid gap-8 md:grid-cols-3">
           {SETUP.map(([t, d], i) => (
             <li key={t} data-reveal data-reveal-delay={String(i * 110)} className="border-t-[3px] border-[#23282D] pt-5">
               <p className="num text-sm font-semibold text-[#6B7278]">Step {i + 1}</p>
-              <p className="mt-1 text-[18px] font-bold">{t}</p>
-              <p className="mt-2 text-[15px] leading-relaxed text-[#565D63]">{d}</p>
+              <p className="t-h5 mt-1">{t}</p>
+              <p className="t-body mt-2 text-[#565D63]">{d}</p>
             </li>
           ))}
         </ol>
@@ -407,11 +407,11 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
 
 function Faq() {
   return (
-    <section id="faq" className="scroll-mt-16 py-16 sm:py-28">
+    <section id="faq" className="anchor section-y">
       <div className={`${wrap} grid gap-10 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)]`}>
         <div>
           <h2 className={h2} data-reveal>Questions</h2>
-          <p className="mt-4 text-[16px] leading-relaxed text-[#565D63]">
+          <p className="t-body mt-4 text-[#565D63]">
             More in{" "}
             <a href="/support" className="font-semibold text-[#4C6395] underline underline-offset-4">Help and FAQ</a>.
           </p>
@@ -419,11 +419,11 @@ function Faq() {
         <div className="border-t-2 border-[#23282D]" data-reveal data-reveal-delay="100">
           {FAQS.map((f) => (
             <details key={f.q} className="group border-b border-[#D6D9D4]">
-              <summary className="flex items-center justify-between gap-6 py-5 text-[18px] font-bold">
+              <summary className="t-h5 flex items-center justify-between gap-6 py-5">
                 {f.q}
                 <Plus className="faq-sign h-5 w-5 shrink-0 transition-transform duration-200" aria-hidden="true" />
               </summary>
-              <div className="max-w-[62ch] pb-6 text-[16px] leading-relaxed text-[#3A4046]">{f.a}</div>
+              <div className="t-body max-w-[62ch] pb-6 text-[#3A4046]">{f.a}</div>
             </details>
           ))}
         </div>
@@ -436,11 +436,11 @@ function Faq() {
 
 function Contact({ role, formKey }: { role: Role; formKey: number }) {
   return (
-    <section id="contact" className="scroll-mt-16 border-t-2 border-[#23282D] bg-[#E6E8E4] py-16 sm:py-28">
+    <section id="contact" className="anchor section-y border-t-2 border-[#23282D] bg-[#E6E8E4]">
       <div className={`${wrap} grid gap-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]`}>
         <div>
           <h2 className={h2} data-reveal>Talk to us</h2>
-          <p className="mt-4 max-w-[44ch] text-lg leading-relaxed text-[#3A4046]">
+          <p className="t-lead mt-4 max-w-[44ch] text-[#3A4046]">
             Questions about the app, setting up your company or advertising? Send a message, or reach us directly.
           </p>
           <dl className="mt-8 space-y-5 text-[16px]">

@@ -48,10 +48,10 @@ const Support = () => {
       <SiteNav />
 
       <main>
-        <section className="pb-10 pt-28 sm:pb-14 sm:pt-36">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <h1 className="wide text-[clamp(2.6rem,12vw,3rem)] font-black leading-[0.95] sm:text-[4.5rem]">Help</h1>
-            <p className="load-in mt-5 max-w-[56ch] text-lg leading-relaxed text-[#3A4046]" style={{ ["--load-delay" as string]: "90ms" }}>
+        <section className="hero-top pb-[clamp(2.5rem,1.8rem+3vw,3.5rem)]">
+          <div className="wrap">
+            <h1 className="t-title">Help</h1>
+            <p className="load-in t-lead mt-5 max-w-[56ch] text-[#3A4046]" style={{ ["--load-delay" as string]: "90ms" }}>
               Answers to common questions about the iCOPEDIA app. Can't find yours? Message us and a person will reply.
             </p>
 
@@ -70,11 +70,11 @@ const Support = () => {
           </div>
         </section>
 
-        <section className="border-t-2 border-[#23282D] bg-white py-10 sm:py-20">
-          <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] gap-10 px-4 sm:px-6 lg:grid-cols-[minmax(0,0.32fr)_minmax(0,1fr)] lg:gap-12">
-            <nav aria-label="Help topics" className="lg:sticky lg:top-24 lg:self-start">
+        <section className="border-t-2 border-[#23282D] bg-white py-[clamp(2.5rem,1.4rem+4.5vw,5rem)]">
+          <div className="wrap grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,0.32fr)_minmax(0,1fr)] lg:gap-12">
+            <nav aria-label="Help topics" className="lg:sticky lg:top-[calc(var(--header-h)+2rem)] lg:self-start">
               <p className="text-sm font-semibold text-[#565D63]">Topics</p>
-              <ul className="hide-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 lg:mx-0 lg:block lg:space-y-1 lg:overflow-visible lg:px-0">
+              <ul className="hide-scrollbar bleed mt-3 flex gap-2 overflow-x-auto lg:!mx-0 lg:block lg:space-y-1 lg:overflow-visible lg:!px-0">
                 {SECTIONS.map((s) => (
                   <li key={s.id} className="shrink-0">
                     <a
@@ -91,23 +91,23 @@ const Support = () => {
             <div className="space-y-14" data-reveal>
               {sections.length === 0 && (
                 <div className="drop-in border-l-4 border-[#23282D] bg-[#F3F4F2] p-6" role="status">
-                  <p className="text-[18px] font-bold">No questions match “{query.trim()}”</p>
-                  <p className="mt-2 text-[16px] leading-relaxed text-[#3A4046]">
+                  <p className="t-h5">No questions match “{query.trim()}”</p>
+                  <p className="t-body mt-2 text-[#3A4046]">
                     Try a shorter word, or <a className={link} href={wa} target="_blank" rel="noopener noreferrer">ask us on WhatsApp</a>.
                   </p>
                 </div>
               )}
               {sections.map((s) => (
-                <section key={s.id} id={s.id} className="scroll-mt-24">
-                  <h2 className="semi-wide text-2xl sm:text-3xl">{s.title}</h2>
+                <section key={s.id} id={s.id} className="scroll-mt-[calc(var(--header-h)+1.5rem)]">
+                  <h2 className="t-h3">{s.title}</h2>
                   <div className="mt-5 border-t-2 border-[#23282D]">
                     {s.faqs.map((f) => (
                       <details key={f.q} className="border-b border-[#D6D9D4]">
-                        <summary className="flex items-center justify-between gap-6 py-4 text-[17px] font-bold">
+                        <summary className="t-h5 flex items-center justify-between gap-6 py-4">
                           {f.q}
                           <Plus className="faq-sign h-5 w-5 shrink-0 transition-transform duration-200" aria-hidden="true" />
                         </summary>
-                        <p className="max-w-[64ch] pb-5 text-[16px] leading-relaxed text-[#3A4046]">{f.a}</p>
+                        <p className="t-body max-w-[64ch] pb-5 text-[#3A4046]">{f.a}</p>
                       </details>
                     ))}
                   </div>
@@ -117,10 +117,10 @@ const Support = () => {
           </div>
         </section>
 
-        <section className="bg-[#23282D] py-14 text-white sm:py-20">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <h2 className="wide text-[2rem] leading-[1.05] text-white sm:text-[2.5rem]" data-reveal>Still stuck?</h2>
-            <p className="mt-3 max-w-[52ch] text-lg leading-relaxed text-white/70">
+        <section className="section-y bg-[#23282D] text-white">
+          <div className="wrap">
+            <h2 className="t-h2 text-white" data-reveal>Still stuck?</h2>
+            <p className="t-lead mt-3 max-w-[52ch] text-white/70">
               Tell us your mobile number and what happened. A screenshot helps.
             </p>
             <ul className="mt-10 grid gap-px bg-white/15 sm:grid-cols-3" data-reveal data-reveal-delay="120">

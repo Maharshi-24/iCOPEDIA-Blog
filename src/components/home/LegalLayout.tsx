@@ -68,17 +68,17 @@ export function LegalLayout({
     <div className="ico min-h-screen">
       <SiteNav />
       <main>
-        <header className="pb-10 pt-28 sm:pb-12 sm:pt-36">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <h1 className="wide max-w-[16ch] text-[clamp(2.3rem,10.5vw,2.6rem)] font-black leading-[0.98] sm:text-[4.25rem]">{title}</h1>
+        <header className="hero-top pb-[clamp(2.5rem,1.8rem+3vw,3rem)]">
+          <div className="wrap">
+            <h1 className="t-title max-w-[16ch]">{title}</h1>
             <p className="load-in num mt-5 text-[15px] text-[#565D63]" style={{ ["--load-delay" as string]: "90ms" }}>{meta}</p>
-            {intro && <div style={{ ["--load-delay" as string]: "180ms" }} className="load-in mt-6 max-w-[62ch] text-lg leading-relaxed text-[#3A4046]">{intro}</div>}
+            {intro && <div style={{ ["--load-delay" as string]: "180ms" }} className="load-in t-lead mt-6 max-w-[62ch] text-[#3A4046]">{intro}</div>}
           </div>
         </header>
 
         <div className="border-t-2 border-[#23282D] bg-white">
-          <div className="mx-auto grid max-w-6xl gap-10 px-4 py-8 sm:px-6 sm:py-16 lg:grid-cols-[minmax(0,0.36fr)_minmax(0,1fr)] lg:gap-14">
-            <nav aria-label="Contents" className="lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:self-start lg:overflow-y-auto">
+          <div className="wrap grid gap-10 py-[clamp(2rem,1rem+4vw,4rem)] lg:grid-cols-[minmax(0,0.36fr)_minmax(0,1fr)] lg:gap-14">
+            <nav aria-label="Contents" className="lg:sticky lg:top-[calc(var(--header-h)+1rem)] lg:max-h-[calc(100dvh-var(--header-h)-2rem)] lg:self-start lg:overflow-y-auto">
               <details className="border-2 border-[#23282D] lg:hidden">
                 <summary className="flex items-center justify-between px-4 py-3 text-[16px] font-bold">
                   Contents <span className="faq-sign text-xl leading-none transition-transform" aria-hidden="true">+</span>
