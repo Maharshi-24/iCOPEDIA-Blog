@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 
-const LAST_UPDATED = "24 September 2026";
-const CONTACT_EMAIL = "contact@icopedia.co";
+const LAST_UPDATED = "20 November 2026";
+const CONTACT_EMAIL = "hello@icopedia.co";
+const WHATSAPP = "+91 92747 22707";
 
 type Section = { id: string; title: string; body: React.ReactNode };
 
@@ -46,12 +47,16 @@ const SECTIONS: Section[] = [
           This Privacy Policy explains how <strong>iCOPEDIA</strong> ("iCOPEDIA", "we", "us")
           collects, uses, shares and protects personal data when you use the iCOPEDIA mobile
           app (package <code>com.icopedia.app</code>) and the website at icopedia.co
-          (together, the "Services").
+          (together, the "Services"). The Services are operated by <strong>iCOPEDIA GLOBAL</strong>,
+          a partnership firm registered under the Indian Partnership Act, 1932, at 505, Neptune
+          Prime, OP Road, Vadodara 390020, Gujarat, India. Read it together with our{" "}
+          <a className="text-[#1d4ed8] underline underline-offset-2 hover:text-[#1e3a8a]" href="/terms">Terms of Use</a>.
         </p>
         <p>
           iCOPEDIA is a toolkit for coating inspectors and protective-coating professionals:
-          calculators, daily inspection reports, instrument calibration records, a technical
-          glossary, a community and a professional directory. For the purposes of India's
+          calculators and bills of quantities, daily inspection reports, instrument calibration
+          records, notes, Ustad (an AI technical assistant), a community, news, tutorials and a
+          professional directory. For the purposes of India's
           Digital Personal Data Protection Act, 2023, iCOPEDIA is the Data Fiduciary for the
           personal data described below.
         </p>
@@ -92,11 +97,23 @@ const SECTIONS: Section[] = [
             ],
             [
               "Content you share",
-              "Posts and messages in the Community, your Directory listing, questions you ask the AI glossary assistant, referrals, and messages you send through Contact Us.",
+              "Posts and messages in the Community, your Directory listing, questions you ask Ustad, the AI assistant, referrals, and messages you send through Contact Us.",
             ],
             [
               "App diagnostics",
-              "App version, feature usage counts (for plan limits) and error logs needed to keep the Services working.",
+              "App version, feature usage counts (for usage limits) and error logs needed to keep the Services working. If the app crashes, a crash report (device model, operating system, app version and where the error happened) is sent through Firebase Crashlytics.",
+            ],
+            [
+              "Notifications",
+              "A push notification token for your device, used to send you alerts such as calibration reminders and app announcements. You can turn notifications off in your phone's settings.",
+            ],
+            [
+              "Terms acceptance",
+              "The version of the Terms of Use you agreed to at sign-in, with the date, time and platform, as a record of your agreement.",
+            ],
+            [
+              "Ads",
+              "Free accounts see ads in the app. We count how many times each ad is shown and tapped; these counts are not linked to your account.",
             ],
           ]}
         />
@@ -116,9 +133,10 @@ const SECTIONS: Section[] = [
         <li>To provide the app's features: saving and syncing your reports, records and files, and generating PDFs and exports you request.</li>
         <li>To pre-fill weather conditions in daily reports from your location.</li>
         <li>To process subscription payments, issue receipts and apply plan limits.</li>
-        <li>To answer glossary questions with our AI assistant.</li>
+        <li>To answer your questions with Ustad, our AI assistant.</li>
+        <li>To show ads to free accounts and count how often each ad is seen and tapped.</li>
         <li>To show your Directory listing and Community posts to other users, where you choose to publish them.</li>
-        <li>To send service notices, such as calibration due-date reminders and important updates.</li>
+        <li>To send service notices and push notifications, such as calibration due-date reminders and important updates.</li>
         <li>To prevent fraud and misuse, keep the Services secure, and fix problems.</li>
         <li>To comply with legal obligations, such as tax and accounting records for payments.</li>
       </ul>
@@ -140,17 +158,24 @@ const SECTIONS: Section[] = [
             ["Supabase", "Database, file storage, authentication and server functions (hosts your account and records)."],
             ["MSG91", "Delivers sign-in OTPs to your mobile number by SMS."],
             ["Razorpay", "Processes subscription payments."],
-            ["Google (Gemini API)", "Generates answers to questions you ask the AI glossary assistant. Only the question text is sent."],
+            ["Google (Gemini API)", "Generates answers to questions you ask Ustad, the AI assistant. Only the question text is sent."],
+            ["Google (Firebase)", "Sends push notifications (Firebase Cloud Messaging) and collects crash reports (Firebase Crashlytics)."],
             ["Open-Meteo", "Returns weather for the coordinates of your site. Only coordinates are sent."],
             ["ipapi.co", "Estimates your city from your IP address when GPS location is unavailable."],
             ["India Post PIN code API", "Looks up city and state from the PIN code you enter."],
-            ["Render and Vercel", "Host our backend services and website."],
+            ["Vercel", "Hosts our website."],
           ]}
         />
         <p>
           <strong>Other users.</strong> Your Directory listing and anything you post in the
           Community are visible to other iCOPEDIA users. Reports and records are private to your
           account unless you export or share them yourself.
+        </p>
+        <p>
+          <strong>Advertisers.</strong> Free accounts see ads for iCOPEDIA's own services and
+          paid ads from sponsors, each marked "Ad" or "Sponsored". Sponsors receive no personal
+          data from us. If you tap an ad, you leave iCOPEDIA for the sponsor's website, WhatsApp
+          or phone, and the sponsor's own privacy terms apply from there.
         </p>
         <p>
           <strong>Legal reasons.</strong> We may disclose data if required by law, court order
@@ -197,7 +222,11 @@ const SECTIONS: Section[] = [
     title: "Delete your account and data",
     body: (
       <>
-        <p>You can ask us to delete your iCOPEDIA account and all associated data at any time. You do not need the app installed to do this.</p>
+        <p>
+          You can ask us to delete your iCOPEDIA account and all associated data at any time, in
+          the app from your Profile (Delete account), or by email as below. You do not need the
+          app installed to ask by email.
+        </p>
         <ol>
           <li>
             Email <Mail subject="Delete my iCOPEDIA account" /> with the subject
@@ -303,9 +332,13 @@ const SECTIONS: Section[] = [
           For privacy questions, requests or complaints, contact our Grievance Officer:
         </p>
         <p className="rounded-xl border border-[#dbe3f3] bg-white px-5 py-4">
-          <strong>Grievance Officer, iCOPEDIA</strong>
+          <strong>Grievance Officer, iCOPEDIA GLOBAL</strong>
+          <br />
+          505, Neptune Prime, OP Road, Vadodara 390020, Gujarat, India
           <br />
           Email: <Mail subject="Privacy grievance" />
+          <br />
+          WhatsApp: {WHATSAPP}
         </p>
         <p>
           We acknowledge complaints within 7 days and respond within 30 days. If you are not
@@ -368,7 +401,7 @@ const PrivacyPolicy = () => {
       </main>
 
       <footer className="border-t border-[#e2e8f5] py-6 text-center text-sm text-[#64748b]">
-        © {new Date().getFullYear()} iCOPEDIA. All rights reserved.
+        © {new Date().getFullYear()} iCOPEDIA GLOBAL. All rights reserved.
       </footer>
 
       <style>{`
