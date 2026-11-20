@@ -287,6 +287,8 @@ const SECTIONS: Section[] = [
       <ul>
         <li><strong>Location</strong>: weather auto-fill in daily reports, only while you use it.</li>
         <li><strong>Camera, photos and files</strong>: attach site photos, certificates and documents you choose.</li>
+        <li><strong>Microphone</strong>: voice dictation in Notes, only while dictation is switched on. Your phone's speech service turns speech into text; iCOPEDIA does not receive or store the audio.</li>
+        <li><strong>Notifications</strong>: alerts such as calibration reminders; you can turn them off in your phone's settings.</li>
         <li><strong>Internet and network state</strong>: sync your data and check connectivity.</li>
       </ul>
     ),
