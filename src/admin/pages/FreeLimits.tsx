@@ -6,11 +6,18 @@ import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/lib/supabase';
 import { attempt, Empty, Loading, PageHeader, Panel, Pill, Spinner, timeAgo } from '../shared';
 
-// Table usage_limits (backend migrations 20261119160000_boq_limit_settings and
-// 20261119170000_boq_limits_into_usage_limits). default_limit is the per-day
-// number. Only the features listed in ENFORCED are checked by the server
-// today; the table's other rows belong to the retired trial system.
-const ENFORCED: Record<string, string> = { boq_create: 'Bill of Quantities' };
+// Table usage_limits (backend migrations 20261119160000_boq_limit_settings,
+// 20261119170000_boq_limits_into_usage_limits and
+// 20261121140000_free_user_products). Only the features listed in ENFORCED
+// are checked by the server today; the table's other rows belong to the
+// retired trial system.
+//   boq_create    - per day or per week; default_limit is the per-day number.
+//   user_products - a total, not per period: how many products a free user
+//                   may keep. default_limit is that number.
+const ENFORCED: Record<string, string> = {
+  boq_create: 'Bill of Quantities',
+  user_products: 'Products',
+};
 
 type Limit = {
   feature: string;
@@ -59,10 +66,12 @@ export default function FreeLimits() {
       {error ? (
         <Panel><Empty>Could not load the limits: {error}</Empty></Panel>
       ) : !rows ? <Panel><Loading /></Panel> : rows.length === 0 ? (
-        <Panel><Empty>The BOQ limit row (usage_limits, boq_create) is missing on the server.</Empty></Panel>
+        <Panel><Empty>The limit rows (usage_limits: boq_create, user_products) are missing on the server.</Empty></Panel>
       ) : (
         <div className="space-y-4">
-          {rows.map((r) => <LimitCard key={r.feature} row={r} onSaved={load} />)}
+          {rows.map((r) => r.feature === 'user_products'
+            ? <ProductLimitCard key={r.feature} row={r} onSaved={load} />
+            : <LimitCard key={r.feature} row={r} onSaved={load} />)}
         </div>
       )}
     </>
@@ -166,6 +175,92 @@ function LimitCard({ row, onSaved }: { row: Limit; onSaved: () => void }) {
         <p className="text-xs text-slate-400">
           Switching between day and week keeps counting: BOQs already made today count toward the week, and the other way round.
         </p>
+      </div>
+    </Panel>
+  );
+}
+
+/**
+ * How many products a free user may keep in the app. Calculator saves
+ * (Coverage, Quantity, DFT to WFT) and products typed in Product Details
+ * count together. A total, not per day or week.
+ */
+function ProductLimitCard({ row, onSaved }: { row: Limit; onSaved: () => void }) {
+  const [enabled, setEnabled] = useState(row.enabled);
+  const [limit, setLimit] = useState(String(row.daily_limit));
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setEnabled(row.enabled); setLimit(String(row.daily_limit));
+  }, [row]);
+
+  const n = Number(limit);
+  const valid = Number.isInteger(n) && n >= 1 && n <= 1000;
+  const dirty = enabled !== row.enabled || n !== row.daily_limit;
+  const lowered = enabled && valid && (n < row.daily_limit || !row.enabled);
+
+  const summary = !enabled
+    ? 'Free users can keep as many products as they like.'
+    : `Free users can keep up to ${valid ? n : '…'} products. Once they reach it, new calculations aren't saved and they can't add products until they delete one.`;
+
+  async function save() {
+    setSaving(true);
+    const ok = await attempt(
+      () => supabase.from('usage_limits')
+        .update({ enabled, default_limit: n })
+        .eq('feature_key', row.feature),
+      'Product limit saved',
+    );
+    setSaving(false);
+    if (ok) onSaved();
+  }
+
+  return (
+    <Panel
+      title={row.label}
+      description={`Changed ${timeAgo(row.updated_at)}`}
+      actions={enabled ? <Pill tone="amber">limited</Pill> : <Pill tone="green">unlimited</Pill>}
+    >
+      <div className="space-y-5">
+        <p className="text-sm text-slate-600">
+          Free users' own products in the app's Product Details. Calculations saved from
+          Coverage, Quantity and DFT to WFT and products they type in count together.
+        </p>
+
+        <label htmlFor={`${row.feature}-on`} className="flex cursor-pointer items-center justify-between gap-4">
+          <div>
+            <div className="text-sm font-medium text-slate-900">Limit free users</div>
+            <div className="text-xs text-slate-500">Off means no limit at all.</div>
+          </div>
+          <Switch id={`${row.feature}-on`} checked={enabled} onCheckedChange={setEnabled} />
+        </label>
+
+        <div className={`max-w-[12rem] ${enabled ? '' : 'pointer-events-none opacity-50'}`}>
+          <Label htmlFor={`${row.feature}-limit`}>Products per user</Label>
+          <Input id={`${row.feature}-limit`} type="number" min={1} max={1000} inputMode="numeric"
+            value={limit} onChange={(e) => setLimit(e.target.value)} className="mt-1" aria-invalid={!valid} />
+          {!valid && <p className="mt-1 text-xs text-red-600">1 to 1000</p>}
+        </div>
+
+        <div className="rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-700">{summary}</div>
+
+        {lowered && dirty && (
+          <p className="text-xs text-amber-700">
+            Lowering the limit deletes nothing. Users already over it keep their products but can't add more until they're under it.
+          </p>
+        )}
+
+        <div className="flex gap-2">
+          <Button disabled={!dirty || !valid || saving} onClick={save} className="bg-slate-900 text-white hover:bg-slate-800">
+            {saving && <Spinner className="mr-2" />} Save
+          </Button>
+          {dirty && (
+            <Button variant="ghost" disabled={saving} onClick={() => {
+              setEnabled(row.enabled); setLimit(String(row.daily_limit));
+            }}>Undo</Button>
+          )}
+        </div>
+        <p className="text-xs text-slate-400">Applies straight away; the app picks it up the next time it syncs.</p>
       </div>
     </Panel>
   );

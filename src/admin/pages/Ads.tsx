@@ -255,7 +255,7 @@ const TILE_LABELS: Record<string, string> = {
   instruments: 'Instruments', community: 'Community', tutorials: 'Tutorials', news: 'News', notes: 'Notes',
 };
 /** Used when home_tiles can't be read: the app's own default for free users. */
-const FREE_HIDDEN_DEFAULT = new Set(['product_details', 'daily_report', 'instruments']);
+const FREE_HIDDEN_DEFAULT = new Set(['daily_report', 'instruments']);
 
 export type HomeTile = { key: string; label: string; visible_for_free: boolean };
 type Phone = (typeof PHONES)[number];
