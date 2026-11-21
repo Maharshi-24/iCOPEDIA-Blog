@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
+// Self-hosted: the site CSP only allows fonts from our own origin.
+import "@fontsource-variable/montserrat";
+import "@fontsource/poppins/400.css";
 
 const TITLE = "COMING SOON";
 const WHATSAPP_NUMBER = "919274722707";
@@ -66,7 +69,7 @@ const ComingSoon = () => {
           overflow: hidden;
           background: var(--ink);
           color: var(--paper);
-          font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+          font-family: 'Montserrat Variable', 'Montserrat', system-ui, -apple-system, sans-serif;
           display: flex;
           flex-direction: column;
           isolation: isolate;
