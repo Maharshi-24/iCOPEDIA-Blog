@@ -14,8 +14,8 @@
     { "source": "/app-shell", "destination": "/admin", "permanent": false }
   ],
   "rewrites": [
-    { "source": "/admin", "destination": "/app-shell.html" },
-    { "source": "/admin/:path*", "destination": "/app-shell.html" }
+    { "source": "/admin", "destination": "/app-shell" },
+    { "source": "/admin/:path*", "destination": "/app-shell" }
   ],
   "headers": [
     {
