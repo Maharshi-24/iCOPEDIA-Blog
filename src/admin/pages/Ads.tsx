@@ -249,14 +249,13 @@ const APP = { header: 60, tile: 100, tileGap: 10, tilesPadX: 16, tilesPadY: 8, n
 const PREVIEW_W = 300; // px the phone screen is drawn at
 
 /** Home's tile rows in app order; a row with no visible tiles is dropped. */
-// Free users' Product Details is the 'my_products' tile (their own products).
-const TILE_ROWS: string[][] = [['calculators'], ['my_products', 'boq'], ['daily_report', 'instruments'], ['community', 'tutorials'], ['news', 'notes']];
+const TILE_ROWS: string[][] = [['calculators'], ['product_details', 'boq'], ['daily_report', 'instruments'], ['community', 'tutorials'], ['news', 'notes']];
 const TILE_LABELS: Record<string, string> = {
-  calculators: 'Calculators', my_products: 'Product Details', boq: 'Bill of Quantities', daily_report: 'Project Report',
+  calculators: 'Calculators', product_details: 'Product Details', boq: 'Bill of Quantities', daily_report: 'Project Report',
   instruments: 'Instruments', community: 'Community', tutorials: 'Tutorials', news: 'News', notes: 'Notes',
 };
 /** Used when home_tiles can't be read: the app's own default for free users. */
-const FREE_HIDDEN_DEFAULT = new Set(['daily_report', 'instruments']);
+const FREE_HIDDEN_DEFAULT = new Set(['product_details', 'daily_report', 'instruments']);
 
 export type HomeTile = { key: string; label: string; visible_for_free: boolean };
 type Phone = (typeof PHONES)[number];

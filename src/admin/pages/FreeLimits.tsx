@@ -12,11 +12,13 @@ import { attempt, Empty, Loading, PageHeader, Panel, Pill, Spinner, timeAgo } fr
 // are checked by the server today; the table's other rows belong to the
 // retired trial system.
 //   boq_create    - per day or per week; default_limit is the per-day number.
-//   user_products - a total, not per period: how many products a free user
-//                   may keep. default_limit is that number.
+//   user_products - a total, not per period: how many Coverage, Quantity and
+//                   DFT to WFT saves a free user keeps. default_limit is that
+//                   number; a new save past it deletes their oldest
+//                   (20261121160000_saved_calcs_drop_oldest).
 const ENFORCED: Record<string, string> = {
   boq_create: 'Bill of Quantities',
-  user_products: 'Products',
+  user_products: 'Saved calculations',
 };
 
 type Limit = {
@@ -181,9 +183,9 @@ function LimitCard({ row, onSaved }: { row: Limit; onSaved: () => void }) {
 }
 
 /**
- * How many products a free user may keep in the app. Calculator saves
- * (Coverage, Quantity, DFT to WFT) and products typed in Product Details
- * count together. A total, not per day or week.
+ * How many Coverage, Quantity and DFT to WFT saves a free user keeps. A
+ * total, not per day or week. Past it, the oldest go (unstarred first);
+ * the app doesn't tell the user.
  */
 function ProductLimitCard({ row, onSaved }: { row: Limit; onSaved: () => void }) {
   const [enabled, setEnabled] = useState(row.enabled);
@@ -200,8 +202,8 @@ function ProductLimitCard({ row, onSaved }: { row: Limit; onSaved: () => void })
   const lowered = enabled && valid && (n < row.daily_limit || !row.enabled);
 
   const summary = !enabled
-    ? 'Free users can keep as many products as they like.'
-    : `Free users can keep up to ${valid ? n : '…'} products. Once they reach it, new calculations aren't saved and they can't add products until they delete one.`;
+    ? 'Free users keep every calculation they save.'
+    : `Free users keep their ${valid ? n : '…'} newest saved calculations. Saving one more deletes their oldest (starred ones last). The app doesn't tell them.`;
 
   async function save() {
     setSaving(true);
@@ -209,7 +211,7 @@ function ProductLimitCard({ row, onSaved }: { row: Limit; onSaved: () => void })
       () => supabase.from('usage_limits')
         .update({ enabled, default_limit: n })
         .eq('feature_key', row.feature),
-      'Product limit saved',
+      'Saved calculation limit saved',
     );
     setSaving(false);
     if (ok) onSaved();
@@ -223,8 +225,8 @@ function ProductLimitCard({ row, onSaved }: { row: Limit; onSaved: () => void })
     >
       <div className="space-y-5">
         <p className="text-sm text-slate-600">
-          Free users' own products in the app's Product Details. Calculations saved from
-          Coverage, Quantity and DFT to WFT and products they type in count together.
+          Calculations free users save from Coverage, Quantity and DFT to WFT, which they can
+          reuse in BOQ and the calculators. Mixing saves don't count; they expire after 14 days unused.
         </p>
 
         <label htmlFor={`${row.feature}-on`} className="flex cursor-pointer items-center justify-between gap-4">
@@ -236,7 +238,7 @@ function ProductLimitCard({ row, onSaved }: { row: Limit; onSaved: () => void })
         </label>
 
         <div className={`max-w-[12rem] ${enabled ? '' : 'pointer-events-none opacity-50'}`}>
-          <Label htmlFor={`${row.feature}-limit`}>Products per user</Label>
+          <Label htmlFor={`${row.feature}-limit`}>Saves per user</Label>
           <Input id={`${row.feature}-limit`} type="number" min={1} max={1000} inputMode="numeric"
             value={limit} onChange={(e) => setLimit(e.target.value)} className="mt-1" aria-invalid={!valid} />
           {!valid && <p className="mt-1 text-xs text-red-600">1 to 1000</p>}
@@ -246,7 +248,7 @@ function ProductLimitCard({ row, onSaved }: { row: Limit; onSaved: () => void })
 
         {lowered && dirty && (
           <p className="text-xs text-amber-700">
-            Lowering the limit deletes nothing. Users already over it keep their products but can't add more until they're under it.
+            Nothing is deleted straight away. Users over the new limit lose their oldest saves, down to it, the next time they save a calculation.
           </p>
         )}
 
