@@ -1,5 +1,5 @@
 import { PointerEvent as ReactPointerEvent, useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowDown, ArrowUp, Bell, CalendarDays, Home, ImagePlus, Menu, Pencil, Plus, Sparkles, Trash2, X } from 'lucide-react';
+import { ArrowDown, ArrowUp, BarChart3, Bell, CalendarDays, Home, ImagePlus, Menu, Pencil, Plus, Sparkles, Trash2, X } from 'lucide-react';
 import { addDays, differenceInCalendarDays, format, startOfDay } from 'date-fns';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -40,6 +40,25 @@ type Ad = {
   starts_at: string | null; ends_at: string | null; impressions: number; clicks: number;
 };
 
+// From admin_promo_stats() (backend migration 20261122120000). The app sends a
+// view only once the ad's picture or video is on screen. views / taps are
+// raw counts; viewers / tappers are different people. Days are IST.
+type DayStat = { day: string; views: number; viewers: number; taps: number; tappers: number };
+type AdStats = { views: number; viewers: number; taps: number; tappers: number; open_reports: number; daily: DayStat[] };
+type ReportReason = 'inappropriate' | 'misleading' | 'irrelevant' | 'other';
+type AdReport = {
+  id: string; ad_id: string; reason: ReportReason; note: string | null;
+  status: 'open' | 'actioned' | 'dismissed'; created_at: string; reviewed_at: string | null;
+};
+const STATS_DAYS = 30;
+const REASON_LABEL: Record<ReportReason, string> = {
+  inappropriate: 'Offensive or inappropriate',
+  misleading: 'Misleading or a scam',
+  irrelevant: 'Not relevant to me',
+  other: 'Something else',
+};
+const fmt = (n: number) => n.toLocaleString('en-IN');
+
 const BUCKET = 'ads';
 
 // Table names the page uses. Ad blockers (Brave Shields, uBlock) block
@@ -48,6 +67,8 @@ const BUCKET = 'ads';
 // promo_slots / promo_settings (backend migration 20261120130000). Until that
 // migration is run it falls back to the tables themselves.
 const VIEWS = { ads: 'promo_items', slots: 'promo_slots', settings: 'promo_settings' };
+// Ad reports, through the same kind of view (backend migration 20261122120000).
+const REPORTS = 'promo_reports';
 const TABLES = { ads: 'ads', slots: 'ad_slots', settings: 'ad_settings' };
 let T = VIEWS;
 const missing = (m?: string) => !!m && /does not exist|schema cache|Could not find the table/i.test(m);
@@ -100,6 +121,8 @@ export default function Ads() {
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [tiles, setTiles] = useState<HomeTile[] | null>(null);
+  // Null until loaded, or when the stats migration isn't on the server yet.
+  const [stats, setStats] = useState<Record<string, AdStats> | null>(null);
 
   const [usingTables, setUsingTables] = useState(false);
 
@@ -108,12 +131,13 @@ export default function Ads() {
     const probe = await supabase.from(VIEWS.settings).select('cols').limit(1);
     T = missing(probe.error?.message) ? TABLES : VIEWS;
     setUsingTables(T === TABLES);
-    const [s, sl, a, t] = await Promise.all([
+    const [s, sl, a, t, st] = await Promise.all([
       supabase.from(T.settings).select('direct_enabled, sponsor_enabled, google_enabled, cols, rows, min_height').maybeSingle(),
       supabase.from(T.slots).select('id, x, y, w, h, scrollable, active').order('y').order('x'),
       supabase.from(T.ads).select('*').order('sort').order('created_at'),
       // For the phone preview: which Home tiles free users see.
       supabase.from('home_tiles').select('key, label, visible_for_free'),
+      supabase.rpc('admin_promo_stats', { p_days: STATS_DAYS }),
     ]);
     const err = s.error ?? sl.error ?? a.error;
     if (err) {
@@ -131,6 +155,7 @@ export default function Ads() {
     setSlots((sl.data ?? []) as Slot[]);
     setAds((a.data ?? []) as Ad[]);
     setTiles(t.error ? null : ((t.data ?? []) as HomeTile[]));
+    setStats(st.error ? null : ((st.data as { ads?: Record<string, AdStats> } | null)?.ads ?? {}));
   }, []);
   useEffect(() => { load(); }, [load]);
 
@@ -150,6 +175,7 @@ export default function Ads() {
       )}
       {error ? <Panel><Empty>{error}</Empty></Panel> : !settings ? <Panel><Loading /></Panel> : (
         <div className="space-y-4">
+          <ReportsNotice ads={ads} stats={stats} onPick={(slotId) => setSelected(slotId)} />
           <TypesPanel settings={settings} onSaved={load} />
           <div className="grid items-start gap-4 lg:grid-cols-[380px_minmax(0,1fr)]">
             <Panel title="Layout" description="Drag across empty cells to add a slot. Drag a slot to move it, or its blue corner to resize it.">
@@ -165,6 +191,7 @@ export default function Ads() {
                 slots={slots}
                 ads={ads.filter((a) => a.slot_id === selectedSlot.id)}
                 allAds={ads}
+                stats={stats}
                 onChanged={load}
                 onDeleted={() => { setSelected(null); load(); }}
                 onBack={() => setSelected(null)}
@@ -175,11 +202,15 @@ export default function Ads() {
                   <ul className="divide-y divide-slate-100 rounded-lg border border-slate-200">
                     {slots.map((s) => {
                       const n = ads.filter((a) => a.slot_id === s.id).length;
+                      const reports = ads.filter((a) => a.slot_id === s.id).reduce((sum, a) => sum + (stats?.[a.id]?.open_reports ?? 0), 0);
                       return (
                         <li key={s.id}>
                           <button type="button" onClick={() => setSelected(s.id)} className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left hover:bg-slate-50">
                             <span className="text-sm font-medium text-slate-900">{slotName(s, settings)}</span>
-                            <span className="text-xs text-slate-500">{n} ad{n === 1 ? '' : 's'}{!s.active ? ' · hidden' : ''}</span>
+                            <span className="flex items-center gap-2 text-xs text-slate-500">
+                              {reports > 0 && <Pill tone="red">{reports} report{reports === 1 ? '' : 's'}</Pill>}
+                              {n} ad{n === 1 ? '' : 's'}{!s.active ? ' · hidden' : ''}
+                            </span>
                           </button>
                         </li>
                       );
@@ -662,13 +693,15 @@ function GridSettings({ settings, slots, onSaved }: { settings: Settings; slots:
 
 // ------------------------------------------------------------------- slot
 
-function SlotPanel({ slot, tiles, settings, slots, ads, allAds, onChanged, onDeleted, onBack }: {
+function SlotPanel({ slot, tiles, settings, slots, ads, allAds, stats, onChanged, onDeleted, onBack }: {
   slot: Slot; tiles: HomeTile[] | null; settings: Settings; slots: Slot[]; ads: Ad[]; allAds: Ad[];
+  stats: Record<string, AdStats> | null;
   onChanged: () => void; onDeleted: () => void; onBack: () => void;
 }) {
   const spec = creativeSpec(slot, settings, tiles);
   const [pos, setPos] = useState({ x: String(slot.x + 1), y: String(slot.y + 1), w: String(slot.w), h: String(slot.h) });
   const [editing, setEditing] = useState<Ad | 'new' | null>(null);
+  const [statsFor, setStatsFor] = useState<Ad | null>(null);
   const [busy, setBusy] = useState(false);
   useEffect(() => setPos({ x: String(slot.x + 1), y: String(slot.y + 1), w: String(slot.w), h: String(slot.h) }), [slot]);
 
@@ -803,8 +836,16 @@ function SlotPanel({ slot, tiles, settings, slots, ads, allAds, onChanged, onDel
                       <div className="mt-1 flex flex-wrap items-center gap-1.5">
                         <Pill tone={TYPE_TONE[ad.type]}>{TYPE_LABEL[ad.type]}</Pill>
                         <Pill tone={st.tone}>{st.label}</Pill>
-                        <span className="text-xs text-slate-500">{ad.media_type} · {ad.duration_seconds} s · {ad.impressions.toLocaleString('en-IN')} views · {ad.clicks.toLocaleString('en-IN')} taps</span>
+                        {(stats?.[ad.id]?.open_reports ?? 0) > 0 && (
+                          <Pill tone="red">{stats![ad.id].open_reports} report{stats![ad.id].open_reports === 1 ? '' : 's'}</Pill>
+                        )}
+                        <span className="text-xs text-slate-500">{ad.media_type} · {ad.duration_seconds} s</span>
                       </div>
+                      {stats?.[ad.id] && (
+                        <div className="mt-1 text-xs text-slate-500">
+                          Last {STATS_DAYS} days: {fmt(stats[ad.id].views)} views by {fmt(stats[ad.id].viewers)} {stats[ad.id].viewers === 1 ? 'person' : 'people'} · {fmt(stats[ad.id].taps)} taps
+                        </div>
+                      )}
                     </div>
                     </button>
                     <Switch checked={ad.active} aria-label="Show this ad" disabled={busy}
@@ -812,6 +853,7 @@ function SlotPanel({ slot, tiles, settings, slots, ads, allAds, onChanged, onDel
                     <div className="flex">
                       <Button size="icon" variant="ghost" className="h-8 w-8" disabled={busy || i === 0} aria-label="Move up" onClick={() => reorder(i, -1)}><ArrowUp className="h-4 w-4" /></Button>
                       <Button size="icon" variant="ghost" className="h-8 w-8" disabled={busy || i === ads.length - 1} aria-label="Move down" onClick={() => reorder(i, 1)}><ArrowDown className="h-4 w-4" /></Button>
+                      <Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Stats and reports" title="Stats and reports" onClick={() => setStatsFor(ad)}><BarChart3 className="h-4 w-4" /></Button>
                       <Button size="sm" variant="ghost" className="h-8 px-2" onClick={() => setEditing(ad)}><Pencil className="mr-1 h-4 w-4" /> Edit</Button>
                       <Confirm
                         trigger={<Button size="icon" variant="ghost" className="h-8 w-8 text-red-600 hover:bg-red-50" aria-label="Delete"><Trash2 className="h-4 w-4" /></Button>}
@@ -836,7 +878,170 @@ function SlotPanel({ slot, tiles, settings, slots, ads, allAds, onChanged, onDel
           onSaved={() => { setEditing(null); onChanged(); }}
         />
       )}
+      {statsFor && (
+        <AdStatsDialog ad={statsFor} stats={stats?.[statsFor.id] ?? null} onClose={() => setStatsFor(null)} onChanged={onChanged} />
+      )}
     </Panel>
+  );
+}
+
+// ------------------------------------------------------- stats & reports
+
+/** Open reports, at the top of the page, so they aren't missed. */
+function ReportsNotice({ ads, stats, onPick }: { ads: Ad[]; stats: Record<string, AdStats> | null; onPick: (slotId: string) => void }) {
+  const reported = ads.filter((a) => (stats?.[a.id]?.open_reports ?? 0) > 0);
+  if (reported.length === 0) return null;
+  return (
+    <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+      <div className="font-medium">Users reported {reported.length === 1 ? 'an ad' : `${reported.length} ads`}.</div>
+      <div className="mt-0.5 text-xs text-red-800">The person who reported an ad no longer sees it; everyone else still does. Open the ad's stats to read the reports, then turn the ad off or dismiss them.</div>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {reported.map((a) => (
+          <Button key={a.id} size="sm" variant="outline" className="h-7 bg-white" onClick={() => onPick(a.slot_id)}>
+            {a.title || a.sponsor_name || '(untitled)'} · {stats![a.id].open_reports}
+          </Button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AdStatsDialog({ ad, stats, onClose, onChanged }: {
+  ad: Ad; stats: AdStats | null; onClose: () => void; onChanged: () => void;
+}) {
+  const [reports, setReports] = useState<AdReport[] | null>(null);
+  const [reportsError, setReportsError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const loadReports = useCallback(async () => {
+    const { data, error } = await supabase.from(REPORTS)
+      .select('id, ad_id, reason, note, status, created_at, reviewed_at')
+      .eq('ad_id', ad.id).order('created_at', { ascending: false });
+    if (error) {
+      setReportsError(missing(error.message)
+        ? 'Reports need backend migration 20261122120000_ad_stats_and_reports.sql.'
+        : friendlyError(error.message));
+      setReports([]);
+      return;
+    }
+    setReportsError(null);
+    setReports((data ?? []) as AdReport[]);
+  }, [ad.id]);
+  useEffect(() => { loadReports(); }, [loadReports]);
+
+  async function review(r: AdReport, status: AdReport['status'], msg: string) {
+    setBusy(true);
+    const ok = await attempt(() => supabase.from(REPORTS).update({ status }).eq('id', r.id), msg);
+    setBusy(false);
+    if (ok) { await loadReports(); onChanged(); }
+  }
+
+  const tiles: [string, number, string][] = stats ? [
+    ['Views', stats.views, 'Every time it was on screen'],
+    ['People', stats.viewers, 'Different people who saw it'],
+    ['Taps', stats.taps, 'Every tap on the ad'],
+    ['People who tapped', stats.tappers, 'Different people who tapped'],
+  ] : [];
+
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+        <DialogHeader><DialogTitle>{ad.title || ad.sponsor_name || 'Ad'}: stats and reports</DialogTitle></DialogHeader>
+
+        {!stats ? (
+          <Empty>Stats need backend migration 20261122120000_ad_stats_and_reports.sql.</Empty>
+        ) : (
+          <div className="space-y-4">
+            <div>
+              <div className="mb-2 text-sm font-medium text-slate-900">Last {STATS_DAYS} days</div>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {tiles.map(([label, value, hint]) => (
+                  <div key={label} className="rounded-lg border border-slate-200 p-3">
+                    <div className="text-xs text-slate-500">{label}</div>
+                    <div className="text-xl font-semibold tabular-nums text-slate-900">{fmt(value)}</div>
+                    <div className="text-[11px] leading-tight text-slate-400">{hint}</div>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-2 text-xs text-slate-500">
+                A view counts only once the ad's picture or video has appeared on a free user's Home screen, at most once per ad each time they open Home.
+                People counts each person once however often they saw it, so it is the number to give a sponsor.
+              </p>
+            </div>
+
+            <div>
+              <div className="mb-2 text-sm font-medium text-slate-900">By day <span className="font-normal text-slate-500">(India time)</span></div>
+              {stats.daily.length === 0 ? <Empty>No views or taps in the last {STATS_DAYS} days.</Empty> : (
+                <div className="overflow-x-auto rounded-lg border border-slate-200">
+                  <table className="w-full text-sm">
+                    <thead className="bg-slate-50 text-xs text-slate-500">
+                      <tr>
+                        <th className="px-3 py-2 text-left font-medium">Day</th>
+                        <th className="px-3 py-2 text-right font-medium">Views</th>
+                        <th className="px-3 py-2 text-right font-medium">People</th>
+                        <th className="px-3 py-2 text-right font-medium">Taps</th>
+                        <th className="px-3 py-2 text-right font-medium">People who tapped</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 tabular-nums">
+                      {stats.daily.map((d) => (
+                        <tr key={d.day}>
+                          <td className="px-3 py-1.5 text-slate-700">{format(new Date(`${d.day}T00:00:00`), 'EEE d MMM')}</td>
+                          <td className="px-3 py-1.5 text-right">{fmt(d.views)}</td>
+                          <td className="px-3 py-1.5 text-right font-medium">{fmt(d.viewers)}</td>
+                          <td className="px-3 py-1.5 text-right">{fmt(d.taps)}</td>
+                          <td className="px-3 py-1.5 text-right font-medium">{fmt(d.tappers)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+              {(ad.impressions > 0 || ad.clicks > 0) && (
+                <p className="mt-2 text-xs text-slate-500">
+                  Counted separately by app builds from 20–22 Nov 2026 (before media had loaded, so they run high): {fmt(ad.impressions)} views · {fmt(ad.clicks)} taps.
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        <div>
+          <div className="mb-2 text-sm font-medium text-slate-900">Reports from users</div>
+          {reports === null ? <Loading /> : reportsError ? <Empty>{reportsError}</Empty> : reports.length === 0 ? <Empty>No reports.</Empty> : (
+            <ul className="divide-y divide-slate-100 rounded-lg border border-slate-200">
+              {reports.map((r) => (
+                <li key={r.id} className="flex flex-wrap items-start justify-between gap-3 p-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-sm font-medium text-slate-900">{REASON_LABEL[r.reason] ?? r.reason}</span>
+                      <Pill tone={r.status === 'open' ? 'red' : 'slate'}>{r.status === 'actioned' ? 'handled' : r.status}</Pill>
+                    </div>
+                    {r.note && <p className="mt-1 whitespace-pre-wrap break-words text-sm text-slate-700">{r.note}</p>}
+                    <div className="mt-1 text-xs text-slate-500">{format(new Date(r.created_at), 'd MMM yyyy, h:mm a')}</div>
+                  </div>
+                  <div className="flex shrink-0 gap-1">
+                    {r.status === 'open' ? (
+                      <>
+                        <Button size="sm" variant="outline" className="h-8" disabled={busy} onClick={() => review(r, 'actioned', 'Marked as handled')}>Handled</Button>
+                        <Button size="sm" variant="ghost" className="h-8" disabled={busy} onClick={() => review(r, 'dismissed', 'Report dismissed')}>Dismiss</Button>
+                      </>
+                    ) : (
+                      <Button size="sm" variant="ghost" className="h-8" disabled={busy} onClick={() => review(r, 'open', 'Report reopened')}>Reopen</Button>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+          <p className="mt-2 text-xs text-slate-500">To stop showing the ad to everyone, turn it off with its switch. The person who reported it no longer sees it either way.</p>
+        </div>
+
+        <DialogFooter>
+          <Button variant="ghost" onClick={onClose}>Close</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
