@@ -2,7 +2,7 @@ import { APP_STORE_URL, PLAY_URL } from "./site";
 
 const base = "inline-flex min-h-[3.5rem] flex-col items-start justify-center rounded-[3px] px-5 py-2 text-left leading-tight";
 
-/** Google Play and App Store buttons. The App Store one is inert until APP_STORE_URL is set. */
+/** Google Play and App Store buttons. The App Store one shows "Coming soon" until APP_STORE_URL is set. */
 export function StoreButtons({ dark = false }: { dark?: boolean }) {
   return (
     <div className="flex flex-col gap-3 min-[420px]:flex-row">
@@ -31,7 +31,7 @@ export function StoreButtons({ dark = false }: { dark?: boolean }) {
           className={`${base} cursor-not-allowed border-2 border-dashed ${dark ? "border-white/35 text-white/60" : "border-[#A9AEA8] text-[#6B7278]"}`}
         >
           <span className="text-[13px] font-medium">App Store</span>
-          <span className="text-[17px] font-bold">Not available yet</span>
+          <span className="text-[17px] font-bold">Coming soon</span>
         </span>
       )}
     </div>

@@ -14,7 +14,7 @@ export const whatsapp = (text: string) =>
 export const mailto = (subject: string) =>
   `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}`;
 
-/** Empty until the iOS app is live; the App Store button shows as unavailable until then. */
+/** Empty until the iOS app is live; the App Store button shows "Coming soon" until then. */
 export const APP_STORE_URL = "";
 
 /**
