@@ -1,7 +1,7 @@
 // One entry per public page: its single canonical URL, a unique title and
 // description, and its structured data. scripts/prerender.mjs writes these
 // into each page's HTML at build time and builds sitemap.xml from PAGES.
-import { EMAIL, PLAY_URL } from "@/components/home/site";
+import { EMAIL, INSTAGRAM_URL, LINKEDIN_URL, PLAY_URL } from "@/components/home/site";
 
 export const SITE = "https://icopedia.co";
 export const OG_IMAGE = `${SITE}/og-image.png`;
@@ -44,6 +44,7 @@ const organization = {
     telephone: "+91-92747-22707",
     availableLanguage: ["en"],
   },
+  sameAs: [LINKEDIN_URL, INSTAGRAM_URL],
 };
 
 const website = {

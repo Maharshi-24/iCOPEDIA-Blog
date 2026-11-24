@@ -3,6 +3,8 @@ export const EMAIL = "hello@icopedia.co";
 export const PHONE_DISPLAY = "+91 92747 22707";
 export const WHATSAPP = "919274722707";
 export const PLAY_URL = "https://play.google.com/store/apps/details?id=com.icopedia.app";
+export const LINKEDIN_URL = "https://www.linkedin.com/company/145255681/";
+export const INSTAGRAM_URL = "https://www.instagram.com/icopedia.co/";
 
 /** Who is writing, picked on the contact form and added to the message. */
 export const ROLES = ["Coating professional", "Manufacturer", "Contractor or inspection company", "Other"] as const;

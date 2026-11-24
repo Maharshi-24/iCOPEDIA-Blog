@@ -1,4 +1,10 @@
-import { EMAIL, PHONE_DISPLAY, PLAY_URL, goToSection, whatsapp } from "./site";
+import { Instagram, Linkedin } from "lucide-react";
+import { EMAIL, INSTAGRAM_URL, LINKEDIN_URL, PHONE_DISPLAY, PLAY_URL, goToSection, whatsapp } from "./site";
+
+const SOCIAL = [
+  { href: LINKEDIN_URL, label: "iCOPEDIA on LinkedIn", Icon: Linkedin },
+  { href: INSTAGRAM_URL, label: "iCOPEDIA on Instagram", Icon: Instagram },
+];
 
 export function SiteFooter() {
   const year = new Date().getFullYear();
@@ -28,6 +34,16 @@ export function SiteFooter() {
               </a>
             </p>
           </address>
+          <ul className="mt-5 flex gap-2" aria-label="Follow iCOPEDIA">
+            {SOCIAL.map(({ href, label, Icon }) => (
+              <li key={href}>
+                <a href={href} target="_blank" rel="noopener noreferrer" aria-label={label} title={label}
+                  className="flex h-10 w-10 items-center justify-center rounded-[3px] border border-white/20 text-white/75 hover:border-white/60 hover:text-white">
+                  <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
 
         <div className="row-span-2 md:col-span-3 md:row-span-1">
