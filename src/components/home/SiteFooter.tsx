@@ -23,7 +23,7 @@ const SOCIAL = [
   { href: whatsapp("Hello iCOPEDIA team"), label: "Message iCOPEDIA on WhatsApp", Icon: WhatsApp },
 ];
 
-const LINKS = [{ href: "/", label: "The app" }, { href: "/about", label: "About us" }];
+const LINKS = [{ href: "/about", label: "About us" }];
 
 // The same footer on both sites. manufacturer.icopedia.co only has its home
 // page, so there the page links point at icopedia.co.
