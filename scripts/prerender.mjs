@@ -3,6 +3,7 @@
 //   - Each public page in src/seo.ts PAGES is rendered to static HTML with its
 //     own title, description, canonical URL, Open Graph tags and JSON-LD, and
 //     React hydrates it in the browser.
+//   - dist/manufacturers.html is manufacturer.icopedia.co's home (noindex).
 //   - dist/404.html is the rendered not-found page; Vercel serves it with a
 //     real 404 status for any URL that isn't a file, redirect or rewrite.
 //   - dist/app-shell.html is the empty client shell for /admin (noindex).
@@ -15,7 +16,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
 const server = join(root, "dist-ssr");
 
-const { render, supportFaqJsonLd, PAGES, NOT_FOUND, SITE, OG_IMAGE } = await import(
+const { render, supportFaqJsonLd, PAGES, NOT_FOUND, MANUFACTURER_HOME, SITE, OG_IMAGE } = await import(
   pathToFileURL(join(server, "entry-server.js")).href
 );
 
@@ -82,6 +83,9 @@ for (const p of PAGES) {
   writeFileSync(join(dist, p.file), page(p, p.path));
   console.log(`prerendered ${p.path.padEnd(16)} -> dist/${p.file}`);
 }
+// manufacturer.icopedia.co's "/" (vercel.json rewrite); noindex, not in the sitemap.
+writeFileSync(join(dist, MANUFACTURER_HOME.file), page(MANUFACTURER_HOME, MANUFACTURER_HOME.path));
+console.log(`prerendered ${MANUFACTURER_HOME.path.padEnd(16)} -> dist/${MANUFACTURER_HOME.file}`);
 writeFileSync(join(dist, NOT_FOUND.file), page(NOT_FOUND, "/this-page-does-not-exist"));
 console.log(`prerendered 404              -> dist/${NOT_FOUND.file}`);
 

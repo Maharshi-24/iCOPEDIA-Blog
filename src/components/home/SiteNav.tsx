@@ -2,13 +2,27 @@ import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { PLAY_URL, goToSection } from "./site";
 
-const LINKS = [
-  { href: "/about", label: "About us" },
-  { href: "/support", label: "Help & FAQ" },
-  { href: "/#contact", label: "Contact" },
-];
+export type SiteVariant = "main" | "manufacturer";
 
-export function SiteNav() {
+const LINKS: Record<SiteVariant, { href: string; label: string }[]> = {
+  main: [
+    { href: "/about", label: "About us" },
+    { href: "/support", label: "Help & FAQ" },
+    { href: "/#contact", label: "Contact" },
+  ],
+  // manufacturer.icopedia.co: one page, so its links are its own sections;
+  // help lives on the main site.
+  manufacturer: [
+    { href: "/#tools", label: "Tools" },
+    { href: "/#plans", label: "Plans" },
+    { href: "/#manufacturers", label: "Manufacturers" },
+    { href: "/#contact", label: "Contact" },
+    { href: "https://icopedia.co/support", label: "Help" },
+  ],
+};
+
+export function SiteNav({ variant = "main" }: { variant?: SiteVariant }) {
+  const links = LINKS[variant];
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -31,7 +45,7 @@ export function SiteNav() {
         </a>
 
         <nav className="hidden items-center gap-7 lg:flex" aria-label="Main">
-          {LINKS.map((l) => (
+          {links.map((l) => (
             <a key={l.href} href={l.href} onClick={(e) => goToSection(e, l.href)} className="text-[15px] text-[#3A4046] hover:text-[#23282D] hover:underline hover:underline-offset-4">
               {l.label}
             </a>
@@ -60,7 +74,7 @@ export function SiteNav() {
 
       {open && (
         <nav className="drop-in max-h-[calc(100dvh-var(--header-h))] overflow-y-auto border-t border-[#D6D9D4] px-[var(--gutter)] pb-5 pt-1 lg:hidden" aria-label="Main">
-          {LINKS.map((l) => (
+          {links.map((l) => (
             <a key={l.href} href={l.href} onClick={(e) => { setOpen(false); goToSection(e, l.href); }} className="block w-full border-b border-[#E3E5E1] py-3.5 text-left text-base text-[#23282D]">
               {l.label}
             </a>

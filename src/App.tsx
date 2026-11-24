@@ -2,6 +2,7 @@ import { Suspense, lazy } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Index from "./pages/Index";
 import About from "./pages/About";
+import ManufacturerHome from "./pages/ManufacturerHome";
 import NotFound from "./pages/NotFound";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfUse from "./pages/TermsOfUse";
@@ -12,6 +13,15 @@ import Support from "./pages/Support";
 const AdminApp = lazy(() => import("./admin/AdminApp"));
 
 /**
+ * manufacturer.icopedia.co is served by this same site: Vercel rewrites its "/"
+ * to the prerendered /manufacturers page, and the browser, which still sees
+ * "/", has to render that page too. The prerender has no window, so "/" there
+ * is always the main home page.
+ */
+const isManufacturerHost = () =>
+  typeof window !== "undefined" && window.location.hostname.startsWith("manufacturer.");
+
+/**
  * The route tree, shared by the browser (main.tsx, BrowserRouter) and the
  * build-time prerender (entry-server.tsx, StaticRouter). Old and alias URLs
  * are 301-redirected by vercel.json in production; the <Navigate>s below only
@@ -20,7 +30,8 @@ const AdminApp = lazy(() => import("./admin/AdminApp"));
 export function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Index />} />
+      <Route path="/" element={isManufacturerHost() ? <ManufacturerHome /> : <Index />} />
+      <Route path="/manufacturers" element={<ManufacturerHome />} />
       <Route path="/about" element={<About />} />
       <Route path="/terms" element={<TermsOfUse />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />

@@ -5,6 +5,14 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [
+    { "source": "/manufacturers", "missing": [{ "type": "host", "value": "manufacturer.icopedia.co" }], "destination": "/", "permanent": false },
+    { "source": "/about", "has": [{ "type": "host", "value": "manufacturer.icopedia.co" }], "destination": "https://icopedia.co/about", "permanent": false },
+    { "source": "/support", "has": [{ "type": "host", "value": "manufacturer.icopedia.co" }], "destination": "https://icopedia.co/support", "permanent": false },
+    { "source": "/terms", "has": [{ "type": "host", "value": "manufacturer.icopedia.co" }], "destination": "https://icopedia.co/terms", "permanent": false },
+    { "source": "/privacy-policy", "has": [{ "type": "host", "value": "manufacturer.icopedia.co" }], "destination": "https://icopedia.co/privacy-policy", "permanent": false },
+    { "source": "/admin", "has": [{ "type": "host", "value": "manufacturer.icopedia.co" }], "destination": "https://icopedia.co/admin", "permanent": false },
+    { "source": "/admin/:path*", "has": [{ "type": "host", "value": "manufacturer.icopedia.co" }], "destination": "https://icopedia.co/admin/:path*", "permanent": false },
+    { "source": "/otp-viewer", "has": [{ "type": "host", "value": "manufacturer.icopedia.co" }], "destination": "https://icopedia.co/admin/otp-viewer", "permanent": false },
     { "source": "/home", "destination": "/", "permanent": true },
     { "source": "/index", "destination": "/", "permanent": true },
     { "source": "/privacy", "destination": "/privacy-policy", "permanent": true },
@@ -44,6 +52,11 @@
     },
     {
       "source": "/admin(.*)",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    },
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "manufacturer.icopedia.co" }],
       "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
     }
   ],

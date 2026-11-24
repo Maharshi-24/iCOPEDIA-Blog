@@ -1,4 +1,5 @@
 import { Instagram, Linkedin } from "lucide-react";
+import type { SiteVariant } from "./SiteNav";
 import { EMAIL, INSTAGRAM_URL, LINKEDIN_URL, PHONE_DISPLAY, PLAY_URL, goToSection, whatsapp } from "./site";
 
 const SOCIAL = [
@@ -6,7 +7,29 @@ const SOCIAL = [
   { href: INSTAGRAM_URL, label: "iCOPEDIA on Instagram", Icon: Instagram },
 ];
 
-export function SiteFooter() {
+// manufacturer.icopedia.co has its own blurb and section links; its help and
+// legal links go to the main site.
+const VARIANTS = {
+  main: {
+    blurb: "Connecting people, knowledge and opportunities across the protective coatings and corrosion protection industry.",
+    heading: "iCOPEDIA",
+    links: [{ href: "/", label: "The app" }, { href: "/about", label: "About us" }],
+    site: "",
+  },
+  manufacturer: {
+    blurb: "Tools for the people who estimate, apply and inspect protective coatings, and for the manufacturers who supply them.",
+    heading: "App",
+    links: [
+      { href: "/#tools", label: "Tools" },
+      { href: "/#plans", label: "Free and company plans" },
+      { href: "/#manufacturers", label: "Manufacturers" },
+    ],
+    site: "https://icopedia.co",
+  },
+};
+
+export function SiteFooter({ variant = "main" }: { variant?: SiteVariant }) {
+  const v = VARIANTS[variant];
   const year = new Date().getFullYear();
   const heading = "mb-3 text-sm font-semibold text-white";
   const item = "inline-block py-1.5 text-[15px] sm:py-1 sm:text-sm text-white/65 hover:text-white hover:underline hover:underline-offset-4";
@@ -22,7 +45,7 @@ export function SiteFooter() {
             </span>
           </a>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/65">
-            Connecting people, knowledge and opportunities across the protective coatings and corrosion protection industry.
+            {v.blurb}
           </p>
           <address className="mt-6 space-y-1.5 text-sm not-italic leading-relaxed text-white/65">
             <p>iCOPEDIA GLOBAL</p>
@@ -47,10 +70,11 @@ export function SiteFooter() {
         </div>
 
         <div className="row-span-2 md:col-span-3 md:row-span-1">
-          <p className={heading}>iCOPEDIA</p>
+          <p className={heading}>{v.heading}</p>
           <ul className="space-y-1.5">
-            <li><a className={item} href="/">The app</a></li>
-            <li><a className={item} href="/about">About us</a></li>
+            {v.links.map((l) => (
+              <li key={l.href}><a className={item} href={l.href} onClick={(e) => goToSection(e, l.href)}>{l.label}</a></li>
+            ))}
             <li><a className={item} href={PLAY_URL} target="_blank" rel="noopener noreferrer">Google Play</a></li>
           </ul>
         </div>
@@ -58,7 +82,7 @@ export function SiteFooter() {
         <div className="md:col-span-2">
           <p className={heading}>Help</p>
           <ul className="space-y-1.5">
-            <li><a className={item} href="/support">Help & FAQ</a></li>
+            <li><a className={item} href={`${v.site}/support`}>Help & FAQ</a></li>
             <li><a className={item} href="/#contact" onClick={(e) => goToSection(e, "/#contact")}>Contact us</a></li>
           </ul>
         </div>
@@ -66,8 +90,8 @@ export function SiteFooter() {
         <div className="md:col-span-2">
           <p className={heading}>Legal</p>
           <ul className="space-y-1.5">
-            <li><a className={item} href="/terms">Terms of Use</a></li>
-            <li><a className={item} href="/privacy-policy">Privacy Policy</a></li>
+            <li><a className={item} href={`${v.site}/terms`}>Terms of Use</a></li>
+            <li><a className={item} href={`${v.site}/privacy-policy`}>Privacy Policy</a></li>
           </ul>
         </div>
       </div>

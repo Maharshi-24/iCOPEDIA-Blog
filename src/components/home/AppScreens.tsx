@@ -7,6 +7,7 @@ const SCREENS = [
     alt: "The Calculators screen: coverage estimation, quantity estimation, part quantity, DFT to WFT, unit converter and dew point",
     title: "Calculators",
     text: "Everyday coating calculations, worked out in seconds.",
+    manufacturerText: "Six calculators for the numbers you work out on every job.",
     delay: 120,
   },
   {
@@ -14,6 +15,7 @@ const SCREENS = [
     alt: "The iCOPEDIA Home screen with tiles for calculators, product details, bill of quantities, project report, instruments, community, tutorials, news and notes",
     title: "Home",
     text: "Calculators, notes, community and Ustad, one tap away.",
+    manufacturerText: "Every tool one tap away, from BOQs to project reports.",
     delay: 0,
     raised: true,
   },
@@ -22,6 +24,7 @@ const SCREENS = [
     alt: "The Ustad screen: AI chat and glossary topics such as general terms, types and systems, surface preparation, testing and QC, and defects",
     title: "Ustad",
     text: "Ask a coating question, or browse the glossary.",
+    manufacturerText: "Ask the AI assistant, or look it up in the coatings glossary.",
     delay: 240,
   },
 ];
@@ -44,7 +47,8 @@ function Phone({ src, alt, priority = false }: { src: string; alt: string; prior
   );
 }
 
-export function AppScreens() {
+/** `manufacturer` uses the captions written for manufacturer.icopedia.co. */
+export function AppScreens({ variant = "main" }: { variant?: "main" | "manufacturer" }) {
   return (
     <div className="relative mt-[clamp(3rem,1.8rem+5vw,5rem)]">
       {/* The steel band starts halfway up the phones, so they stand on it. */}
@@ -62,7 +66,7 @@ export function AppScreens() {
               <div className="rise mx-auto max-w-[290px]" style={{ animationDelay: `${s.delay}ms` }}>
                 <Phone src={s.src} alt={s.alt} priority={s.raised} />
                 <p className="t-h5 mt-5 text-white sm:mt-6">{s.title}</p>
-                <p className="t-body mt-1 text-white/70">{s.text}</p>
+                <p className="t-body mt-1 text-white/70">{variant === "manufacturer" ? s.manufacturerText : s.text}</p>
               </div>
             </li>
           ))}

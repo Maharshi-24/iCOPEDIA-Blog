@@ -5,9 +5,9 @@ import { renderToStaticMarkup, renderToString } from "react-dom/server";
 import { StaticRouter } from "react-router-dom/server";
 import { AppRoutes } from "./App";
 import { FAQ_SECTIONS } from "./pages/supportFaqs";
-import { NOT_FOUND, OG_IMAGE, PAGES, SITE } from "./seo";
+import { MANUFACTURER_HOME, NOT_FOUND, OG_IMAGE, PAGES, SITE } from "./seo";
 
-export { NOT_FOUND, OG_IMAGE, PAGES, SITE };
+export { MANUFACTURER_HOME, NOT_FOUND, OG_IMAGE, PAGES, SITE };
 
 export function render(url: string): string {
   return renderToString(

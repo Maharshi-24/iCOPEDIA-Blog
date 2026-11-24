@@ -122,6 +122,20 @@ export const PAGES: PageSeo[] = [
   },
 ];
 
+/**
+ * manufacturer.icopedia.co's home page. Built to manufacturers.html, served at
+ * "/" on that host only, never indexed and not in the sitemap.
+ */
+export const MANUFACTURER_HOME: PageSeo = {
+  path: "/manufacturers",
+  file: "manufacturers.html",
+  title: "iCOPEDIA: coating calculators, BOQs and site reports",
+  description:
+    "Free app for protective coating professionals: calculators, bills of quantities, project reports, instrument records, product data and Ustad, an AI coating assistant.",
+  jsonLd: [],
+  noindex: true,
+};
+
 export const NOT_FOUND: PageSeo = {
   path: "/404",
   file: "404.html",
