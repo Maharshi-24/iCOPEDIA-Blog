@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import {
-  Activity, BarChart3, Gauge, LayoutGrid, Megaphone, Bell, Building2, Globe, LayoutDashboard, LogOut, Mail, Menu, MessagesSquare, Newspaper, ShieldCheck, Smartphone, UserCheck, Users, Video, X,
+  Activity, BarChart3, Inbox, Gauge, LayoutGrid, Megaphone, Bell, Building2, Globe, LayoutDashboard, LogOut, Mail, Menu, MessagesSquare, Newspaper, ShieldCheck, Smartphone, UserCheck, Users, Video, X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/sonner';
@@ -25,6 +25,10 @@ import HomeTiles from './pages/HomeTiles';
 import FreeLimits from './pages/FreeLimits';
 import Ads from './pages/Ads';
 import ActivityLog from './pages/Activity';
+import ContactMessages from './pages/ContactMessages';
+import ContactMessage from './pages/ContactMessage';
+import { CONTACT_CHANGED } from './pages/contactShared';
+import { supabase } from '@/lib/supabase';
 // Shows test sign-in codes, so it lives behind the admin login (not in the menu;
 // opened from Login activity).
 import OtpViewer from '../pages/OtpViewer';
@@ -38,6 +42,7 @@ const NAV = [
   { to: 'login-access', label: 'Login activity', icon: UserCheck, element: <LoginAccess /> },
   { to: 'notifications', label: 'Notifications', icon: Bell, element: <Notifications /> },
   { to: 'email', label: 'Email', icon: Mail, element: <EmailPage /> },
+  { to: 'contact', label: 'Contact messages', icon: Inbox, element: <ContactMessages /> },
   { to: 'versions', label: 'App versions', icon: Smartphone, element: <Versions /> },
   { to: 'users', label: 'Users & roles', icon: Users, element: <UsersPage /> },
   { to: 'companies', label: 'Companies', icon: Building2, element: <Companies /> },
@@ -86,6 +91,7 @@ function Shell() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   useEffect(() => setOpen(false), [location.pathname]);
+  const newContacts = useNewContactCount(location.pathname);
 
   const nav = (
     <nav className="flex flex-col gap-0.5">
@@ -95,7 +101,17 @@ function Shell() {
             'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
             isActive ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
           )}>
-          <Icon className="h-4 w-4" /> {label}
+          {({ isActive }) => (
+            <>
+              <Icon className="h-4 w-4" /> <span className="flex-1">{label}</span>
+              {to === 'contact' && newContacts > 0 && (
+                <span className={cn('min-w-[1.25rem] rounded-full px-1.5 text-center text-xs font-semibold tabular-nums leading-5',
+                  isActive ? 'bg-white text-slate-900' : 'bg-amber-400 text-slate-900')}>
+                  {newContacts > 99 ? '99+' : newContacts}
+                </span>
+              )}
+            </>
+          )}
         </NavLink>
       ))}
     </nav>
@@ -159,6 +175,7 @@ function Shell() {
             {NAV.map(({ to, element }) => (
               <Route key={to} index={to === ''} path={to === '' ? undefined : to} element={element} />
             ))}
+            <Route path="contact/:id" element={<ContactMessage />} />
             <Route path="otp-viewer" element={<OtpViewer />} />
             <Route path="*" element={<Navigate to="/admin" replace />} />
           </Routes>
@@ -166,4 +183,21 @@ function Shell() {
       </main>
     </div>
   );
+}
+
+/** Count of contact messages still marked New, for the sidebar badge. */
+function useNewContactCount(pathname: string) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    let live = true;
+    const refresh = async () => {
+      const { count } = await supabase.from('contact_submissions')
+        .select('id', { count: 'exact', head: true }).eq('status', 'new');
+      if (live) setCount(count ?? 0);
+    };
+    refresh();
+    window.addEventListener(CONTACT_CHANGED, refresh);
+    return () => { live = false; window.removeEventListener(CONTACT_CHANGED, refresh); };
+  }, [pathname]);
+  return count;
 }

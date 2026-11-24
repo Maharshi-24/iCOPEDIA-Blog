@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
   Archive, File, Folder as FolderIcon, Inbox, Mail, MailOpen, Paperclip, PenSquare, RefreshCw, Reply, Search, Send,
@@ -12,6 +13,12 @@ import { Confirm, Spinner } from '../shared';
 import { avatarFor, displayName, Folder, ListItem, listDate, mail, Role } from '../mail/api';
 import Compose, { ComposeSeed } from '../mail/Compose';
 import MessageView, { MessageChange } from '../mail/MessageView';
+
+/**
+ * Other admin pages open a ready-made email by navigating here with this as
+ * router state (kept out of the URL, so addresses don't land in history).
+ */
+export type ComposeRequest = { mailbox?: string; seed: ComposeSeed };
 
 const PAGE = 50;
 const MAILBOX_KEY = 'icopedia-admin-mailbox';
@@ -54,6 +61,9 @@ export default function Email() {
   const [compose, setCompose] = useState<ComposeSeed | null>(null);
   const [bulkBusy, setBulkBusy] = useState(false);
   const listRequest = useRef(0);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [request] = useState(() => (location.state as { compose?: ComposeRequest } | null)?.compose ?? null);
 
   const folder = folders.find((f) => f.path === folderPath) ?? null;
   const role = folder?.role ?? null;
@@ -65,9 +75,17 @@ export default function Email() {
       .then(({ mailboxes }) => {
         setMailboxes(mailboxes);
         const stored = readStored(MAILBOX_KEY);
-        setMailbox(mailboxes.includes(stored ?? '') ? stored! : mailboxes.find((m) => m.startsWith('hello@')) ?? mailboxes[0] ?? '');
+        const wanted = request?.mailbox && mailboxes.includes(request.mailbox) ? request.mailbox : null;
+        setMailbox(wanted ?? (mailboxes.includes(stored ?? '') ? stored! : mailboxes.find((m) => m.startsWith('hello@')) ?? mailboxes[0] ?? ''));
+        if (request) {
+          setCompose(request.seed);
+          // Drop the state so a reload or Back doesn't open the same draft again.
+          navigate(location.pathname, { replace: true, state: null });
+        }
       })
       .catch((e: Error) => setSetupError(e.message));
+  // Runs once: `request` is read on mount and never changes.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadFolders = useCallback(async (box: string) => {
