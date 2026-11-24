@@ -1,6 +1,7 @@
 import { Suspense, lazy } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
-import ComingSoon from "./pages/ComingSoon";
+import Index from "./pages/Index";
+import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfUse from "./pages/TermsOfUse";
@@ -19,8 +20,8 @@ const AdminApp = lazy(() => import("./admin/AdminApp"));
 export function AppRoutes() {
   return (
     <Routes>
-      {/* Coming Soon holds "/" for now. The new home page lives on the new-home-ui branch. */}
-      <Route path="/" element={<ComingSoon />} />
+      <Route path="/" element={<Index />} />
+      <Route path="/about" element={<About />} />
       <Route path="/terms" element={<TermsOfUse />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/support" element={<Support />} />
@@ -29,6 +30,7 @@ export function AppRoutes() {
       <Route path="/privacy" element={<Navigate to="/privacy-policy" replace />} />
       <Route path="/terms-of-use" element={<Navigate to="/terms" replace />} />
       <Route path="/help" element={<Navigate to="/support" replace />} />
+      <Route path="/about-us" element={<Navigate to="/about" replace />} />
       <Route path="/admin/*" element={<Suspense fallback={null}><AdminApp /></Suspense>} />
       <Route path="*" element={<NotFound />} />
     </Routes>

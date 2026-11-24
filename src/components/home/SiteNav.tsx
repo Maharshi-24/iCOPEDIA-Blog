@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
-import { PLAY_URL } from "./site";
+import { PLAY_URL, goToSection } from "./site";
 
 const LINKS = [
-  { id: "tools", label: "Tools" },
-  { id: "plans", label: "Plans" },
-  { id: "manufacturers", label: "Manufacturers" },
-  { id: "contact", label: "Contact" },
+  { href: "/about", label: "About us" },
+  { href: "/support", label: "Help & FAQ" },
+  { href: "/#contact", label: "Contact" },
 ];
 
 export function SiteNav() {
@@ -33,13 +32,10 @@ export function SiteNav() {
 
         <nav className="hidden items-center gap-7 lg:flex" aria-label="Main">
           {LINKS.map((l) => (
-            <a key={l.id} href={`/#${l.id}`} className="text-[15px] text-[#3A4046] hover:text-[#23282D] hover:underline hover:underline-offset-4">
+            <a key={l.href} href={l.href} onClick={(e) => goToSection(e, l.href)} className="text-[15px] text-[#3A4046] hover:text-[#23282D] hover:underline hover:underline-offset-4">
               {l.label}
             </a>
           ))}
-          <a href="/support" className="text-[15px] text-[#3A4046] hover:text-[#23282D] hover:underline hover:underline-offset-4">
-            Help
-          </a>
         </nav>
 
         <div className="flex items-center gap-2">
@@ -65,11 +61,10 @@ export function SiteNav() {
       {open && (
         <nav className="drop-in max-h-[calc(100dvh-var(--header-h))] overflow-y-auto border-t border-[#D6D9D4] px-[var(--gutter)] pb-5 pt-1 lg:hidden" aria-label="Main">
           {LINKS.map((l) => (
-            <a key={l.id} href={`/#${l.id}`} onClick={() => setOpen(false)} className="block w-full border-b border-[#E3E5E1] py-3.5 text-left text-base text-[#23282D]">
+            <a key={l.href} href={l.href} onClick={(e) => { setOpen(false); goToSection(e, l.href); }} className="block w-full border-b border-[#E3E5E1] py-3.5 text-left text-base text-[#23282D]">
               {l.label}
             </a>
           ))}
-          <a href="/support" className="block border-b border-[#E3E5E1] py-3.5 text-base text-[#23282D]">Help</a>
           <a
             href={PLAY_URL}
             target="_blank"

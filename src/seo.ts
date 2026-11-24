@@ -56,7 +56,7 @@ const website = {
 };
 
 const HOME_DESCRIPTION =
-  "Free app for protective coating professionals: calculators, bills of quantities, project reports, instrument records, product data and Ustad, an AI coating assistant.";
+  "The iCOPEDIA Individual App: a free everyday digital companion for the protective coatings industry, with practical calculators, digital notes, an industry community and Ustad, an AI learning companion.";
 
 const app = {
   "@context": "https://schema.org",
@@ -83,18 +83,26 @@ export const PAGES: PageSeo[] = [
   {
     path: "/",
     file: "index.html",
-    title: "iCOPEDIA: coating calculators, BOQs and site reports",
+    title: "iCOPEDIA: the protective coatings industry in your pocket",
     description: HOME_DESCRIPTION,
     jsonLd: [organization, website, app],
   },
   {
+    path: "/about",
+    file: "about.html",
+    title: "About us | iCOPEDIA",
+    description:
+      "iCOPEDIA is building a connected ecosystem for the protective coatings and corrosion protection industry: connecting people, knowledge and opportunities.",
+    jsonLd: [breadcrumb("About us", "/about")],
+  },
+  {
     path: "/support",
     file: "support.html",
-    title: "Help and FAQ | iCOPEDIA",
+    title: "Help & FAQ | iCOPEDIA",
     description:
       "Answers about signing in, BOQ and Ustad limits, company accounts, ads and deleting your account in the iCOPEDIA app, and how to contact the team.",
     // The FAQPage block is added by the prerender step from the page's own questions.
-    jsonLd: [breadcrumb("Help and FAQ", "/support")],
+    jsonLd: [breadcrumb("Help & FAQ", "/support")],
   },
   {
     path: "/terms",

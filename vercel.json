@@ -10,6 +10,7 @@
     { "source": "/privacy", "destination": "/privacy-policy", "permanent": true },
     { "source": "/terms-of-use", "destination": "/terms", "permanent": true },
     { "source": "/help", "destination": "/support", "permanent": true },
+    { "source": "/about-us", "destination": "/about", "permanent": true },
     { "source": "/otp-viewer", "destination": "/admin/otp-viewer", "permanent": true },
     { "source": "/app-shell", "destination": "/admin", "permanent": false }
   ],

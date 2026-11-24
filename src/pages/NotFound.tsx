@@ -8,7 +8,8 @@ import { NOT_FOUND } from "@/seo";
 // any URL that isn't a page, redirect or file. The head carries noindex.
 const NEXT = [
   { href: "/", label: "Home", text: "What the iCOPEDIA app does, and how to get it." },
-  { href: "/support", label: "Help and FAQ", text: "Signing in, limits, company accounts and your data." },
+  { href: "/about", label: "About us", text: "Our vision for a connected coatings industry." },
+  { href: "/support", label: "Help & FAQ", text: "Signing in, limits, company accounts and your data." },
   { href: "/#contact", label: "Contact us", text: "WhatsApp, email or the contact form." },
 ];
 
@@ -27,7 +28,7 @@ const NotFound = () => {
           <p className="t-lead mt-5 max-w-[52ch] text-[#3A4046]">
             The link may be old or mistyped. Try one of these instead.
           </p>
-          <ul className="mt-10 grid max-w-4xl gap-6 border-t-2 border-[#23282D] pt-6 sm:grid-cols-3">
+          <ul className="mt-10 grid max-w-4xl gap-6 border-t-2 border-[#23282D] pt-6 sm:grid-cols-2 lg:grid-cols-4">
             {NEXT.map((n) => (
               <li key={n.href}>
                 <a href={n.href} className="t-h5 text-[#23282D] underline underline-offset-4 hover:text-[#4C6395]">

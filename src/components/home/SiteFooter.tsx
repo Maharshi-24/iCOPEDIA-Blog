@@ -1,4 +1,4 @@
-import { EMAIL, PHONE_DISPLAY, PLAY_URL, whatsapp } from "./site";
+import { EMAIL, PHONE_DISPLAY, PLAY_URL, goToSection, whatsapp } from "./site";
 
 export function SiteFooter() {
   const year = new Date().getFullYear();
@@ -16,7 +16,7 @@ export function SiteFooter() {
             </span>
           </a>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/65">
-            Tools for the people who estimate, apply and inspect protective coatings, and for the manufacturers who supply them.
+            Connecting people, knowledge and opportunities across the protective coatings and corrosion protection industry.
           </p>
           <address className="mt-6 space-y-1.5 text-sm not-italic leading-relaxed text-white/65">
             <p>iCOPEDIA GLOBAL</p>
@@ -31,11 +31,10 @@ export function SiteFooter() {
         </div>
 
         <div className="row-span-2 md:col-span-3 md:row-span-1">
-          <p className={heading}>App</p>
+          <p className={heading}>iCOPEDIA</p>
           <ul className="space-y-1.5">
-            <li><a className={item} href="/#tools">Tools</a></li>
-            <li><a className={item} href="/#plans">Free and company plans</a></li>
-            <li><a className={item} href="/#manufacturers">Manufacturers</a></li>
+            <li><a className={item} href="/">The app</a></li>
+            <li><a className={item} href="/about">About us</a></li>
             <li><a className={item} href={PLAY_URL} target="_blank" rel="noopener noreferrer">Google Play</a></li>
           </ul>
         </div>
@@ -43,8 +42,8 @@ export function SiteFooter() {
         <div className="md:col-span-2">
           <p className={heading}>Help</p>
           <ul className="space-y-1.5">
-            <li><a className={item} href="/support">Help and FAQ</a></li>
-            <li><a className={item} href="/#contact">Contact us</a></li>
+            <li><a className={item} href="/support">Help & FAQ</a></li>
+            <li><a className={item} href="/#contact" onClick={(e) => goToSection(e, "/#contact")}>Contact us</a></li>
           </ul>
         </div>
 

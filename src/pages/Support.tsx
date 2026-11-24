@@ -50,7 +50,7 @@ const Support = () => {
       <main>
         <section className="hero-top pb-[clamp(2.5rem,1.8rem+3vw,3.5rem)]">
           <div className="wrap">
-            <h1 className="t-title">Help</h1>
+            <h1 className="t-title">Help &amp; FAQ</h1>
             <p className="load-in t-lead mt-5 max-w-[56ch] text-[#3A4046]" style={{ ["--load-delay" as string]: "90ms" }}>
               Answers to common questions about the iCOPEDIA app. Can't find yours? Message us and a person will reply.
             </p>
