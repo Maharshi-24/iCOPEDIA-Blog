@@ -42,7 +42,7 @@ export default function Overview() {
           <Stat label="Seen in 24 h" value={stats.seen_24h} sub={`${stats.active_sessions} active sessions`} />
           <Stat label="Push devices" value={devices}
             sub={Object.entries(stats.devices_by_platform).map(([k, v]) => `${v} ${k}`).join(' · ') || 'none yet'} />
-          <Stat label="Can log in" value={stats.allowlist_active} sub={`${stats.otp_requests_24h} OTP requests in 24 h`} to="login-access" />
+          <Stat label="Login codes (24 h)" value={stats.otp_requests_24h} sub="anyone can sign up" to="login-access" />
           <Stat label="Admins" value={stats.users_by_role.admin ?? 0} sub={`${stats.users_by_role.company_admin ?? 0} company admins`} to="users" />
           <Stat label="Premium users" value={stats.premium_users} />
           <Stat label="News live" value={stats.news_published} sub={`${stats.notifications_total} notifications sent`} to="news" />

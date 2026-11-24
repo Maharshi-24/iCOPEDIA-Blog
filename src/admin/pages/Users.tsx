@@ -7,7 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { supabase } from '@/lib/supabase';
 import { useAdminAuth } from '../auth';
-import { attempt, Empty, fmtDate, Loading, normalizePhone, PageHeader, Panel, phoneKey, Pill, Spinner } from '../shared';
+import { attempt, Empty, fmtDate, Loading, PageHeader, Panel, phoneKey, Pill, Spinner, timeAgo } from '../shared';
+
+const NEW_USER_DAYS = 7;
 
 type Profile = {
   id: string; full_name: string | null; phone_no: string | null; email: string | null; app_role: string;
@@ -24,21 +26,26 @@ export default function UsersPage() {
   const { session } = useAdminAuth();
   const [users, setUsers] = useState<Profile[] | null>(null);
   const [companies, setCompanies] = useState<Company[]>([]);
-  const [allowed, setAllowed] = useState<Set<string>>(new Set());
+  // Last OTP request per number (last 30 days), keyed by phoneKey.
+  const [lastOtp, setLastOtp] = useState<Map<string, string>>(new Map());
   const [query, setQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [editing, setEditing] = useState<Profile | null>(null);
 
   const load = useCallback(async () => {
+    const since = new Date(Date.now() - 30 * 86400_000).toISOString();
     const [u, c, a] = await Promise.all([
       supabase.from('user_profiles').select('id, full_name, phone_no, email, app_role, company_id, company_name, is_premium, user_type, city, created_at')
         .order('created_at', { ascending: false }).limit(2000),
       supabase.from('companies').select('id, name').order('name'),
-      supabase.from('test_phone_numbers').select('phone').eq('is_active', true),
+      supabase.from('otp_send_attempts').select('phone, requested_at').gte('requested_at', since)
+        .order('requested_at', { ascending: false }).limit(2000),
     ]);
     setUsers((u.data as Profile[]) ?? []);
     setCompanies((c.data as Company[]) ?? []);
-    setAllowed(new Set((a.data ?? []).map((r) => phoneKey(r.phone))));
+    const last = new Map<string, string>();
+    for (const r of a.data ?? []) if (!last.has(phoneKey(r.phone))) last.set(phoneKey(r.phone), r.requested_at);
+    setLastOtp(last);
   }, []);
 
   useEffect(() => { load(); }, [load]);
@@ -51,14 +58,8 @@ export default function UsersPage() {
     return [u.full_name, u.email, u.phone_no, u.company_name, u.city].some((v) => (v ?? '').toLowerCase().includes(q));
   });
 
-  async function allowLogin(u: Profile) {
-    const phone = normalizePhone(u.phone_no ?? '');
-    const ok = await attempt(
-      () => supabase.from('test_phone_numbers').upsert({ phone, description: u.full_name, is_active: true }, { onConflict: 'phone' }),
-      `${u.full_name || phone} can log in`,
-    );
-    if (ok) load();
-  }
+  const newSince = Date.now() - NEW_USER_DAYS * 86400_000;
+  const newCount = (users ?? []).filter((u) => new Date(u.created_at).getTime() >= newSince).length;
 
   return (
     <>
@@ -79,7 +80,7 @@ export default function UsersPage() {
             </Select>
           </div>
         }
-        title={users ? `${filtered.length} of ${users.length} users` : 'Users'}
+        title={users ? `${filtered.length} of ${users.length} users · ${newCount} new in ${NEW_USER_DAYS} days` : 'Users'}
       >
         {!users ? <Loading /> : filtered.length === 0 ? <Empty>No users match.</Empty> : (
           <div className="-mx-5 overflow-x-auto">
@@ -96,12 +97,14 @@ export default function UsersPage() {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {filtered.map((u) => {
-                  const canLogIn = allowed.has(phoneKey(u.phone_no));
+                  const otpAt = u.phone_no ? lastOtp.get(phoneKey(u.phone_no)) : undefined;
+                  const isNew = new Date(u.created_at).getTime() >= newSince;
                   return (
                     <tr key={u.id}>
                       <td className="px-5 py-2.5">
                         <div className="flex items-center gap-1.5 font-medium text-slate-900">
                           {u.full_name || 'Unnamed'}
+                          {isNew && <Pill tone="green">new</Pill>}
                           {u.is_premium && <Pill tone="amber">premium</Pill>}
                           {u.id === session?.user.id && <Pill>you</Pill>}
                         </div>
@@ -110,9 +113,7 @@ export default function UsersPage() {
                       <td data-label="Phone" className="whitespace-nowrap px-3 py-2.5">
                         <div>
                           <div className="font-mono text-xs">{u.phone_no || '—'}</div>
-                          {u.phone_no && (canLogIn
-                            ? <span className="text-xs text-emerald-700">can log in</span>
-                            : <button className="text-xs font-medium text-amber-700 underline" onClick={() => allowLogin(u)}>blocked: allow login</button>)}
+                          {otpAt && <span className="text-xs text-slate-500">last OTP {timeAgo(otpAt)}</span>}
                         </div>
                       </td>
                       <td data-label="Role" className="px-3 py-2.5"><Pill tone={ROLE_TONE[u.app_role] ?? 'slate'}>{ROLE_LABEL[u.app_role] ?? u.app_role}</Pill></td>

@@ -26,7 +26,7 @@ import FreeLimits from './pages/FreeLimits';
 import Ads from './pages/Ads';
 import ActivityLog from './pages/Activity';
 // Shows test sign-in codes, so it lives behind the admin login (not in the menu;
-// opened from Login access).
+// opened from Login activity).
 import OtpViewer from '../pages/OtpViewer';
 
 const NAV = [
@@ -35,7 +35,7 @@ const NAV = [
   { to: 'home-tiles', label: 'Home tiles', icon: LayoutGrid, element: <HomeTiles /> },
   { to: 'free-limits', label: 'Free user limits', icon: Gauge, element: <FreeLimits /> },
   { to: 'ads', label: 'Ads', icon: Megaphone, element: <Ads /> },
-  { to: 'login-access', label: 'Login access', icon: UserCheck, element: <LoginAccess /> },
+  { to: 'login-access', label: 'Login activity', icon: UserCheck, element: <LoginAccess /> },
   { to: 'notifications', label: 'Notifications', icon: Bell, element: <Notifications /> },
   { to: 'email', label: 'Email', icon: Mail, element: <EmailPage /> },
   { to: 'versions', label: 'App versions', icon: Smartphone, element: <Versions /> },

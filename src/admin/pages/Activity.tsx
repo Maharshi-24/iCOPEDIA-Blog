@@ -11,7 +11,7 @@ type Entry = {
 };
 
 const TABLES: Record<string, string> = {
-  test_phone_numbers: 'Login access', app_versions: 'App versions', notifications: 'Notifications',
+  test_phone_numbers: 'Test numbers (old allowlist)', app_versions: 'App versions', notifications: 'Notifications',
   user_profiles: 'User roles', companies: 'Companies', company_admins: 'Company admins',
   organizations: 'Domains', tutorial_videos: 'Tutorial videos', news_articles: 'News',
 };
