@@ -2,7 +2,7 @@ import { FormEvent, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { EMAIL, ROLES, type Role } from "./site";
 
-/** Posts to /api/contact (Vercel function), which takes only name, email and message. */
+/** Posts to /api/contact (Vercel function), which saves it for the admin panel (/admin/contact). */
 export function ContactForm({ defaultRole = "Coating professional" }: { defaultRole?: Role }) {
   const [role, setRole] = useState<Role>(defaultRole);
   const [name, setName] = useState("");
@@ -16,14 +16,11 @@ export function ContactForm({ defaultRole = "Coating professional" }: { defaultR
   async function submit(e: FormEvent) {
     e.preventDefault();
     setState("sending");
-    const lines = [`I am a: ${role}`];
-    if (company.trim()) lines.push(`Company: ${company.trim()}`);
-    const body = [...lines, "", message.trim()].join("\n");
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ name: name.trim(), email: email.trim(), message: body, website }),
+        body: JSON.stringify({ name: name.trim(), email: email.trim(), role, company: company.trim(), message: message.trim(), website }),
       });
       if (!res.ok) throw new Error(String(res.status));
       setState("sent");
@@ -37,7 +34,7 @@ export function ContactForm({ defaultRole = "Coating professional" }: { defaultR
     return (
       <div className="border-l-4 border-[#23282D] bg-white p-8" role="status">
         <p className="t-h4">Message sent</p>
-        <p className="mt-2 text-[15px] leading-relaxed text-[#565D63]">We'll reply to the email address you gave.</p>
+        <p className="mt-2 text-[15px] leading-relaxed text-[#565D63]">We will respond shortly.</p>
         <button onClick={() => setState("idle")} className="mt-5 text-[15px] font-semibold text-[#4C6395] underline underline-offset-4">
           Send another message
         </button>
@@ -54,11 +51,13 @@ export function ContactForm({ defaultRole = "Coating professional" }: { defaultR
       <fieldset>
         <legend className={label}>You are</legend>
         <div className="grid gap-2 sm:grid-cols-2">
+          {/* The selected chip keeps the same font weight: bold text is wider and
+              "Contractor or inspection company" would wrap onto a second line. */}
           {ROLES.map((r) => (
             <label
               key={r}
               className={`flex cursor-pointer items-center gap-2.5 rounded-[3px] border px-3 py-2.5 text-[15px] ${
-                role === r ? "border-[#23282D] bg-[#F3F4F2] font-semibold" : "border-[#D6D9D4] hover:border-[#8A9095]"
+                role === r ? "border-[#23282D] bg-[#F3F4F2] ring-1 ring-inset ring-[#23282D]" : "border-[#D6D9D4] hover:border-[#8A9095]"
               }`}
             >
               <input type="radio" name="role" value={r} checked={role === r} onChange={() => setRole(r)} className="accent-[#23282D]" />
