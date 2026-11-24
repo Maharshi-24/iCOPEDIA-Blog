@@ -1,35 +1,34 @@
+import type { SVGProps } from "react";
 import { Instagram, Linkedin } from "lucide-react";
 import type { SiteVariant } from "./SiteNav";
 import { EMAIL, INSTAGRAM_URL, LINKEDIN_URL, PHONE_DISPLAY, PLAY_URL, goToSection, whatsapp } from "./site";
 
+// lucide-react has no WhatsApp icon; this matches its 24px, 2px-stroke style.
+function WhatsApp(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+      <path
+        fill="currentColor"
+        stroke="none"
+        d="M9.5 8.5c.3-.3.8-.3 1 .1l.7 1.4c.1.3.1.6-.1.8l-.5.5c.5 1 1.3 1.8 2.3 2.3l.5-.5c.2-.2.5-.3.8-.1l1.4.7c.4.2.4.7.1 1l-.6.6c-.6.6-1.6.7-2.4.3-1.8-.9-3.2-2.3-4.1-4.1-.4-.8-.3-1.8.3-2.4z"
+      />
+    </svg>
+  );
+}
+
 const SOCIAL = [
   { href: LINKEDIN_URL, label: "iCOPEDIA on LinkedIn", Icon: Linkedin },
   { href: INSTAGRAM_URL, label: "iCOPEDIA on Instagram", Icon: Instagram },
+  { href: whatsapp("Hello iCOPEDIA team"), label: "Message iCOPEDIA on WhatsApp", Icon: WhatsApp },
 ];
 
-// manufacturer.icopedia.co has its own blurb and section links; its help and
-// legal links go to the main site.
-const VARIANTS = {
-  main: {
-    blurb: "Connecting people, knowledge and opportunities across the protective coatings and corrosion protection industry.",
-    heading: "iCOPEDIA",
-    links: [{ href: "/", label: "The app" }, { href: "/about", label: "About us" }],
-    site: "",
-  },
-  manufacturer: {
-    blurb: "Tools for the people who estimate, apply and inspect protective coatings, and for the manufacturers who supply them.",
-    heading: "App",
-    links: [
-      { href: "/#tools", label: "Tools" },
-      { href: "/#plans", label: "Free and company plans" },
-      { href: "/#manufacturers", label: "Manufacturers" },
-    ],
-    site: "https://icopedia.co",
-  },
-};
+const LINKS = [{ href: "/", label: "The app" }, { href: "/about", label: "About us" }];
 
+// The same footer on both sites. manufacturer.icopedia.co only has its home
+// page, so there the page links point at icopedia.co.
 export function SiteFooter({ variant = "main" }: { variant?: SiteVariant }) {
-  const v = VARIANTS[variant];
+  const site = variant === "manufacturer" ? "https://icopedia.co" : "";
   const year = new Date().getFullYear();
   const heading = "mb-3 text-sm font-semibold text-white";
   const item = "inline-block py-1.5 text-[15px] sm:py-1 sm:text-sm text-white/65 hover:text-white hover:underline hover:underline-offset-4";
@@ -45,7 +44,7 @@ export function SiteFooter({ variant = "main" }: { variant?: SiteVariant }) {
             </span>
           </a>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/65">
-            {v.blurb}
+            Connecting people, knowledge and opportunities across the protective coatings and corrosion protection industry.
           </p>
           <address className="mt-6 space-y-1.5 text-sm not-italic leading-relaxed text-white/65">
             <p>iCOPEDIA GLOBAL</p>
@@ -70,10 +69,10 @@ export function SiteFooter({ variant = "main" }: { variant?: SiteVariant }) {
         </div>
 
         <div className="row-span-2 md:col-span-3 md:row-span-1">
-          <p className={heading}>{v.heading}</p>
+          <p className={heading}>iCOPEDIA</p>
           <ul className="space-y-1.5">
-            {v.links.map((l) => (
-              <li key={l.href}><a className={item} href={l.href} onClick={(e) => goToSection(e, l.href)}>{l.label}</a></li>
+            {LINKS.map((l) => (
+              <li key={l.href}><a className={item} href={site + l.href}>{l.label}</a></li>
             ))}
             <li><a className={item} href={PLAY_URL} target="_blank" rel="noopener noreferrer">Google Play</a></li>
           </ul>
@@ -82,7 +81,7 @@ export function SiteFooter({ variant = "main" }: { variant?: SiteVariant }) {
         <div className="md:col-span-2">
           <p className={heading}>Help</p>
           <ul className="space-y-1.5">
-            <li><a className={item} href={`${v.site}/support`}>Help & FAQ</a></li>
+            <li><a className={item} href={`${site}/support`}>Help & FAQ</a></li>
             <li><a className={item} href="/#contact" onClick={(e) => goToSection(e, "/#contact")}>Contact us</a></li>
           </ul>
         </div>
@@ -90,8 +89,8 @@ export function SiteFooter({ variant = "main" }: { variant?: SiteVariant }) {
         <div className="md:col-span-2">
           <p className={heading}>Legal</p>
           <ul className="space-y-1.5">
-            <li><a className={item} href={`${v.site}/terms`}>Terms of Use</a></li>
-            <li><a className={item} href={`${v.site}/privacy-policy`}>Privacy Policy</a></li>
+            <li><a className={item} href={`${site}/terms`}>Terms of Use</a></li>
+            <li><a className={item} href={`${site}/privacy-policy`}>Privacy Policy</a></li>
           </ul>
         </div>
       </div>
