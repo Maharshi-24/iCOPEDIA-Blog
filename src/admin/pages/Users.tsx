@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Search, UserCheck } from 'lucide-react';
+import { Search, Trash2, UserCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,6 +31,7 @@ export default function UsersPage() {
   const [query, setQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [editing, setEditing] = useState<Profile | null>(null);
+  const [removing, setRemoving] = useState<Profile | null>(null);
 
   const load = useCallback(async () => {
     const since = new Date(Date.now() - 30 * 86400_000).toISOString();
@@ -63,7 +64,7 @@ export default function UsersPage() {
 
   return (
     <>
-      <PageHeader title="Users & roles" description="Everyone with an app account. Change a role here to make someone an admin or a company admin." />
+      <PageHeader title="Users & roles" description="Everyone with an app account. Change a role here to make someone an admin or a company admin, or remove an account." />
       <Panel
         actions={
           <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
@@ -120,7 +121,15 @@ export default function UsersPage() {
                       <td data-label="Company" className="px-3 py-2.5 text-slate-600">{(u.company_id && companyName.get(u.company_id)) || u.company_name || '—'}</td>
                       <td data-label="Joined" className="whitespace-nowrap px-3 py-2.5 text-slate-500">{fmtDate(u.created_at, false)}</td>
                       <td className="px-5 py-2.5 text-right max-sm:!pt-2.5">
-                        <Button variant="outline" size="sm" className="max-sm:w-full" onClick={() => setEditing(u)}>Change role</Button>
+                        <div className="flex justify-end gap-2">
+                          <Button variant="outline" size="sm" className="max-sm:flex-1" onClick={() => setEditing(u)}>Change role</Button>
+                          <Button variant="outline" size="sm" className="text-red-600 hover:bg-red-50 hover:text-red-700 max-sm:flex-1"
+                            disabled={u.id === session?.user.id || u.app_role === 'admin'}
+                            title={u.id === session?.user.id ? "You can't remove your own account" : u.app_role === 'admin' ? 'Change their role to User first' : 'Remove this user'}
+                            onClick={() => setRemoving(u)}>
+                            <Trash2 className="h-4 w-4" /> <span className="sr-only sm:not-sr-only">Remove</span>
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -133,6 +142,8 @@ export default function UsersPage() {
 
       <RoleDialog user={editing} companies={companies} isSelf={editing?.id === session?.user.id}
         onClose={() => setEditing(null)} onSaved={() => { setEditing(null); load(); }} />
+
+      <RemoveDialog user={removing} onClose={() => setRemoving(null)} onRemoved={() => { setRemoving(null); load(); }} />
     </>
   );
 }
@@ -202,6 +213,50 @@ function RoleDialog({ user, companies, isSelf, onClose, onSaved }: {
           <Button onClick={save} className="bg-slate-900 text-white hover:bg-slate-800"
             disabled={saving || (isSelf && role !== 'admin') || (role === 'company_admin' && !companyId)}>
             {saving && <Spinner className="mr-2" />} Save role
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function RemoveDialog({ user, onClose, onRemoved }: { user: Profile | null; onClose: () => void; onRemoved: () => void }) {
+  const [confirm, setConfirm] = useState('');
+  const [removing, setRemoving] = useState(false);
+
+  useEffect(() => { setConfirm(''); }, [user]);
+
+  async function remove() {
+    if (!user) return;
+    setRemoving(true);
+    const ok = await attempt(
+      () => supabase.rpc('admin_delete_user', { p_user_id: user.id }),
+      `${user.full_name || user.phone_no || 'User'} was removed.`,
+    );
+    setRemoving(false);
+    if (ok) onRemoved();
+  }
+
+  return (
+    <Dialog open={!!user} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Remove {user?.full_name || user?.phone_no || 'user'}?</DialogTitle>
+          <DialogDescription>
+            This permanently deletes the account{user?.phone_no ? ` for ${user.phone_no}` : ''} and everything it owns:
+            profile, saved calculations, reports, community posts, and their subscription and payment history.
+            It can't be undone. They can sign up again later
+            with the same number as a new user.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-1.5">
+          <Label htmlFor="remove-confirm">Type DELETE to confirm</Label>
+          <Input id="remove-confirm" autoComplete="off" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" onClick={onClose}>Cancel</Button>
+          <Button onClick={remove} className="bg-red-600 text-white hover:bg-red-700" disabled={removing || confirm.trim() !== 'DELETE'}>
+            {removing && <Spinner className="mr-2" />} Remove user
           </Button>
         </DialogFooter>
       </DialogContent>
